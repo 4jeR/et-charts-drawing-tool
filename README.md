@@ -3,12 +3,12 @@ This repository contains my Engineering Thesis titled **_An interactive tool dem
 
 
 ## Used libraries:
-**+ Matplotlib**
-**+ Seaborn**
-**+ ggplot**
-**+ Plotly**
-**+ Missingno**
-**+ Bokeh**
-**+ Pygal**
++ **Matplotlib**
++ **Seaborn**
++ **ggplot**
++ **Plotly**
++ **Missingno**
++ **Bokeh**
++ **Pygal**
 
 © Copyright 2021.
