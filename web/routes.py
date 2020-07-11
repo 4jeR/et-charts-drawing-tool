@@ -13,6 +13,16 @@ def create_figure():
     axis.plot(xs, ys)
     return fig
 
+
+
+@app.route('/plot.png')
+def plot_png():
+    fig = create_figure()
+    output = io.BytesIO()
+    FigureCanvas(fig).print_png(output)
+    return Response(output.getvalue(), mimetype='image/png')
+
+
 @app.route("/")
 @app.route("/home")
 def home():
@@ -24,9 +34,30 @@ def about():
     return render_template('about.html', title='About')
 
 
-@app.route('/plot.png')
-def plot_png():
-    fig = create_figure()
-    output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
-    return Response(output.getvalue(), mimetype='image/png')
+
+@app.route("/matplotlib")
+def route_matplotlib():
+    return render_template('matplotlib.html')
+
+
+@app.route("/seaborn")
+def route_seaborn():
+    return render_template('seaborn.html')
+
+
+@app.route("/bokeh")
+def route_bokeh():
+    return render_template('bokeh.html')
+
+@app.route("/plotly")
+def route_plotly():
+    return render_template('plotly.html')
+
+@app.route("/pygal")
+def route_pygal():
+    return render_template('pygal.html')
+
+@app.route("/missingno")
+def route_missingno():
+    return render_template('missingno.html')
+
