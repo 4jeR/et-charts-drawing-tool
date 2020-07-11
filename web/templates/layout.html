@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <style>
+        html {
+            height: 100%;
+            position: relative;
+        }
+
+
+        body {
+            height: 100%;
+            margin: 0;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background: linear-gradient(0deg, rgb(238, 223, 13) 0%, rgb(212, 93, 38) 100%);
+        }
+
+        #nav{
+            position: absolute;
+            top: 0;
+            margin-left: 30%;
+            margin-right: 30%;
+            width: 30%;
+            overflow: hidden;
+            text-align: center;
+            border: solid black 2px;
+        }
+     
+
+        
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            overflow: hidden;
+            text-align: center;
+        }
+    </style>
+    
+</head>
+    
+    
+
+<body>
+    <div id="nav">
+        Nawigacja
+    </div>
+
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <footer><b>Bartłomiej Długosz &copy; charts-drawing-tool</b></footer>
+   
+</body>
+
+</html>
