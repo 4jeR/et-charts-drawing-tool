@@ -1,8 +1,176 @@
 body {
     height: 100%;
-    margin: 0;
     background-repeat: no-repeat;
+    background: linear-gradient(0deg, rgb(173, 82, 8) 0%, rgb(251, 199, 27) 100%);
+    margin: 0;
     background-attachment: fixed;
-    background: linear-gradient(0deg, rgb(0, 255, 213) 0%, rgb(253, 45, 45) 100%);
+}
+#container {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 100%;
+    position: absolute;
 }
 
+    #menu_left {
+        font-size: 32px;
+        padding-top: 8%;
+        width: 15%;
+        color: #110c01;
+        float: left;
+        text-align: center;
+    }
+
+    #header_and_content{
+        float:left;
+        text-align: center;
+        padding: 20px;
+        width: 70%;
+    }
+        #header {
+            text-align: center;
+            background: linear-gradient(-10deg, #f3e13c, #b16f06 100%);
+            border: solid rgb(97, 112, 14) 2px;
+            letter-spacing: 2px;
+        }
+
+
+        #content {
+            background: #84e45e;
+            background: linear-gradient(-10deg, #df9b08, #f19a0e 100%);
+            border: solid rgb(97, 112, 14) 2px;
+            padding: 5px;
+            text-align: left;
+        }
+
+
+    #menu_right {
+        font-size: 32px;
+        padding-top: 8%;
+        width: 15%;
+        color: #110d01;
+        float: left;
+        text-align: center;
+    }
+#footer {
+    bottom: 0;
+    margin-bottom: auto;
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    padding-bottom: 20px;
+    bottom: 0;
+    color: rgb(29, 25, 1);
+}
+
+
+#quote {
+    text-align: right;
+    font-style: italic;
+}
+
+
+
+
+
+
+
+
+h1 {
+    color: #1f1401;
+    font-size: 60px;
+    margin-left: 15px;
+    text-align: center;
+}
+
+h2, h3, h4, h5, h6 {
+    color: black;
+}   
+
+p {
+    color: #ffa600;
+    font-size: 24px;
+}
+p:hover {
+    color: #26ff00;
+    font-style: italic;
+}
+
+
+.chart {
+    background-color: rgb(251, 117, 27);
+    padding: 10px;
+}
+
+
+.form_point {
+    width: 55%;
+    margin-left: 12%;
+    margin-right: 33%;
+    text-align: right;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+
+.form_label {
+    font-size: 28px;
+    color: rgb(0, 0, 0);
+}
+
+
+.form_field {
+    margin-left: 30px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 40%;
+    margin-right: 10%;
+    background-color: rgb(197, 245, 205);
+    text-align: center;
+    
+}
+
+#header-logo:hover{
+    opacity: 80%;
+}
+
+#header-logo > #header-logo-link:hover{
+    color: blue;
+}
+
+.form_field:hover {
+    opacity: 80%;
+}
+
+.form_field_bad {
+    margin-left: 50px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border: rgb(248, 230, 230) solid 3px;
+    background-color: rgb(197, 245, 205);
+    text-align: center;
+    margin-right: 100px;
+}
+
+
+#span-header{
+    margin-right:10px;
+}
+
+
+
+
+.navbar{
+    max-height: 100px;
+    min-height: 90px;
+}
+
+.navbar-nav > li:first-child{
+    padding-left:30px;
+}
+
+.btn-group{
+    padding-left: 10px;
+    padding-right: 10px;
+}

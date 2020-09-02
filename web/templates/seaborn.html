@@ -2,5 +2,9 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1>Seaborn</h1>
-    <img src="/plot.png" alt="my plot">
+    {% for chart_img in chart_images %}
+        <div class="chart">
+            <img src="{{ chart_img }}" alt="Seaborn image">
+        </div></br>
+    {% endfor %}
 {% endblock content %}
