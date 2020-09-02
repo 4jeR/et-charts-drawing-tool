@@ -6,7 +6,7 @@ from web.models import *
 
 
 class PointForm(FlaskForm):
-    x = FloatField('x', validators=[DataRequired()])
-    y = FloatField('y', validators=[DataRequired()])
+    begin = FloatField('begin', validators=[DataRequired()])
+    end = FloatField('end', validators=[DataRequired()])
     
-    submit = SubmitField('Add point')
+    submit = SubmitField('Add data')

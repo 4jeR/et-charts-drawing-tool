@@ -14,16 +14,34 @@ def home():
     return render_template('home.html')
 
 
-@app.route("/add_point", methods=['GET', 'POST'])
-def route_add_point():
+@app.route("/add_data", methods=['GET', 'POST'])
+def route_add_data():
     form = PointForm()
     if form.validate_on_submit():
-        point = Point(x=form.x.data, y=form.y.data)
-        db.session.add(point)
+        func = lambda x: float(2*x*x + 2*x - 5) # this probably will be the class field named for ex.: f_x = ....
+                                        # so different models could be placed in the database, for ex.: sinus, sqrt, etc.
+        step = 0.1
+        x_range = int((1.0)/step * (form.end.data - form.begin.data))+1
+        current_points = set([point.x for point in Point.query.all()])
+        for i in range(x_range):
+            dx = i*step
+            pt = Point(x=float(form.begin.data + dx), y=float(func(form.begin.data + dx)))
+            if pt.x not in current_points:
+               db.session.add(pt)
+        
         db.session.commit()
-        flash(f'{point} has been added to the database!', 'success')
-        return redirect(url_for('route_add_point'))
-    return render_template('add_point.html', form=form)
+        flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
+        return redirect(url_for('route_show_data'))
+    return render_template('add_data.html', form=form)
+
+
+@app.route("/show_data", methods=['GET', 'POST'])
+def route_show_data():
+    points = Point.query.all()
+    if not points:
+        points = []
+    return render_template('show_data.html', points=points)
+
 
 @app.route("/matplotlib")
 def route_matplotlib():
