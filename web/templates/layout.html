@@ -14,36 +14,37 @@
     
 
 <body>
-    <div class="col-md-12"><h1>-----------------------------------------</h1></div>
-    <div class="col-md-12"><h1>-----------------------------------------</h1></div>
+    <div class="row" style="margin-top: 100px;"></div>
     <header>
         <nav class="navbar navbar-dark bg-dark navbar-expand-md">
-            <div class="btn-group col-md-1">
-                <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Libraries
-                </button>
-                
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="{{ url_for('route_matplotlib') }}">Matplotlib</a>
-                    <a class="dropdown-item" href="{{ url_for('route_seaborn') }}">Seaborn</a>
-                    <a class="dropdown-item" href="{{ url_for('route_bokeh') }}">Bokeh</a>
-                    <a class="dropdown-item" href="{{ url_for('route_plotly') }}">Plotly</a>
-                    <a class="dropdown-item" href="{{ url_for('route_pygal') }}">Pygal</a>
-                    <a class="dropdown-item" href="{{ url_for('route_missingno') }}">Missingno</a>
+            <div class="navbar-main-menu col-md-6">
+                <div class="btn-group col-md-2">
+                    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Libraries
+                    </button>
+                    
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{{ url_for('route_matplotlib') }}">Matplotlib</a>
+                        <a class="dropdown-item" href="{{ url_for('route_seaborn') }}">Seaborn</a>
+                        <a class="dropdown-item" href="{{ url_for('route_bokeh') }}">Bokeh</a>
+                        <a class="dropdown-item" href="{{ url_for('route_plotly') }}">Plotly</a>
+                        <a class="dropdown-item" href="{{ url_for('route_pygal') }}">Pygal</a>
+                        <a class="dropdown-item" href="{{ url_for('route_missingno') }}">Missingno</a>
+                    </div>
                 </div>
-            </div>
-            <div class="btn-group col-md-1">
-                <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Data
-                </button>
-                
-                <div class="dropdown-menu">
-                    <a class="nav-link" href="{{ url_for('route_show_data') }}">Show data</a>
-                    <a class="nav-link" href="{{ url_for('route_add_data') }}">Add data</a>
+                <div class="btn-group col-md-2">
+                    <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Data
+                    </button>
+                    
+                    <div class="dropdown-menu">
+                        <a class="nav-link" href="{{ url_for('route_show_data') }}">Show data</a>
+                        <a class="nav-link" href="{{ url_for('route_add_data') }}">Add data</a>
+                    </div>
                 </div>
+                
             </div>
-            <div class="col-md-2"></div>
-            <div id="banner" class="carousel slide col-md-3 " data-ride="carousel">
+            <div id="banner" class="carousel slide col-md-2 " data-ride="carousel">
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img class="w-100 mr-auto ml-auto" style="height:70px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_1.jpg') }}" alt="First slide">
@@ -56,13 +57,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-1"></div>
             <span id="header-logo" class="badge badge-secondary col-md-4 mr-auto">
                 <a id="header-logo-link" class="nav-link" href="{{ url_for('home') }}">
                     <h1 style="color: #fdb821;">
                         <img width="32px" height="32px" src="{{ url_for('static', filename='home.jpg') }}">
                         <i>
-                            <span id="span-header" class="badge badge-dark">Interactive tool</span>to draw charts
+                            <span id="span-header" class="badge badge-dark">Interactive tool</span><u>to draw charts</u>
                             
                         </i>
                     </h1>
@@ -82,9 +82,9 @@
                     {% endfor %}
                 {% endif %}
                 {% endwith %}
-                {% block content %}{% endblock %}
             </div>
         </div>
+        {% block content %}{% endblock %}
     </main>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>

@@ -1,7 +1,7 @@
 body {
     height: 100%;
     background-repeat: no-repeat;
-    background: linear-gradient(0deg, rgb(173, 82, 8) 0%, rgb(251, 199, 27) 100%);
+    background: linear-gradient(0deg, rgb(112, 53, 4) 0%, rgb(224, 175, 14) 100%);
     margin: 0;
     background-attachment: fixed;
 }
@@ -22,7 +22,7 @@ p {
 }
 
 p:hover {
-    opacity: 90%;
+    opacity: 80%;
     cursor: crosshair;
     font-style: italic;
 }
@@ -64,6 +64,8 @@ header .navbar{
     min-height: 90px;
 }
 
+
+
 .navbar-nav > li:first-child{
     padding-left:30px;
 }
@@ -71,4 +73,27 @@ header .navbar{
 .btn-group{
     padding-left: 10px;
     padding-right: 10px;
+}
+
+#header-logo:hover{
+    opacity: 80%;
+}
+
+.table-scrollbar {
+    position: relative;
+    height: 610px;
+    overflow: auto;
+}
+.table-wrapper-scroll-y {
+    display: block;
+}
+
+::-webkit-scrollbar {
+    background: gray;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgb(46, 25, 0);
+    border-radius: 55px;
 }

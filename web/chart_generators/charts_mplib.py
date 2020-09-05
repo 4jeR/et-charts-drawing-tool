@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-x   = np.arange(start=0.0, stop=2*np.pi, step=0.1)
+x = np.arange(start=0.0, stop=2*np.pi, step=0.1)
 
 
 for case in range(1, 5):
