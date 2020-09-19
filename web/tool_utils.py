@@ -72,22 +72,16 @@ def make_plot_seaborn(model_name):
     return chart
 
 
-
 def make_plot_bokeh(model_name):
-    # Generate canvas
     points = str_to_class(model_name).query.all()
     
     xx = [point.x for point in points]
     yy = [point.y for point in points]
-    #source = ColumnDataSource(data=dict(x=xx, y=yy, name='Bokeh plot'))
-    #line = plot.line("x", "y", source=source)
-    #plot = figure(sizing_mode='stretch_both', tools='pan', id="bokehplot")
-    #plot.line([3,2], [3,1])
-    # html = file_html(plot, CDN, "Bokeh plot")
-    # output_file(f"web/templates/bokeh_plot_{model_name}.html")
-    # save(plot)
-    plot = figure()
-    plot.circle([1,2], [3,4])
+
+    plot = figure(title="Bokeh plot", width=450, height=450, x_axis_label='x', y_axis_label='y')
+    plot.line(xx, yy)
+    
+
     return plot
 
     

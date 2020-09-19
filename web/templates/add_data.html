@@ -1,29 +1,31 @@
  
 {% extends "layout.html" %}
 {% block content %}
-    <h1>Add data for {{ model_name }} </h1>
-    <form class="col md-1 mr-auto ml-auto" method="POST" action="">
+<h1 class="col-md-12">Add data for {{ model_name }} </h1> 
+<div class="row">
+    <form class="col md-6 offset-5" method="POST" action="">
         {{ form.hidden_tag() }}
         <div class="form-group">
             <b>{{ form.begin.label(for="begin", class="col-md-1 col-form-label") }}</b>
-            {{ form.begin(id="begin", class="form-control form-control-md col-md-1")}}
+            {{ form.begin(id="begin", class="form-control form-control-md col-md-3")}}
         </div>
         <div class="form-group">
             <b>{{ form.end.label(for="end", class="col-md-1 col-form-label") }}</b>
-            {{ form.end(id="end", class="form-control form-control-md col-md-1")}}
+            {{ form.end(id="end", class="form-control form-control-md col-md-3")}}
         </div>
         <div class="form-group">
             <b>{{ form.coef_a.label(for="a", class="col-md-1 col-form-label") }}</b>
-            {{ form.coef_a(id="coef_a", class="form-control form-control-md col-md-1")}}
+            {{ form.coef_a(id="coef_a", class="form-control form-control-md col-md-3")}}
         </div>
         <div class="form-group">
             <b>{{ form.coef_b.label(for="b", class="col-md-1 col-form-label") }}</b>
-            {{ form.coef_b(id="coef_b", class="form-control form-control-md col-md-1")}}
+            {{ form.coef_b(id="coef_b", class="form-control form-control-md col-md-3")}}
         </div>
         <div class="form-group">
             <b>{{ form.coef_c.label(for="c", class="col-md-1 col-form-label") }}</b>
-            {{ form.coef_c(id="coef_c", class="form-control form-control-md col-md-1")}}
+            {{ form.coef_c(id="coef_c", class="form-control form-control-md col-md-3")}}
         </div>
-        <button type="submit" class="btn btn-dark">Add data</button>
+        <button type="submit" class="col-md-3 btn btn-dark">Add data</button>
     </form>
+</div>
 {% endblock content %}

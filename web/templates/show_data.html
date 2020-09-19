@@ -56,34 +56,37 @@
         <div class="collapse" id="card-seaborn">
             <div class="card card-body">
                 <!-- <img src="{{ url_for('route_plot_seaborn', model_name=model_name) }}">-->
+                SEABORN CHART {{ model_name }}
             </div>
         </div>
         <div class="collapse" id="card-bokeh">
             <div class="card card-body">
-                -- Bokeh plot should be below --
-                {{ bokehdiv | safe }}
-                {{ script | safe }}
+                {{ div_bokeh | safe }}
+                {{ script_bokeh | safe }}
             </div>
         </div>
         <div class="collapse" id="card-plotly">
             <div class="card card-body">
                 <!-- <img src="{{ url_for('route_plot_plotly', model_name=model_name) }}">-->
+                PLOTLY CHART {{ model_name }}
             </div>
         </div>
         <div class="collapse" id="card-pygal">
             <div class="card card-body">
                 <!-- <img src="{{ url_for('route_plot_pygal', model_name=model_name) }}">-->
+                PYGAL CHART {{ model_name }}
             </div>
         </div>
         <div class="collapse" id="card-missingno">
             <div class="card card-body">
                 <!-- <img src="{{ url_for('route_plot_missingno', model_name=model_name) }}"> -->
+                MISSINGNO CHART {{ model_name }}
             </div>
         </div>
     </div>
 </div>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.0.1.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.0.1.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.0.1.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.0.1.min.js" crossorigin="anonymous"></script>
 {% endblock content %}

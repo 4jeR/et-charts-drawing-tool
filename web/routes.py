@@ -9,12 +9,15 @@ from flask import url_for
 from flask import flash
 from flask import redirect
 from flask import Response
+from flask import make_response
+
 
 from web import app 
 from web import db
 from web.models import Sinus
 from web.models import Cosinus
 
+from web.forms import DataForm
 from web.forms import SinusForm
 from web.forms import CosinusForm
 from web.forms import SqrtForm
@@ -31,6 +34,11 @@ from bokeh.embed import json_item
 from bokeh.plotting import figure
 from bokeh.resources import CDN
 from bokeh.embed import components
+from bokeh.io import export_png
+
+from PIL import Image
+from io import StringIO
+
 
 @app.route('/data/plot/matplotlib/<string:model_name>')
 def route_plot_mplib(model_name):
@@ -43,19 +51,15 @@ def route_plot_mplib(model_name):
 @app.route('/data/plot/seaborn/<string:model_name>')
 def route_plot_seaborn(model_name):   
     pass
-    # fig = make_plot_seaborn(model_name)
-    # output = io.BytesIO()
-    # FigureCanvas(fig).print_png(output)
-    # return Response(output.getvalue(), mimetype='image/png')
 
 
 
 @app.route('/data/plot/bokeh/<string:model_name>')
 def route_plot_bokeh(model_name):
     plot = make_plot_bokeh(model_name)
-    script, div = components(plot)
-    kwargs = {'script': script, 'bokehdiv': div}
-    return render_template('show_data.html', model_name=model_name, **kwargs)
+    filename = f'bokeh_{model_name}.html'
+    
+    return "XD"
 
 
 @app.route('/data/plot/plotly/<string:model_name>')
@@ -99,20 +103,21 @@ def home():
 # SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS
 #CRUD
 #C
-@app.route("/data/add/sinus", methods=['GET', 'POST'])
-def route_add_data_sinus():
-    form = SinusForm()
+@app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
+def route_add_data(model_name):
+    form = DataForm()
     if form.validate_on_submit():
-        Sinus.set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, x_zero=form.begin.data)
-        make_points(db, form, model_name='Sinus', step=0.1)
+        str_to_class(model_name).set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, x_zero=form.begin.data)
+        make_points(db, form, model_name=model_name, step=0.1)
         db.session.commit()
         flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
-        return redirect(url_for('route_show_data', model_name='Sinus'))
-    return render_template('add_data.html', form=form, model_name='Sinus')
+        return redirect(url_for('route_show_data', model_name=model_name))
+    return render_template('add_data.html', form=form, model_name=model_name)
 
+'''
 @app.route("/data/add/cosinus", methods=['GET', 'POST'])
 def route_add_data_cosinus():
-    form = CosinusForm()
+    form = DataForm()
     if form.validate_on_submit():
         Cosinus.set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data)
         make_points(db, form, model_name='Cosinus', step=0.1)
@@ -123,7 +128,7 @@ def route_add_data_cosinus():
 
 @app.route("/data/add/sqrt", methods=['GET', 'POST'])
 def route_add_data_sqrt():
-    form = CosinusForm()
+    form = DataForm()
     if form.validate_on_submit():
         Cosinus.set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data)
         make_points(db, form, model_name='Sinus', step=0.1)
@@ -131,7 +136,7 @@ def route_add_data_sqrt():
         flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name='SquareRoot'))
     return render_template('add_data.html', form=form, model_name='SquareRoot')
-
+'''
 
 
 
@@ -139,9 +144,14 @@ def route_add_data_sqrt():
 @app.route("/data/show/<string:model_name>")
 def route_show_data(model_name):
     points = str_to_class(model_name).query.all()
+    
+    plot = make_plot_bokeh(model_name)
+    script_bokeh, div_bokeh = components(plot)
+
+    kwargs = { "script_bokeh": script_bokeh, "div_bokeh": div_bokeh }
     if not points:
         points = []
-    return render_template('show_data.html', points=points, model_name=model_name)
+    return render_template('show_data.html', points=points, model_name=model_name, **kwargs)
 #U
 
 #D
