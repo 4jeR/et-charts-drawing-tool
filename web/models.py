@@ -70,8 +70,7 @@ class SquareRoot(db.Model):
     def __repr__(self):
         return f"{self.id}. Sqrt Point({self.x}, {self.y}) | a={self.a}, b={self.b}, c={self.c}"
 
-
-    # a*sin(x_zero + b*x) + c
+    # a*sqrt(x_zero + b*x) + c
     @staticmethod
     def set_coefs(a=1, b=1, c=0, x_zero=0):
         SquareRoot.a = a

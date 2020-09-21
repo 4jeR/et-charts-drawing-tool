@@ -27,16 +27,6 @@ p:hover {
     font-style: italic;
 }
 
-
-.chart {
-    background-color: rgb(251, 117, 27);
-    padding: 10px;
-}
-
-
-
-
-
 header {
     position: fixed;
     top: 0;
@@ -50,21 +40,20 @@ header {
     padding-bottom: -100px;
 }
 
-
-header span-header{
-    margin-right:10px;
-    position: relative;
+.chart {
+    background-color: rgb(251, 117, 27);
+    padding: 10px;
 }
 
-
-
+header span-header{
+    margin-right: 10px;
+    position: relative;
+}
 
 header .navbar{
     max-height: 90px;
     min-height: 90px;
 }
-
-
 
 .navbar-nav > li:first-child{
     padding-left:30px;
@@ -92,7 +81,6 @@ header .navbar{
     background: gray;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
     background: rgb(46, 25, 0);
     border-radius: 55px;

@@ -33,10 +33,11 @@ import plotly.express as px
 import plotly
 import plotly.graph_objs as go
 
+# PYGAL
+import pygal
 
-
-def str_to_class(str):
-    return getattr(sys.modules[__name__], str)
+def str_to_class(string):
+    return getattr(sys.modules[__name__], string)
 
 
 def make_chart_mplib(model_name):
@@ -86,13 +87,24 @@ def make_chart_plotly(model_name):
     xx = [point.x for point in points]
     yy = [point.y for point in points]
     chart_props = {
-        "data": [go.Scatter(x=xx, y=yy)],
+        "data": [go.Line(x=xx, y=yy)],
         "layout": go.Layout(title="Plotly chart", xaxis_title="x", yaxis_title="y", width=500, height=500, margin={"l": 20, "t": 30})
     }
     chart_div_html = plotly.offline.plot(chart_props, include_plotlyjs=False, output_type='div')
     return chart_div_html
     
+
+def make_chart_pygal(model_name):
+    points = str_to_class(model_name).query.all()
     
+    xx = [point.x for point in points]
+    yy = [point.y for point in points]
+
+    chart = pygal.XY(show_dots=False, width=450, height=450)
+    chart.title = model_name
+    chart.add('y', [(point.x, point.y) for point in points])
+
+    return chart
 
 
 def files_count(lib_name='', path_to_images='.'):

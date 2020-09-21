@@ -18,14 +18,13 @@ from web.models import Sinus
 from web.models import Cosinus
 
 from web.forms import DataForm
-from web.forms import SinusForm
-from web.forms import CosinusForm
-from web.forms import SqrtForm
 
 from web.tool_utils import files_count
 from web.tool_utils import make_chart_mplib
 from web.tool_utils import make_chart_bokeh
 from web.tool_utils import make_chart_plotly
+from web.tool_utils import make_chart_pygal
+
 from web.tool_utils import make_points
 from web.tool_utils import str_to_class
 
@@ -53,49 +52,11 @@ def route_plot_seaborn(model_name):
     pass
 
 
-
-
-
-@app.route('/data/plot/plotly/<string:model_name>')
-def route_plot_plotly(model_name):
-    pass
-    # fig = make_plot_mplib(model_name)
-    # output = io.BytesIO()
-    # FigureCanvas(fig).print_png(output)
-    # return Response(output.getvalue(), mimetype='image/jpg')
-
-
-@app.route('/data/plot/pygal/<string:model_name>')
-def route_plot_pygal(model_name):
-    pass
-    # fig = make_plot_mplib(model_name)
-    # output = io.BytesIO()
-    # FigureCanvas(fig).print_png(output)
-    # return Response(output.getvalue(), mimetype='image/jpg')
-
-
-@app.route('/data/plot/missingno/<string:model_name>')
-def route_plot_missingno(model_name):
-    pass
-    # fig = make_plot_mplib(model_name)
-    # output = io.BytesIO()
-    # FigureCanvas(fig).print_png(output)
-    # return Response(output.getvalue(), mimetype='image/jpg')
-
-
-
-
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template('home.html')
 
-
-
-
-
-# SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS SINUS
-#CRUD
 #C
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
 def route_add_data(model_name):
@@ -108,49 +69,26 @@ def route_add_data(model_name):
         return redirect(url_for('route_show_data', model_name=model_name))
     return render_template('add_data.html', form=form, model_name=model_name)
 
-'''
-@app.route("/data/add/cosinus", methods=['GET', 'POST'])
-def route_add_data_cosinus():
-    form = DataForm()
-    if form.validate_on_submit():
-        Cosinus.set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data)
-        make_points(db, form, model_name='Cosinus', step=0.1)
-        db.session.commit()
-        flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
-        return redirect(url_for('route_show_data', model_name='Cosinus'))
-    return render_template('add_data.html', form=form, model_name='Cosinus')
-
-@app.route("/data/add/sqrt", methods=['GET', 'POST'])
-def route_add_data_sqrt():
-    form = DataForm()
-    if form.validate_on_submit():
-        Cosinus.set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data)
-        make_points(db, form, model_name='Sinus', step=0.1)
-        db.session.commit()
-        flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
-        return redirect(url_for('route_show_data', model_name='SquareRoot'))
-    return render_template('add_data.html', form=form, model_name='SquareRoot')
-'''
-
-
 
 #R
 @app.route("/data/show/<string:model_name>")
 def route_show_data(model_name):
-    kwargs = dict()
+    points = str_to_class(model_name).query.all()
+    if not points:
+        points = []
 
+    kwargs = dict()
     chart = make_chart_bokeh(model_name)
     script_bokeh, div_bokeh = components(chart)
     kwargs["script_bokeh"] = script_bokeh
     kwargs["div_bokeh"] = div_bokeh
 
-    points = str_to_class(model_name).query.all()
-    if not points:
-        points = []
-    xx = [point.x for point in points]
-    yy = [point.y for point in points]
     kwargs["script_plotly"] = '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> '
     kwargs["div_plotly"] = make_chart_plotly(model_name)
+
+
+    chart = make_chart_pygal(model_name)
+    kwargs["src_pygal"] = chart.render_data_uri()
 
     return render_template('show_data.html', points=points, model_name=model_name, **kwargs)
 #U
@@ -179,7 +117,6 @@ def route_delete_all_points(model_name):
 
 @app.route("/matplotlib")
 def route_matplotlib():
-    #images will be caught from database later, for now it is fine !!!!!!
     path_to_images = os.getcwd() + '/web/static/plots'
     mplib_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'mplib_{i}.png') for i in range(1, files_count('mplib', path_to_images))]
     return render_template('matplotlib.html', chart_images=mplib_charts)
@@ -203,8 +140,3 @@ def route_plotly():
 @app.route("/pygal")
 def route_pygal():
     return render_template('pygal.html')
-
-@app.route("/missingno")
-def route_missingno():
-    return render_template('missingno.html')
-

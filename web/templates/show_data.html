@@ -46,7 +46,6 @@
             <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-bokeh" aria-expanded="false" aria-controls="card-bokeh">Bokeh</button>
             <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-plotly" aria-expanded="false" aria-controls="card-plotly">Plotly</button>
             <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-pygal" aria-expanded="false" aria-controls="card-pygal">Pygal</button>
-            <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-missingno" aria-expanded="false" aria-controls="card-missingno">Missingno</button>
         </div>
         <div class="collapse" id="card-matplotlib">
             <div class="card card-body">
@@ -55,7 +54,6 @@
         </div>
         <div class="collapse" id="card-seaborn">
             <div class="card card-body">
-                <!-- <img src="{{ url_for('route_plot_seaborn', model_name=model_name) }}">-->
                 SEABORN CHART {{ model_name }}
             </div>
         </div>
@@ -67,21 +65,13 @@
         </div>
         <div class="collapse" id="card-plotly">
             <div class="card card-body">
-                <!-- <img src="{{ url_for('route_plot_plotly', model_name=model_name) }}">-->
                 {{ script_plotly | safe}}
                 {{ div_plotly | safe }}
             </div>
         </div>
         <div class="collapse" id="card-pygal">
             <div class="card card-body">
-                <!-- <img src="{{ url_for('route_plot_pygal', model_name=model_name) }}">-->
-                PYGAL CHART {{ model_name }}
-            </div>
-        </div>
-        <div class="collapse" id="card-missingno">
-            <div class="card card-body">
-                <!-- <img src="{{ url_for('route_plot_missingno', model_name=model_name) }}"> -->
-                MISSINGNO CHART {{ model_name }}
+                <embed type="image/svg+xml" src= {{ src_pygal | safe }} />
             </div>
         </div>
     </div>

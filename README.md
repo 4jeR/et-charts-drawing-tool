@@ -24,3 +24,4 @@ pip install plotly
 
 
 pip install chart_studio  
+pip install pygal
