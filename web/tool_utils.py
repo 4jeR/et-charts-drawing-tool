@@ -14,6 +14,7 @@ from flask import Response
 
 from web.models import Sinus
 from web.models import Cosinus
+from web.models import SquareRoot
 # MATPLOTLIB
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure

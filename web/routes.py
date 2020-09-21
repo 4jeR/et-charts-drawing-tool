@@ -16,6 +16,7 @@ from web import app
 from web import db
 from web.models import Sinus
 from web.models import Cosinus
+from web.models import SquareRoot
 
 from web.forms import DataForm
 
@@ -34,9 +35,6 @@ from bokeh.embed import components
 
 
 import chart_studio.tools as plotly_tools
-
-
-
 
 
 @app.route('/data/plot/matplotlib/<string:model_name>')
