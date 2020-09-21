@@ -14,14 +14,13 @@ This repository contains my Engineering Thesis titled **_An interactive tool dem
 © Copyright 2021.
 
 ## Modules to install:
-python -m pip install -U pip
-python -m pip install -U matplotlib
-pip install numpy
-pip install selenium
-conda install -c conda-forge python-chromedriver-binary 
-pip install Flask-WTF
-pip install WTForms
-pip install Flask-SQLAlchemy
+python -m pip install -U pip  
+python -m pip install -U matplotlib  
+pip install numpy  
+pip install Flask-WTF  
+pip install WTForms  
+pip install Flask-SQLAlchemy  
+pip install plotly
 
-*pip install image
-*pip install pillow
+
+pip install chart_studio  

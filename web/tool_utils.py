@@ -26,24 +26,20 @@ import seaborn as sb
 
 # BOKEH
 from bokeh.plotting import figure
-from bokeh.plotting import output_file
-from bokeh.plotting import show
-from bokeh.plotting import save
-from bokeh.plotting import figure
-
-from bokeh.io.export import get_screenshot_as_png
-
-from bokeh.resources import CDN
-
-from bokeh.embed import file_html
-from bokeh.embed import json_item
 from bokeh.embed import components
+
+# PLOTLY
+import plotly.express as px
+import plotly
+import plotly.graph_objs as go
+
+
 
 def str_to_class(str):
     return getattr(sys.modules[__name__], str)
 
 
-def make_plot_mplib(model_name):
+def make_chart_mplib(model_name):
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
     axis.grid(True)
@@ -72,18 +68,29 @@ def make_plot_seaborn(model_name):
     return chart
 
 
-def make_plot_bokeh(model_name):
+def make_chart_bokeh(model_name):
     points = str_to_class(model_name).query.all()
     
     xx = [point.x for point in points]
     yy = [point.y for point in points]
 
-    plot = figure(title="Bokeh plot", width=450, height=450, x_axis_label='x', y_axis_label='y')
-    plot.line(xx, yy)
+    chart = figure(title="Bokeh plot", width=450, height=450, x_axis_label='x', y_axis_label='y')
+    chart.line(xx, yy)
     
 
-    return plot
+    return chart
 
+def make_chart_plotly(model_name):
+    points = str_to_class(model_name).query.all()
+    
+    xx = [point.x for point in points]
+    yy = [point.y for point in points]
+    chart_props = {
+        "data": [go.Scatter(x=xx, y=yy)],
+        "layout": go.Layout(title="Plotly chart", xaxis_title="x", yaxis_title="y", width=500, height=550, margin={"l": 20, "t": 30})
+    }
+    chart_div_html = plotly.offline.plot(chart_props, include_plotlyjs=False, output_type='div')
+    return chart_div_html
     
     
 
