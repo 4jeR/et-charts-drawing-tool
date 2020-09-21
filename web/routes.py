@@ -23,26 +23,26 @@ from web.forms import CosinusForm
 from web.forms import SqrtForm
 
 from web.tool_utils import files_count
-from web.tool_utils import make_plot_mplib
-from web.tool_utils import make_plot_bokeh
+from web.tool_utils import make_chart_mplib
+from web.tool_utils import make_chart_bokeh
+from web.tool_utils import make_chart_plotly
 from web.tool_utils import make_points
 from web.tool_utils import str_to_class
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from bokeh.embed import json_item
-from bokeh.plotting import figure
-from bokeh.resources import CDN
 from bokeh.embed import components
-from bokeh.io import export_png
 
-from PIL import Image
-from io import StringIO
+
+import chart_studio.tools as plotly_tools
+
+
+
 
 
 @app.route('/data/plot/matplotlib/<string:model_name>')
 def route_plot_mplib(model_name):
-    fig = make_plot_mplib(model_name)
+    fig = make_chart_mplib(model_name)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -54,12 +54,6 @@ def route_plot_seaborn(model_name):
 
 
 
-@app.route('/data/plot/bokeh/<string:model_name>')
-def route_plot_bokeh(model_name):
-    plot = make_plot_bokeh(model_name)
-    filename = f'bokeh_{model_name}.html'
-    
-    return "XD"
 
 
 @app.route('/data/plot/plotly/<string:model_name>')
@@ -143,14 +137,21 @@ def route_add_data_sqrt():
 #R
 @app.route("/data/show/<string:model_name>")
 def route_show_data(model_name):
-    points = str_to_class(model_name).query.all()
-    
-    plot = make_plot_bokeh(model_name)
-    script_bokeh, div_bokeh = components(plot)
+    kwargs = dict()
 
-    kwargs = { "script_bokeh": script_bokeh, "div_bokeh": div_bokeh }
+    chart = make_chart_bokeh(model_name)
+    script_bokeh, div_bokeh = components(chart)
+    kwargs["script_bokeh"] = script_bokeh
+    kwargs["div_bokeh"] = div_bokeh
+
+    points = str_to_class(model_name).query.all()
     if not points:
         points = []
+    xx = [point.x for point in points]
+    yy = [point.y for point in points]
+    kwargs["script_plotly"] = '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> '
+    kwargs["div_plotly"] = make_chart_plotly(model_name)
+
     return render_template('show_data.html', points=points, model_name=model_name, **kwargs)
 #U
 

@@ -68,7 +68,8 @@
         <div class="collapse" id="card-plotly">
             <div class="card card-body">
                 <!-- <img src="{{ url_for('route_plot_plotly', model_name=model_name) }}">-->
-                PLOTLY CHART {{ model_name }}
+                {{ script_plotly | safe}}
+                {{ div_plotly | safe }}
             </div>
         </div>
         <div class="collapse" id="card-pygal">
