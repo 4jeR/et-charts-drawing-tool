@@ -25,3 +25,4 @@ pip install plotly
 
 pip install chart_studio  
 pip install pygal
+conda install -c conda-forge python-chromedriver-binary 

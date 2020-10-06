@@ -28,7 +28,7 @@ import seaborn as sb
 # BOKEH
 from bokeh.plotting import figure
 from bokeh.embed import components
-
+from bokeh.io import export_png
 # PLOTLY
 import plotly.express as px
 import plotly
@@ -45,9 +45,9 @@ def make_chart_mplib(model_name):
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
     axis.grid(True)
+    Model = str_to_class(model_name)
 
-    #points = str_to_class(model_name).query.all()
-    points = str_to_class(model_name).query.all()
+    points = Model.query.all()
     xx = [point.x for point in points]
     yy = [point.y for point in points]
     axis.plot(xx, yy)
@@ -57,22 +57,30 @@ def make_chart_mplib(model_name):
 
     return fig
 
-def make_plot_seaborn(model_name):
-    points = str_to_class(model_name).query.all()
-    
-    xx = [point.x for point in points]
-    yy = [point.y for point in points]
-    sb.set_style("dark")
+def make_chart_seaborn(model_name):
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    axis.set_title('Seaborn')
 
-    df = pd.DataFrame(list(zip(xx, yy)))
-    chart.savefig(img, format='png')
-    chart = sns.lineplot(x="timepoint", y="signal", data=df)
-    return chart
+    axis.grid(True)
+    sb.set(style="darkgrid")
+
+    Model = str_to_class(model_name)
+    points = Model.query.all()
+
+    data = [
+        {'x': point.x, model_name: point.y} for point in points
+    ]
+    df = pd.DataFrame(data=data)
+    sb.lineplot(data=df, ax=axis)
+    
+    return fig
 
 
 def make_chart_bokeh(model_name):
-    points = str_to_class(model_name).query.all()
-    
+    Model = str_to_class(model_name)
+    points = Model.query.all()
+
     xx = [point.x for point in points]
     yy = [point.y for point in points]
 
@@ -83,26 +91,28 @@ def make_chart_bokeh(model_name):
     return chart
 
 def make_chart_plotly(model_name):
-    points = str_to_class(model_name).query.all()
+    Model = str_to_class(model_name)
+    points = Model.query.all()
     
     xx = [point.x for point in points]
     yy = [point.y for point in points]
     chart_props = {
         "data": [go.Line(x=xx, y=yy)],
-        "layout": go.Layout(title="Plotly chart", xaxis_title="x", yaxis_title="y", width=500, height=500, margin={"l": 20, "t": 30})
+        "layout": go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=500, height=500, margin={"l": 20, "t": 30})
+        
     }
+    
     chart_div_html = plotly.offline.plot(chart_props, include_plotlyjs=False, output_type='div')
     return chart_div_html
     
 
 def make_chart_pygal(model_name):
-    points = str_to_class(model_name).query.all()
-    
-    xx = [point.x for point in points]
-    yy = [point.y for point in points]
+    Model = str_to_class(model_name)
+    points = Model.query.all()
+
 
     chart = pygal.XY(show_dots=False, width=450, height=450)
-    chart.title = model_name
+    chart.title = "Pygal"
     chart.add('y', [(point.x, point.y) for point in points])
 
     return chart
@@ -112,7 +122,7 @@ def files_count(lib_name='', path_to_images='.'):
     return len(list(filter(lambda s: s.startswith(lib_name), [f for f in os.listdir(path_to_images) if os.path.isfile(os.path.join(path_to_images, f))])))
 
 
-def make_points(db, form, model_name, step=0.1,):
+def make_points(db, form, model_name, step=0.1):
     x_range = int((1.0)/step * (form.end.data - form.begin.data))+1
     current_points = set([point.x for point in str_to_class(model_name).query.all()])
     for i in range(x_range):

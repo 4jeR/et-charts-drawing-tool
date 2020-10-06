@@ -8,6 +8,7 @@ from wtforms import IntegerField
 from wtforms import FloatField
 
 from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 from wtforms.validators import Email
 from wtforms.validators import EqualTo
 from wtforms.validators import ValidationError
@@ -16,11 +17,11 @@ from web.models import *
 
 
 class DataForm(FlaskForm):
-    begin = FloatField('begin', validators=[DataRequired()])
-    end = FloatField('end', validators=[DataRequired()])
+    begin = FloatField('begin', validators=[InputRequired()])
+    end = FloatField('end', validators=[InputRequired()])
     
-    coef_a = FloatField('a', validators=[DataRequired()])
-    coef_b = FloatField('b', validators=[DataRequired()])
-    coef_c = FloatField('c', validators=[DataRequired()])
+    coef_a = FloatField('a', validators=[DataRequired('Non-zero value.')])
+    coef_b = FloatField('b', validators=[InputRequired()])
+    coef_c = FloatField('c', validators=[InputRequired()])
 
     submit = SubmitField('Add data')

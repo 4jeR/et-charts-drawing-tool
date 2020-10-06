@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from web.db_management import DataBaseConnector
 import os 
 CHARTS_FOLDER = os.path.join('static', 'plots')
 
