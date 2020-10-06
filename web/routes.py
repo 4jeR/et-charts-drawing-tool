@@ -93,6 +93,8 @@ def route_show_data(model_name):
         points = []
 
     kwargs = dict()
+    kwargs['coefs'] = Model.get_coefs()
+
     chart = make_chart_bokeh(model_name)
     script_bokeh, div_bokeh = components(chart)
     kwargs["script_bokeh"] = script_bokeh
@@ -104,6 +106,7 @@ def route_show_data(model_name):
 
     chart = make_chart_pygal(model_name)
     kwargs["src_pygal"] = chart.render_data_uri()
+
 
     return render_template('show_data.html', points=points, model_name=model_name, **kwargs)
 #U

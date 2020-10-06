@@ -37,7 +37,6 @@
                     <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Data
                     </button>
-                    
                     <div class="dropdown-menu">
                         <a class="nav-link" href="{{ url_for('route_show_data_main') }}">Show</a>
                         <a class="nav-link" href="{{ url_for('route_add_data_main') }}">Add</a>
@@ -58,13 +57,13 @@
                     </div>
                 </div>
             </div>
-            <span id="header-logo" class="badge badge-secondary col-md-4 mr-auto">
+            <span id="header-logo" class="badge badge-secondary col-md-4">
                 <a id="header-logo-link" class="nav-link" href="{{ url_for('home') }}">
-                    <h1 style="color: #fdb821;">
+                    <h1 style="color: #fdb121;">
                         <img width="32px" height="32px" src="{{ url_for('static', filename='home.jpg') }}">
                         <i>
-                            <span id="span-header" class="badge badge-dark">Interactive tool</span><u>to draw charts</u>
-                            
+                            <span id="span-header" class="badge badge-dark ">Interactive tool</span>
+                            <u>to draw charts</u>
                         </i>
                     </h1>
                 </a>

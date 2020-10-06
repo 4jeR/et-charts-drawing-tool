@@ -2,8 +2,19 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1 class="col-md-12">Add data for {{ model_name }} </h1> 
+<div class="col-md-12" class="btn btn-lg btn-dark">
+        {% if model_name == 'Sinus' %}
+            <h3>$$y = {a\sin{bx} + c}$$</h3>
+        {% elif model_name == 'Cosinus' %}
+            <h3>$$y = {a\cos{bx} + c}$$</h3>
+        {% elif model_name == 'SquareRoot' %}
+            <h3>$$y = {a\sqrt{bx} + c}$$</h3>
+        {% else %}
+            <h2>Unknown equation </h2>
+        {% endif %}
+    </div>
 <div class="row">
-    <form class="col md-6 offset-5" method="POST" action="">
+    <form class="col md-6 offset-5" method="POST" >
         {{ form.hidden_tag() }}
         <div class="form-group">
             <b>{{ form.begin.label(for="begin", class="col-md-1 col-form-label") }}</b>
@@ -28,4 +39,5 @@
         <button type="submit" class="col-md-3 btn btn-dark">Add data</button>
     </form>
 </div>
+
 {% endblock content %}

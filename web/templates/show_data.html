@@ -2,7 +2,17 @@
 {% block content %}
 
 <div class="row">
-    <h1 class="col-md-12">{{ model_name }} data</h1>
+    <div class="col-md-12" class="btn btn-lg btn-dark">
+        {% if model_name == 'Sinus' %}
+            <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x + {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
+        {% elif model_name == 'Cosinus' %}
+            <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x + {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
+        {% elif model_name == 'SquareRoot' %}
+            <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x + {{ coefs[2] }}} + {{ coefs[3] }}}$$</h3>
+        {% else %}
+            <h2>Unknown equation </h2>
+        {% endif %}
+    </div>
     <div class="table-wrapper-scroll-y table-scrollbar col-md-6">
         
         <table class="table table-striped table-dark">
@@ -83,9 +93,13 @@
         </div>
     </div>
 </div>
+
+
 <script type="text/javascript" src="../js/download.js"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.0.1.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.0.1.min.js" crossorigin="anonymous"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 {% endblock content %}
