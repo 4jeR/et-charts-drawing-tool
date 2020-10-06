@@ -62,6 +62,11 @@ def home():
     return render_template('home.html')
 
 #C
+@app.route("/data/add/main")
+def route_add_data_main():
+    return render_template('add_data_main.html')
+
+
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
 def route_add_data(model_name):
     form = DataForm()

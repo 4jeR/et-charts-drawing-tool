@@ -39,16 +39,8 @@
                     </button>
                     
                     <div class="dropdown-menu">
-                        <!-- SINUS -->
-                        <a class="nav-link" href="{{ url_for('route_show_data', model_name='Sinus') }}">Show data sinus</a>
-                        <a class="nav-link" href="{{ url_for('route_add_data', model_name='Sinus') }}">Add data sinus</a>
-                        <!-- COSINUS -->
-                        <a class="nav-link" href="{{ url_for('route_show_data', model_name='Cosinus') }}">Show data cosinus</a>
-                        <a class="nav-link" href="{{ url_for('route_add_data', model_name='Cosinus') }}">Add data cosinus</a>
-                        <!-- SQUARE ROOT -->
-                        <a class="nav-link" href="{{ url_for('route_show_data', model_name='SquareRoot') }}">Show data sqrt</a>
-                        <a class="nav-link" href="{{ url_for('route_add_data', model_name='SquareRoot') }}">Add data sqrt</a>
-                    
+                        <a class="nav-link" href="{{ url_for('route_show_data_main') }}">Show</a>
+                        <a class="nav-link" href="{{ url_for('route_add_data_main') }}">Add</a>
                     </div>
                 </div>
                 <a class="btn btn-lg btn-secondary col-md-2" href="{{ url_for('route_summary') }}" >Summary</a>

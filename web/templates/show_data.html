@@ -2,16 +2,6 @@
 {% block content %}
 
 <div class="row">
-    <div class="btn-group col-md-12" role="group" aria-label="Basic example">
-        <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" aria-expanded="false" aria-controls="card-matplotlib">Matplotlib</button>
-        <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" aria-expanded="false" aria-controls="card-seaborn">Seaborn</button>
-        <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" aria-expanded="false" aria-controls="card-bokeh">Bokeh</button>
-        <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" aria-expanded="false" aria-controls="card-plotly">Plotly</button>
-        <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" aria-expanded="false" aria-controls="card-pygal">Pygal</button>
-    </div>
-    <form action="{{ url_for('route_add_data', model_name=model_name) }}" method="POST">
-        <input type="submit" class="btn btn-danger btn-lg" value="Add data"></input>
-    </form> 
     <h1 class="col-md-12">{{ model_name }} data</h1>
     <div class="table-wrapper-scroll-y table-scrollbar col-md-6">
         
