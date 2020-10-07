@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row">
+    <h1 class="col-md-12">Add data from file</h1>   
+    <div class="col-md-12">
+        <form method="POST" >
+            {{ form.hidden_tag() }}
+            <div class="form-group col-md-6 offset-5">
+                <b>{{ form.filename.label(for="filename", class="col-md-1 col-form-label") }}</b>
+                {{ form.filename(id="filename", class="form-control form-control-md col-md-3")}}
+            </div>
+            <button type="submit" class="col-md-2 offset-5 btn btn-dark">Add data</button>
+        </form>
+    </div>
+</div>
+{% endblock content %}

@@ -3,6 +3,7 @@ import math
 import io
 import random
 import inspect
+from datetime import datetime
 
 from flask import render_template
 from flask import url_for
@@ -17,8 +18,14 @@ from web import db
 from web.models import Sinus
 from web.models import Cosinus
 from web.models import SquareRoot
+from web.models import FileDataPoint
+
 
 from web.forms import DataForm
+from web.forms import SqrtForm
+from web.forms import FromFileForm
+
+
 
 from web.tool_utils import files_count
 from web.tool_utils import make_chart_mplib
@@ -29,6 +36,7 @@ from web.tool_utils import make_chart_pygal
 
 from web.tool_utils import make_points
 from web.tool_utils import str_to_class
+from web.tool_utils import get_data_from_file
 from web.tool_utils import export_png
 
 
@@ -64,20 +72,37 @@ def home():
 #C
 @app.route("/data/add/main")
 def route_add_data_main():
-    return render_template('add_data_main.html')
+    fromfile_form = FromFileForm()
+    return render_template('add_data_main.html', form=fromfile_form)
 
 
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
 def route_add_data(model_name):
-    form = DataForm()
+    form = DataForm() if model_name != "SquareRoot" else SqrtForm()
     if form.validate_on_submit():
         Model = str_to_class(model_name)
-        Model.set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, x_zero=form.begin.data)
+        Model.set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, d=form.coef_d.data, x_zero=form.begin.data)
         make_points(db, form, model_name=model_name, step=0.1)
         db.session.commit()
         flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name))
     return render_template('add_data.html', form=form, model_name=model_name)
+
+@app.route("/data/add/fromfile", methods=['GET', 'POST'])
+def route_add_data_from_file():
+    form = FromFileForm()
+    filename = form.filename.data
+
+    if form.validate_on_submit():
+        x, y = get_data_from_file(filename)
+        for xx, yy in zip(x, y):
+            pt = FileDataPoint.make_point(xx, yy)
+            db.session.add(pt)
+        db.session.commit()
+        flash(f'Data from {filename} has been successfully added to the database!', 'success')
+        return redirect(url_for('route_show_data', model_name='FileDataPoint', filename=filename))
+    return render_template('add_data_file.html', form=form)
+
 
 
 #R
@@ -93,7 +118,8 @@ def route_show_data(model_name):
         points = []
 
     kwargs = dict()
-    kwargs['coefs'] = Model.get_coefs()
+    if model_name != 'FileDataPoint':
+        kwargs['coefs'] = Model.get_coefs()
 
     chart = make_chart_bokeh(model_name)
     script_bokeh, div_bokeh = components(chart)
@@ -140,15 +166,32 @@ def route_summary():
 @app.route("/data/download/mplib/<string:model_name>/<string:filename>")
 def route_download_mplib(model_name, filename):
     """ Downloads image and code. """
+    now = datetime.now().strftime("%m-%d_%H-%M-%S")
     chart = make_chart_mplib(model_name)
-    chart.savefig(f'web/downloads/images/{filename}')
+    chart.savefig(f'web/downloads/images/{now}_{filename}')
 
     code = inspect.getsource(make_chart_mplib)
-    fname_nopng = filename.split('.')[0]
+    fname_nopng = now + '_' + filename.split('.')[0]  
     with open(f'web/downloads/codes/{fname_nopng}.py', 'w') as f:
         f.write(code) 
-    flash(f'Matplotlib chart {model_name} model has been downloaded at web/downloads/images/{filename}.', 'success')
-    flash(f'Matplotlib chart {model_name} code has been saved at web/downloads/codes/{filename}.', 'success')
+    flash(f'Matplotlib chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
+    flash(f'Matplotlib chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
+    return redirect(url_for('route_show_data', model_name=model_name))
+
+
+@app.route("/data/download/seaborn/<string:model_name>/<string:filename>")
+def route_download_seaborn(model_name, filename):
+    """ Downloads image and code. """
+    now = datetime.now().strftime("%m-%d_%H-%M-%S")
+    chart = make_chart_seaborn(model_name)
+    chart.savefig(f'web/downloads/images/{now}_{filename}')
+
+    code = inspect.getsource(make_chart_mplib)
+    fname_nopng = now + '_' + filename.split('.')[0]  
+    with open(f'web/downloads/codes/{fname_nopng}.py', 'w') as f:
+        f.write(code) 
+    flash(f'Seaborn chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
+    flash(f'Seaborn chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 @app.route("/data/download/bokeh/<string:model_name>/<string:filename>")

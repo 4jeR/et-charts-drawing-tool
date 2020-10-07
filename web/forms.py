@@ -53,3 +53,18 @@ class SqrtForm(FlaskForm):
 
     submit = SubmitField('Add data')
 
+    '''
+    def validate(self):
+        min_value = -self.coef_c.data / self.coef_b.data  
+        if self.begin.data < min_value or self.end.data < min_value:
+            return False
+        else: 
+            return True
+        raise ValidationError(f'Min value must be atleast {min_value}')
+    '''
+
+
+class FromFileForm(FlaskForm):
+    filename = StringField('Filename:',  validators=[DataRequired(), Length(min=3, max=40)])
+    
+    submit = SubmitField('Add data')

@@ -15,6 +15,8 @@ from flask import Response
 from web.models import Sinus
 from web.models import Cosinus
 from web.models import SquareRoot
+from web.models import FileDataPoint
+
 # MATPLOTLIB
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -84,7 +86,7 @@ def make_chart_bokeh(model_name):
     xx = [point.x for point in points]
     yy = [point.y for point in points]
 
-    chart = figure(title="Bokeh plot", width=450, height=450, x_axis_label='x', y_axis_label='y')
+    chart = figure(title="Bokeh plot", width=500, height=450, x_axis_label='x', y_axis_label='y')
     chart.line(xx, yy)
     
 
@@ -111,7 +113,7 @@ def make_chart_pygal(model_name):
     points = Model.query.all()
 
 
-    chart = pygal.XY(show_dots=False, width=450, height=450)
+    chart = pygal.XY(show_dots=False, width=500, height=450)
     chart.title = "Pygal"
     chart.add('y', [(point.x, point.y) for point in points])
 
@@ -130,3 +132,14 @@ def make_points(db, form, model_name, step=0.1):
         pt = str_to_class(model_name).make_point(form.begin.data+dx)
         if pt.x not in current_points:
             db.session.add(pt)
+
+def get_data_from_file(filename):
+    x = []
+    y = []
+
+    with open(f'web/data/{filename}', 'r') as f:
+        for line in f:
+            x.append(int(line.split(',')[0]))
+            y.append(int(line.split(',')[1]))
+
+    return x, y

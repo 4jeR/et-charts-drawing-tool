@@ -5,10 +5,11 @@
     <div class="offset-5 col-md-6">
     <h2>SHOW DATA</h2>
     </div>
-    <div class="btn-group col-md-12 offset-3" role="group" aria-label="Basic example">
+    <div class="btn-group col-md-12 offset-2" role="group" aria-label="Basic example">
         <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='Sinus') }}">Sinus</a>
         <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='Cosinus') }}">Cosinus</a>
         <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='SquareRoot') }}">Square root</a>
+        <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='FileDataPoint') }}">Data from file</a>
     </div>
 </div>
 {% endblock content %}
