@@ -11,35 +11,35 @@ class Sinus(db.Model):
     x = db.Column(db.Float, unique=False, nullable=False)
     y = db.Column(db.Float, unique=False, nullable=False)
 
-    a = None
-    b = None
-    c = None
-    d = None
-    def __repr__(self):
-        return f"{self.id}. Sinus Point({self.x}, {self.y}) | a={self.a}, b={self.b}, c={self.c}, d={self.d}"
-
-    
-    # a*sin(x_zero + b*x) + c
-    @staticmethod
-    def set_coefs(a=1, b=1, c=0, d=0, x_zero=0):
-        Sinus.a = a
-        Sinus.b = b
-        Sinus.c = c
-        Sinus.d = d
-        Sinus.x_zero = x_zero
-    
-    @staticmethod
-    def get_coefs():
-        ''' Returns the list of all model coefficients. '''
-        coefs = [Sinus.a, Sinus.b, Sinus.c, Sinus.d]
-        return coefs if all(coefs) else ['?' for i in range(4)]
 
     @staticmethod
     def make_point(x):
         ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
+        coefs = SinusCoefs.query.first()
+
         xx = float(x)
-        yy = float(Sinus.a*sin(Sinus.b*x - Sinus.c) + Sinus.d)
+        yy = float(coefs.a*sin(coefs.b*x - coefs.c) + coefs.d)
         return Sinus(x=xx, y=yy)
+
+
+class SinusCoefs(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    a = db.Column(db.Float, unique=False, nullable=False)
+    b = db.Column(db.Float, unique=False, nullable=False)
+    c = db.Column(db.Float, unique=False, nullable=False)
+    d = db.Column(db.Float, unique=False, nullable=False)
+    step = db.Column(db.Float, unique=False, nullable=False)
+
+    
+    @staticmethod
+    def get_coefs():
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = SinusCoefs.query.first()
+        
+        if coefs_ok:
+            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d, coefs_ok.step] 
+        else:
+            return ['?' for i in range(5)]
 
 
 class Cosinus(db.Model):
@@ -47,15 +47,9 @@ class Cosinus(db.Model):
     x = db.Column(db.Float, unique=False, nullable=False)
     y = db.Column(db.Float, unique=False, nullable=False)
 
-    a = None
-    b = None
-    c = None
-    d = None
     def __repr__(self):
         return f"{self.id}. Cosinus Point({self.x}, {self.y}) | a={self.a}, b={self.b}, c={self.c}, d={self.d}"
 
-
-    # a*sin(x_zero + b*x) + c
     @staticmethod
     def set_coefs(a=1, b=1, c=0, d=0, x_zero=0):
         Cosinus.a = a

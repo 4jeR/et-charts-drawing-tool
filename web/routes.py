@@ -16,6 +16,7 @@ from flask import make_response
 from web import app 
 from web import db
 from web.models import Sinus
+from web.models import SinusCoefs
 from web.models import Cosinus
 from web.models import SquareRoot
 from web.models import FileDataPoint
@@ -80,9 +81,11 @@ def route_add_data_main():
 def route_add_data(model_name):
     form = DataForm() if model_name != "SquareRoot" else SqrtForm()
     if form.validate_on_submit():
-        Model = str_to_class(model_name)
-        Model.set_coefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, d=form.coef_d.data, x_zero=form.begin.data)
-        make_points(db, form, model_name=model_name, step=0.1)
+        ModelCoefs = str_to_class(model_name+'Coefs')
+        coefs_record = ModelCoefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, d=form.coef_d.data, step=form.step.data)
+        db.session.add(coefs_record)
+        db.session.commit()
+        make_points(db, form, model_name=model_name)
         db.session.commit()
         flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name))
@@ -113,13 +116,15 @@ def route_show_data_main():
 @app.route("/data/show/<string:model_name>")
 def route_show_data(model_name):
     Model = str_to_class(model_name)
+    ModelCoefs = str_to_class(model_name+'Coefs')
     points = Model.query.all()
     if not points:
         points = []
 
     kwargs = dict()
     if model_name != 'FileDataPoint':
-        kwargs['coefs'] = Model.get_coefs()
+        print("LOL->", ModelCoefs.get_coefs())
+        kwargs['coefs'] = ModelCoefs.get_coefs()
 
     chart = make_chart_bokeh(model_name)
     script_bokeh, div_bokeh = components(chart)
@@ -143,12 +148,17 @@ def route_delete_point(model_name, point_id):
     point = str_to_class(model_name).query.get_or_404(point_id)
     db.session.delete(point)
     db.session.commit()
+    if not str_to_class(model_name).query.all():
+        db.session.delete(str_to_class(model_name + 'Coefs').query.first())
+        db.session.commit()
     flash(f'Point ({point.id}) has been succesfully removed from the database.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 @app.route("/data/delete/all/<string:model_name>", methods=['POST'])
 def route_delete_all_points(model_name):
     all_points = str_to_class(model_name).query.all()
+    coefs = str_to_class(model_name + 'Coefs').query.first()
+    db.session.delete(coefs)
     for point in all_points:
         db.session.delete(point)
     db.session.commit()
@@ -200,9 +210,6 @@ def route_download_bokeh(model_name, filename):
     export_png(chart, filename=f'web/downloads/images/{filename}')
     flash(f'Matplotlib chart {model_name} model has been downloaded at web/downloads/images/{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
-
-
-
 
 
 @app.route("/matplotlib")

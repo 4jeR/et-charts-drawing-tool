@@ -13,6 +13,7 @@ from flask import url_for
 from flask import Response
 
 from web.models import Sinus
+from web.models import SinusCoefs
 from web.models import Cosinus
 from web.models import SquareRoot
 from web.models import FileDataPoint
