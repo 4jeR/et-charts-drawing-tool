@@ -65,6 +65,16 @@ class SqrtForm(FlaskForm):
         raise ValidationError(f'Min value must be atleast {min_value}')
     '''
 
+class SquareFuncForm(FlaskForm):
+    begin = FloatField('begin', validators=[InputRequired()])
+    end = FloatField('end', validators=[InputRequired()])
+
+    coef_a = FloatField('a', validators=[InputRequired()])
+    coef_p = FloatField('p', validators=[InputRequired()])
+    coef_q = FloatField('q', validators=[InputRequired()])
+    step = FloatField('step', validators=[Optional()])
+
+    submit = SubmitField('Add data')
 
 class FromFileForm(FlaskForm):
     filename = StringField('Filename:',  validators=[DataRequired(), Length(min=3, max=40)])

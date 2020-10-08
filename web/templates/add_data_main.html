@@ -2,16 +2,18 @@
 {% block content %}
 
 <div class="row">
-    <div class="offset-5 col-md-5">
-        <h2>ADD DATA</h2>
+    <div class="offset-4 col-md-4">
+        <h1>ADD DATA</h1>
     </div>
     <div class="col-md-12">
         <h1>Built-in models to choose from</h1>
     </div>
-    <div class="btn-group col-md-12 offset-3" role="group" aria-label="Basic example">
+    <div class="btn-group col-md-12 offset-1" role="group" aria-label="Basic example">
         <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_add_data', model_name='Sinus') }}">Sinus</a>
         <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_add_data', model_name='Cosinus') }}">Cosinus</a>
         <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_add_data', model_name='SquareRoot') }}">Square root</a>
+        <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_add_data', model_name='Exponential') }}">Exponential</a>
+        <a class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_add_data', model_name='SquareFunc') }}">SquareFunc</a>
     </div>
     <div class="col-md-12">
         <h1>From file</h1>

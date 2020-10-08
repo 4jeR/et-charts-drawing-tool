@@ -32,7 +32,7 @@ from web.models import FileDataPoint
 from web.forms import DataForm
 from web.forms import SqrtForm
 from web.forms import FromFileForm
-
+from web.forms import SquareFuncForm
 
 
 from web.tool_utils import files_count
@@ -72,10 +72,34 @@ def route_plot_seaborn(model_name):
     return Response(output.getvalue(), mimetype='image/png')
 
 
+
+
+
+
+
+
+
+
+
 @app.route("/")
 @app.route("/home")
 def home():
     return render_template('home.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #C
 @app.route("/data/add/main")
@@ -86,11 +110,36 @@ def route_add_data_main():
 
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
 def route_add_data(model_name):
-    form = DataForm() if model_name != "SquareRoot" else SqrtForm()
+    defaults = ['Sinus', 'Cosinus', 'Exponential']
+    if model_name in defaults:
+        form = DataForm()
+    elif model_name == 'SquareRoot':
+        form = SqrtForm()
+    elif model_name == 'SquareFunc':
+        form = SquareFuncForm()
+
+
     if form.validate_on_submit():
-        ModelCoefs = str_to_class(model_name+'Coefs')
+        ModelCoefs = str_to_class(model_name + 'Coefs')
         step_value = form.step.data if form.step.data is not None else 0.3
-        coefs_record = ModelCoefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, d=form.coef_d.data, step=step_value)
+        
+        ''' if form has exact structure as this: begin,end,a,b,c,d,step'''
+        coefs_kwargs = dict()
+        if model_name in defaults or model_name == 'SquareRoot': # default forms and squareroot aswell have this struct
+            coefs_kwargs['a'] = form.coef_a.data
+            coefs_kwargs['b'] = form.coef_b.data
+            coefs_kwargs['c'] = form.coef_c.data
+            coefs_kwargs['d'] = form.coef_d.data
+            coefs_kwargs['step'] = form.step.data
+        elif model_name == 'SquareFunc':
+            coefs_kwargs['a'] = form.coef_a.data
+            coefs_kwargs['p'] = form.coef_p.data
+            coefs_kwargs['q'] = form.coef_q.data
+            coefs_kwargs['step'] = form.step.data
+
+
+        coefs_record = ModelCoefs(**coefs_kwargs)
+        # coefs_record = ModelCoefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, d=form.coef_d.data, step=step_value)
         db.session.add(coefs_record)
         db.session.commit()
         make_points(db, form, model_name=model_name, step=step_value)
@@ -116,6 +165,23 @@ def route_add_data_from_file():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #R
 @app.route("/data/show/main")
 def route_show_data_main():
@@ -124,14 +190,17 @@ def route_show_data_main():
 @app.route("/data/show/<string:model_name>")
 def route_show_data(model_name):
     Model = str_to_class(model_name)
-    ModelCoefs = str_to_class(model_name+'Coefs')
+    no_coefs_models = ['FileDataPoint']
+
+    if model_name not in no_coefs_models:
+        ModelCoefs = str_to_class(model_name+'Coefs')
+
     points = Model.query.all()
     if not points:
         points = []
 
     kwargs = dict()
     if model_name != 'FileDataPoint':
-        print("LOL->", ModelCoefs.get_coefs())
         kwargs['coefs'] = ModelCoefs.get_coefs()
 
     chart = make_chart_bokeh(model_name)
@@ -150,6 +219,36 @@ def route_show_data(model_name):
     return render_template('show_data.html', points=points, model_name=model_name, **kwargs)
 #U
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #D
 @app.route("/data/delete/<string:model_name>/<int:point_id>", methods=['POST'])
 def route_delete_point(model_name, point_id):
@@ -164,10 +263,15 @@ def route_delete_point(model_name, point_id):
 
 @app.route("/data/delete/all/<string:model_name>", methods=['POST'])
 def route_delete_all_points(model_name):
-    all_points = str_to_class(model_name).query.all()
-    coefs = str_to_class(model_name + 'Coefs').query.first()
-    if coefs:
-        db.session.delete(coefs)
+    Model = str_to_class(model_name)
+    all_points = Model.query.all()
+    no_coefs_models = ['FileDataPoint']
+
+    if model_name not in no_coefs_models:
+        ModelCoefs = str_to_class(model_name+'Coefs')
+        coefs = str_to_class(model_name + 'Coefs').query.first()
+        if coefs:
+            db.session.delete(coefs)
     for point in all_points:
         db.session.delete(point)
     db.session.commit()

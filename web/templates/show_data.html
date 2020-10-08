@@ -9,6 +9,10 @@
             <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
         {% elif model_name == 'SquareRoot' %}
             <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x - {{ coefs[2] }}} + {{ coefs[3] }}}$$</h3>
+        {% elif model_name == 'Exponential' %}
+            <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
+        {% elif model_name == 'SquareFunc' %}
+            <h3>$$y = { {{ coefs[0] }}{({{ coefs[1] }} x - {{ coefs[1] }})^2} + {{ coefs[2] }}}$$</h3>
         {% elif model_name == 'FileDataPoint' %}
             <h3>Data from file {{ filename }} </h3>
         {% endif %}
@@ -27,11 +31,11 @@
                         
                     </th>
                     -->
-                    <th scope="col" text-align="center">
+                    <td scope="col" align="center">
                         <form action="{{ url_for('route_delete_all_points', model_name=model_name) }}" method="POST">
                             <input class="btn btn-danger" type="submit" value="Delete all">
                         </form>
-                    </th>
+                    </td>
                     <th scope="col" text-align="center">
                         x
                     </th>
