@@ -14,6 +14,7 @@ from wtforms.validators import Email
 from wtforms.validators import EqualTo
 from wtforms.validators import ValidationError
 from wtforms.validators import Length
+from wtforms.validators import Optional
 from web.models import *
 
 
@@ -34,7 +35,7 @@ class DataForm(FlaskForm):
     coef_b = FloatField('b', validators=[DataRequired('Non-zero value.')])
     coef_c = FloatField('c', validators=[InputRequired()])
     coef_d = FloatField('d', validators=[InputRequired()])
-    step = FloatField('step', validators=[InputRequired()])
+    step = FloatField('step', validators=[Optional()])
 
     submit = SubmitField('Add data')
 
@@ -50,7 +51,7 @@ class SqrtForm(FlaskForm):
     coef_b = FloatField('b', validators=[DataRequired('Non-zero value.')])
     coef_c = FloatField('c', validators=[InputRequired()])
     coef_d = FloatField('d', validators=[InputRequired()])
-    step = FloatField('step', validators=[InputRequired()])
+    step = FloatField('step', validators=[Optional()])
 
     submit = SubmitField('Add data')
 

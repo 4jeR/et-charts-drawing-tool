@@ -15,11 +15,18 @@ from flask import make_response
 
 from web import app 
 from web import db
+
 from web.models import Sinus
 from web.models import SinusCoefs
+
 from web.models import Cosinus
+from web.models import CosinusCoefs
+
 from web.models import SquareRoot
+from web.models import SquareRootCoefs
+
 from web.models import FileDataPoint
+
 
 
 from web.forms import DataForm
@@ -82,10 +89,11 @@ def route_add_data(model_name):
     form = DataForm() if model_name != "SquareRoot" else SqrtForm()
     if form.validate_on_submit():
         ModelCoefs = str_to_class(model_name+'Coefs')
-        coefs_record = ModelCoefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, d=form.coef_d.data, step=form.step.data)
+        step_value = form.step.data if form.step.data is not None else 0.3
+        coefs_record = ModelCoefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, d=form.coef_d.data, step=step_value)
         db.session.add(coefs_record)
         db.session.commit()
-        make_points(db, form, model_name=model_name)
+        make_points(db, form, model_name=model_name, step=step_value)
         db.session.commit()
         flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name))
@@ -158,7 +166,8 @@ def route_delete_point(model_name, point_id):
 def route_delete_all_points(model_name):
     all_points = str_to_class(model_name).query.all()
     coefs = str_to_class(model_name + 'Coefs').query.first()
-    db.session.delete(coefs)
+    if coefs:
+        db.session.delete(coefs)
     for point in all_points:
         db.session.delete(point)
     db.session.commit()

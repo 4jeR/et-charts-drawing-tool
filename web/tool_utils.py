@@ -14,8 +14,13 @@ from flask import Response
 
 from web.models import Sinus
 from web.models import SinusCoefs
+
 from web.models import Cosinus
+from web.models import CosinusCoefs
+
 from web.models import SquareRoot
+from web.models import SquareRootCoefs
+
 from web.models import FileDataPoint
 
 # MATPLOTLIB
@@ -125,7 +130,7 @@ def files_count(lib_name='', path_to_images='.'):
     return len(list(filter(lambda s: s.startswith(lib_name), [f for f in os.listdir(path_to_images) if os.path.isfile(os.path.join(path_to_images, f))])))
 
 
-def make_points(db, form, model_name, step=0.1):
+def make_points(db, form, model_name, step):
     x_range = int((1.0)/step * (form.end.data - form.begin.data))+1
     current_points = set([point.x for point in str_to_class(model_name).query.all()])
     for i in range(x_range):
