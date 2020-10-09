@@ -241,11 +241,6 @@ def route_show_data(model_name):
 
 
 
-
-
-
-
-
 #D
 @app.route("/data/delete/<string:model_name>/<int:point_id>", methods=['POST'])
 def route_delete_point(model_name, point_id):

@@ -167,13 +167,20 @@ def get_current_time():
     return datetime.now().strftime("%m-%d_%H-%M-%S")
 
 def download_image(library, model_name, filename, time):
-    r = requests.get('http://localhost:5000/' + url_for(f'route_plot_{library}', model_name=model_name), stream = True)
-
-    # Check if the image was retrieved successfully
-    if r.status_code == 200:
-        r.raw.decode_content = True
-        with open(f'web/downloads/images/{time}_{filename}', 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
+    
+    if library == 'mplib' or library == 'seaborn':
+        r = requests.get('http://localhost:5000/' + url_for(f'route_plot_{library}', model_name=model_name), stream = True)
+        # Check if the image was retrieved successfully
+        if r.status_code == 200:
+            r.raw.decode_content = True
+            with open(f'web/downloads/images/{time}_{filename}', 'wb') as f:
+                shutil.copyfileobj(r.raw, f)
+    elif library == 'bokeh':
+        pass
+    elif library == 'plotly':
+        pass
+    elif library == 'pygal':
+        
 
 def save_source_code(library, model_name, filename, time):
     code = inspect.getsource(str_to_class(f'make_chart_{library}'))
