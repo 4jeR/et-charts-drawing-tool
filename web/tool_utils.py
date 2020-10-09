@@ -146,12 +146,20 @@ def make_points(db, form, model_name, step):
             db.session.add(pt)
 
 def get_data_from_file(filename):
-    x = []
-    y = []
-
+    x_list = []
+    y_list = []
+    sep = ' '
     with open(f'web/data/{filename}', 'r') as f:
+        supported = [' ', ',', ':', '\t', '-']
+        sep = ' '
+        check_line = f.readline()
+        for delimiter in supported:
+            if len(check_line.split(delimiter))>1:
+                sep = delimiter
+                break
+        f.seek(0)
         for line in f:
-            x.append(int(line.split(',')[0]))
-            y.append(int(line.split(',')[1]))
+            x_list.append(float(line.strip().split(sep)[0]))
+            y_list.append(float(line.strip().split(sep)[-1]))
 
-    return x, y
+    return x_list, y_list
