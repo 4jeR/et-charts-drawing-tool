@@ -1,12 +1,11 @@
-import base64
-import io
-import random
 import os
 import sys
-import json 
-
+import requests
+import shutil 
+import inspect
 import pandas as pd
-from io import StringIO
+from datetime import datetime
+
 
 from flask import render_template
 from flask import url_for
@@ -163,3 +162,21 @@ def get_data_from_file(filename):
             y_list.append(float(line.strip().split(sep)[-1]))
 
     return x_list, y_list
+
+def get_current_time():
+    return datetime.now().strftime("%m-%d_%H-%M-%S")
+
+def download_image(library, model_name, filename, time):
+    r = requests.get('http://localhost:5000/' + url_for(f'route_plot_{library}', model_name=model_name), stream = True)
+
+    # Check if the image was retrieved successfully
+    if r.status_code == 200:
+        r.raw.decode_content = True
+        with open(f'web/downloads/images/{time}_{filename}', 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+
+def save_source_code(library, model_name, filename, time):
+    code = inspect.getsource(str_to_class(f'make_chart_{library}'))
+    fname_nopng = time + '_' + filename.split('.')[0]  
+    with open(f'web/downloads/codes/{fname_nopng}.py', 'w') as f:
+        f.write(code) 

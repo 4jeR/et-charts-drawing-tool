@@ -3,7 +3,6 @@ import math
 import io
 import random
 import inspect
-from datetime import datetime
 
 from flask import render_template
 from flask import url_for
@@ -11,7 +10,7 @@ from flask import flash
 from flask import redirect
 from flask import Response
 from flask import make_response
-
+from datetime import datetime
 
 from web import app 
 from web import db
@@ -46,6 +45,10 @@ from web.tool_utils import make_points
 from web.tool_utils import str_to_class
 from web.tool_utils import get_data_from_file
 from web.tool_utils import export_png
+from web.tool_utils import download_image
+from web.tool_utils import get_current_time
+from web.tool_utils import save_source_code
+
 
 
 from matplotlib.figure import Figure
@@ -243,12 +246,6 @@ def route_show_data(model_name):
 
 
 
-
-
-
-
-
-
 #D
 @app.route("/data/delete/<string:model_name>/<int:point_id>", methods=['POST'])
 def route_delete_point(model_name, point_id):
@@ -284,19 +281,20 @@ def route_summary():
     return render_template('summary.html')
 
 
+
+
 ''' Download images and codes section '''
+
+
+
 
 @app.route("/data/download/mplib/<string:model_name>/<string:filename>")
 def route_download_mplib(model_name, filename):
-    """ Downloads image and code. """
-    now = datetime.now().strftime("%m-%d_%H-%M-%S")
-    chart = make_chart_mplib(model_name)
-    chart.savefig(f'web/downloads/images/{now}_{filename}')
+    """ Downloads image and code for Matplotlib library. """
+    now = get_current_time()
+    download_image('mplib', model_name, filename, now)
+    save_source_code('mplib', model_name, filename, now)
 
-    code = inspect.getsource(make_chart_mplib)
-    fname_nopng = now + '_' + filename.split('.')[0]  
-    with open(f'web/downloads/codes/{fname_nopng}.py', 'w') as f:
-        f.write(code) 
     flash(f'Matplotlib chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
     flash(f'Matplotlib chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
@@ -304,24 +302,54 @@ def route_download_mplib(model_name, filename):
 
 @app.route("/data/download/seaborn/<string:model_name>/<string:filename>")
 def route_download_seaborn(model_name, filename):
-    """ Downloads image and code. """
-    now = datetime.now().strftime("%m-%d_%H-%M-%S")
-    chart = make_chart_seaborn(model_name)
-    chart.savefig(f'web/downloads/images/{now}_{filename}')
+    """ Downloads image and code for Seaborn library. """
+    now = get_current_time()
+    download_image('seaborn', model_name, filename, now)
+    save_source_code('seaborn', model_name, filename, now)
 
-    code = inspect.getsource(make_chart_mplib)
-    fname_nopng = now + '_' + filename.split('.')[0]  
-    with open(f'web/downloads/codes/{fname_nopng}.py', 'w') as f:
-        f.write(code) 
+
     flash(f'Seaborn chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
     flash(f'Seaborn chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 @app.route("/data/download/bokeh/<string:model_name>/<string:filename>")
 def route_download_bokeh(model_name, filename):
-    chart = make_chart_bokeh(model_name)
-    export_png(chart, filename=f'web/downloads/images/{filename}')
-    flash(f'Matplotlib chart {model_name} model has been downloaded at web/downloads/images/{filename}.', 'success')
+    """ Downloads image and code for Bokeh library. """
+    now = get_current_time()
+    download_image('bokeh', model_name, filename, now)
+    save_source_code('bokeh', model_name, filename, now)
+
+
+
+    flash(f'Bokeh chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
+    flash(f'Bokeh chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
+    return redirect(url_for('route_show_data', model_name=model_name))
+
+
+@app.route("/data/download/plotly/<string:model_name>/<string:filename>")
+def route_download_plotly(model_name, filename):
+    """ Downloads image and code for Bokeh library. """
+    now = get_current_time()
+    download_image('plotly', model_name, filename, now)
+    save_source_code('plotly', model_name, filename, now)
+
+
+
+    flash(f'Plotly chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
+    flash(f'Plotly chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
+    return redirect(url_for('route_show_data', model_name=model_name))
+
+@app.route("/data/download/pygal/<string:model_name>/<string:filename>")
+def route_download_pygal(model_name, filename):
+    """ Downloads image and code for Bokeh library. """
+    now = get_current_time()
+    download_image('pygal', model_name, filename, now)
+    save_source_code('pygal', model_name, filename, now)
+
+
+
+    flash(f'Pygal chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
+    flash(f'Pygal chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 
