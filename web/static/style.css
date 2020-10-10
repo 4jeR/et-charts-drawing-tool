@@ -1,9 +1,13 @@
 body {
     height: 100%;
-    background-repeat: no-repeat;
     background: linear-gradient(0deg, rgb(112, 53, 4) 0%, rgb(224, 175, 14) 100%);
+    background-image: url("bg_charts.png");
+    background-repeat: no-repeat;
     margin: 0;
     background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 h1 {
