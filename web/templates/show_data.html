@@ -12,7 +12,7 @@
         {% elif model_name == 'Exponential' %}
             <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
         {% elif model_name == 'SquareFunc' %}
-            <h3>$$y = { {{ coefs[0] }}{({{ coefs[1] }} x - {{ coefs[1] }})^2} + {{ coefs[2] }}}$$</h3>
+            <h3>$$ y = { {{coefs[0]}}({x - {{coefs[1]}}})^2 + {{coefs[2]}}} $$</h3>
         {% elif model_name == 'FileDataPoint' %}
             <h3>Data from file {{ filename }} </h3>
         {% endif %}

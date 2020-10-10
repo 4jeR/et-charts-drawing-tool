@@ -180,7 +180,7 @@ def download_image(library, model_name, filename, time):
     elif library == 'plotly':
         pass
     elif library == 'pygal':
-        
+        pass
 
 def save_source_code(library, model_name, filename, time):
     code = inspect.getsource(str_to_class(f'make_chart_{library}'))

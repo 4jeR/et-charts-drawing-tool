@@ -11,5 +11,3 @@ dist/
 build/
 *.egg-info/
 tester.py
-web/data/
-web/downloads/
