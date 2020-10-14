@@ -157,7 +157,7 @@ def get_data_from_file(filename):
     x_list = []
     y_list = []
     sep = ' '
-    with open(f'web/data/{filename}', 'r') as f:
+    with open(f'web/input_data/{filename}', 'r') as f:
         supported = [' ', ',', ':', '\t', '-']
         sep = ' '
         check_line = f.readline()
@@ -188,20 +188,20 @@ def download_image(library, model_name, filename, current_time):
     save_path = f'web/downloads/images/{current_time}_{filename}'
     window_size = (1920, 1080)
     
-    wait = WebDriverWait
 
     chrome_options = Options()
-    chrome_options.add_argument("--kiosk")
-    chrome_options.add_argument("--headless")  
     chrome_options.add_argument(f"--window-size={window_size[0]},{window_size[1]}")
+    chrome_options.add_argument("--kiosk") # for full screen -> images are caught entirely, not in half
+    chrome_options.add_argument("--headless") # in background
     driver = webdriver.Chrome(executable_path='web/chromedriver', chrome_options=chrome_options)
     
     driver.get(image_url)
     button_to_show_chart = driver.find_element_by_id(f'btn-show-chart-{library}')
     driver.execute_script("$(arguments[0]).click();", button_to_show_chart)
 
-    image_element = driver.find_element_by_id(f'card-{library}')
+    wait = WebDriverWait
     wait(driver, 10).until(EC.presence_of_element_located((By.ID, f'card-{library}')))
+    image_element = driver.find_element_by_id(f'card-{library}')
     time.sleep(2)
     image_element.screenshot(save_path)
     driver.quit()

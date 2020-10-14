@@ -232,81 +232,18 @@ def route_summary():
 
 ''' Download images and codes section '''
 
-
-
-
-
-
-
-
-
-
-
-
-@app.route("/data/download/mplib/<string:model_name>/<string:filename>", methods=['GET', 'POST'])
-def route_download_mplib(model_name, filename):
-    """ Downloads image and code for Matplotlib library. """
+@app.route("/data/download/<string:library_name>/<string:model_name>", methods=['GET', 'POST'])
+def route_download_src_img(library_name, model_name):
+    """ Downloads image and code for given chart library name. """
     now = get_current_time()
+    filename_png = f'{library_name}_{model_name}.png'
+    filename_py = f'{library_name}_{model_name}.py'
 
-    download_image('matplotlib', model_name, filename, now)
-    save_source_code('mplib', model_name, filename, now)
+    download_image(library_name, model_name, filename_png, now)
+    flash(f'{library_name} chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename_png}.', 'success')
 
-    flash(f'Matplotlib chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
-    flash(f'Matplotlib chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
-    return redirect(url_for('route_show_data', model_name=model_name))
-
-
-@app.route("/data/download/seaborn/<string:model_name>/<string:filename>")
-def route_download_seaborn(model_name, filename):
-    """ Downloads image and code for Seaborn library. """
-    now = get_current_time()
-    download_image('seaborn', model_name, filename, now)
-    save_source_code('seaborn', model_name, filename, now)
-
-    flash(f'Seaborn chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
-    flash(f'Seaborn chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
-    return redirect(url_for('route_show_data', model_name=model_name))
-
-
-@app.route("/data/download/bokeh/<string:model_name>/<string:filename>")
-def route_download_bokeh(model_name, filename):
-    """ Downloads image and code for Bokeh library. """
-    now = get_current_time()
-    download_image('bokeh', model_name, filename, now)
-    save_source_code('bokeh', model_name, filename, now)
-
-    flash(
-        f'Bokeh chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
-    flash(
-        f'Bokeh chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
-    return redirect(url_for('route_show_data', model_name=model_name))
-
-
-@app.route("/data/download/plotly/<string:model_name>/<string:filename>")
-def route_download_plotly(model_name, filename):
-    """ Downloads image and code for Bokeh library. """
-    now = get_current_time()
-    download_image('plotly', model_name, filename, now)
-    save_source_code('plotly', model_name, filename, now)
-
-    flash(
-        f'Plotly chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
-    flash(
-        f'Plotly chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
-    return redirect(url_for('route_show_data', model_name=model_name))
-
-
-@app.route("/data/download/pygal/<string:model_name>/<string:filename>")
-def route_download_pygal(model_name, filename):
-    """ Downloads image and code for Bokeh library. """
-    now = get_current_time()
-    download_image('pygal', model_name, filename, now)
-    save_source_code('pygal', model_name, filename, now)
-
-    flash(
-        f'Pygal chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
-    flash(
-        f'Pygal chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
+    save_source_code(library_name, model_name, filename_png, now)
+    flash(f'{library_name} chart {model_name} code has been saved at web/downloads/codes/{now}_{filename_py}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 
