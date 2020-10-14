@@ -1,9 +1,13 @@
-import os
-import math
 import io
+import os
+import sys
+import math
 import random
 import inspect
+import pdfcrowd
 
+
+from flask import Flask
 from flask import render_template
 from flask import url_for
 from flask import flash
@@ -11,8 +15,16 @@ from flask import redirect
 from flask import Response
 from flask import make_response
 from datetime import datetime
+from PIL import Image
+from io import BytesIO
 
-from web import app 
+
+
+
+
+
+
+from web import app
 from web import db
 
 from web.models import Sinus
@@ -25,7 +37,6 @@ from web.models import SquareRoot
 from web.models import SquareRootCoefs
 
 from web.models import FileDataPoint
-
 
 
 from web.forms import DataForm
@@ -48,8 +59,7 @@ from web.tool_utils import export_png
 from web.tool_utils import download_image
 from web.tool_utils import get_current_time
 from web.tool_utils import save_source_code
-
-
+from web.tool_utils import get_html_content
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -68,20 +78,11 @@ def route_plot_mplib(model_name):
 
 
 @app.route('/data/plot/seaborn/<string:model_name>')
-def route_plot_seaborn(model_name):   
+def route_plot_seaborn(model_name):
     fig = make_chart_seaborn(model_name)
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
-
-
-
-
-
-
-
-
-
 
 
 @app.route("/")
@@ -90,21 +91,7 @@ def home():
     return render_template('home.html')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#C
+# C
 @app.route("/data/add/main")
 def route_add_data_main():
     fromfile_form = FromFileForm()
@@ -121,14 +108,14 @@ def route_add_data(model_name):
     elif model_name == 'SquareFunc':
         form = SquareFuncForm()
 
-
     if form.validate_on_submit():
         ModelCoefs = str_to_class(model_name + 'Coefs')
         step_value = form.step.data if form.step.data is not None else 0.3
-        
+
         ''' if form has exact structure as this: begin,end,a,b,c,d,step'''
         coefs_kwargs = dict()
-        if model_name in defaults or model_name == 'SquareRoot': # default forms and squareroot aswell have this struct
+        # default forms and squareroot aswell have this struct
+        if model_name in defaults or model_name == 'SquareRoot':
             coefs_kwargs['a'] = form.coef_a.data
             coefs_kwargs['b'] = form.coef_b.data
             coefs_kwargs['c'] = form.coef_c.data
@@ -140,16 +127,17 @@ def route_add_data(model_name):
             coefs_kwargs['q'] = form.coef_q.data
             coefs_kwargs['step'] = form.step.data
 
-
         coefs_record = ModelCoefs(**coefs_kwargs)
         # coefs_record = ModelCoefs(a=form.coef_a.data, b=form.coef_b.data, c=form.coef_c.data, d=form.coef_d.data, step=step_value)
         db.session.add(coefs_record)
         db.session.commit()
         make_points(db, form, model_name=model_name, step=step_value)
         db.session.commit()
-        flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
+        flash(
+            f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name))
     return render_template('add_data.html', form=form, model_name=model_name)
+
 
 @app.route("/data/add/fromfile", methods=['GET', 'POST'])
 def route_add_data_from_file():
@@ -162,33 +150,17 @@ def route_add_data_from_file():
             pt = FileDataPoint.make_point(xx, yy)
             db.session.add(pt)
         db.session.commit()
-        flash(f'Data from {filename} has been successfully added to the database!', 'success')
+        flash(
+            f'Data from {filename} has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name='FileDataPoint', filename=filename))
     return render_template('add_data_file.html', form=form)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#R
+# R
 @app.route("/data/show/main")
 def route_show_data_main():
     return render_template('show_data_main.html')
+
 
 @app.route("/data/show/<string:model_name>")
 def route_show_data(model_name):
@@ -214,34 +186,14 @@ def route_show_data(model_name):
     kwargs["script_plotly"] = '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> '
     kwargs["div_plotly"] = make_chart_plotly(model_name)
 
-
     chart = make_chart_pygal(model_name)
     kwargs["src_pygal"] = chart.render_data_uri()
 
-
     return render_template('show_data.html', points=points, model_name=model_name, **kwargs)
-#U
+# U
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#D
+# D
 @app.route("/data/delete/<string:model_name>/<int:point_id>", methods=['POST'])
 def route_delete_point(model_name, point_id):
     point = str_to_class(model_name).query.get_or_404(point_id)
@@ -250,8 +202,10 @@ def route_delete_point(model_name, point_id):
     if not str_to_class(model_name).query.all():
         db.session.delete(str_to_class(model_name + 'Coefs').query.first())
         db.session.commit()
-    flash(f'Point ({point.id}) has been succesfully removed from the database.', 'success')
+    flash(
+        f'Point ({point.id}) has been succesfully removed from the database.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
+
 
 @app.route("/data/delete/all/<string:model_name>", methods=['POST'])
 def route_delete_all_points(model_name):
@@ -276,18 +230,25 @@ def route_summary():
     return render_template('summary.html')
 
 
-
-
 ''' Download images and codes section '''
 
 
 
 
-@app.route("/data/download/mplib/<string:model_name>/<string:filename>")
+
+
+
+
+
+
+
+
+@app.route("/data/download/mplib/<string:model_name>/<string:filename>", methods=['GET', 'POST'])
 def route_download_mplib(model_name, filename):
     """ Downloads image and code for Matplotlib library. """
     now = get_current_time()
-    download_image('mplib', model_name, filename, now)
+
+    download_image('matplotlib', model_name, filename, now)
     save_source_code('mplib', model_name, filename, now)
 
     flash(f'Matplotlib chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
@@ -302,10 +263,10 @@ def route_download_seaborn(model_name, filename):
     download_image('seaborn', model_name, filename, now)
     save_source_code('seaborn', model_name, filename, now)
 
-
     flash(f'Seaborn chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
     flash(f'Seaborn chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
+
 
 @app.route("/data/download/bokeh/<string:model_name>/<string:filename>")
 def route_download_bokeh(model_name, filename):
@@ -314,10 +275,10 @@ def route_download_bokeh(model_name, filename):
     download_image('bokeh', model_name, filename, now)
     save_source_code('bokeh', model_name, filename, now)
 
-
-
-    flash(f'Bokeh chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
-    flash(f'Bokeh chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
+    flash(
+        f'Bokeh chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
+    flash(
+        f'Bokeh chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 
@@ -328,11 +289,12 @@ def route_download_plotly(model_name, filename):
     download_image('plotly', model_name, filename, now)
     save_source_code('plotly', model_name, filename, now)
 
-
-
-    flash(f'Plotly chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
-    flash(f'Plotly chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
+    flash(
+        f'Plotly chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
+    flash(
+        f'Plotly chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
+
 
 @app.route("/data/download/pygal/<string:model_name>/<string:filename>")
 def route_download_pygal(model_name, filename):
@@ -341,24 +303,26 @@ def route_download_pygal(model_name, filename):
     download_image('pygal', model_name, filename, now)
     save_source_code('pygal', model_name, filename, now)
 
-
-
-    flash(f'Pygal chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
-    flash(f'Pygal chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
+    flash(
+        f'Pygal chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename}.', 'success')
+    flash(
+        f'Pygal chart {model_name} code has been saved at web/downloads/codes/{now}_{filename}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 
 @app.route("/matplotlib")
 def route_matplotlib():
     path_to_images = os.getcwd() + '/web/static/plots'
-    mplib_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'mplib_{i}.png') for i in range(1, files_count('mplib', path_to_images))]
+    mplib_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'mplib_{i}.png') for i in range(
+        1, files_count('mplib', path_to_images))]
     return render_template('matplotlib.html', chart_images=mplib_charts)
 
 
 @app.route("/seaborn")
 def route_seaborn():
     path_to_images = os.getcwd() + '/web/static/plots'
-    sb_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'sborn_{i}.png') for i in range(1, files_count('sborn', path_to_images))]
+    sb_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'sborn_{i}.png') for i in range(
+        1, files_count('sborn', path_to_images))]
     return render_template('seaborn.html', chart_images=sb_charts)
 
 
@@ -366,9 +330,11 @@ def route_seaborn():
 def route_bokeh():
     return render_template('bokeh.html')
 
+
 @app.route("/plotly")
 def route_plotly():
     return render_template('plotly.html')
+
 
 @app.route("/pygal")
 def route_pygal():

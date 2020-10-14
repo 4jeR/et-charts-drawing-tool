@@ -3,8 +3,17 @@ import sys
 import requests
 import shutil 
 import inspect
+import pdfcrowd
 import pandas as pd
+import imgkit
 from datetime import datetime
+import time
+
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium import webdriver
 
 
 from flask import render_template
@@ -166,24 +175,65 @@ def get_data_from_file(filename):
 def get_current_time():
     return datetime.now().strftime("%m-%d_%H-%M-%S")
 
-def download_image(library, model_name, filename, time):
-    
-    if library == 'mplib' or library == 'seaborn':
-        r = requests.get('http://localhost:5000/' + url_for(f'route_plot_{library}', model_name=model_name), stream = True)
-        # Check if the image was retrieved successfully
-        if r.status_code == 200:
-            r.raw.decode_content = True
-            with open(f'web/downloads/images/{time}_{filename}', 'wb') as f:
-                shutil.copyfileobj(r.raw, f)
-    elif library == 'bokeh':
-        pass
-    elif library == 'plotly':
-        pass
-    elif library == 'pygal':
-        pass
 
 def save_source_code(library, model_name, filename, time):
     code = inspect.getsource(str_to_class(f'make_chart_{library}'))
     fname_nopng = time + '_' + filename.split('.')[0]  
     with open(f'web/downloads/codes/{fname_nopng}.py', 'w') as f:
         f.write(code) 
+
+
+def download_image(library, model_name, filename, current_time):
+    image_url = 'http://localhost:5000/' + url_for('route_show_data', model_name=model_name)
+    save_path = f'web/downloads/images/{current_time}_{filename}'
+    window_size = (1920, 1080)
+    # setup
+    wait = WebDriverWait
+
+    chrome_options = Options()
+    chrome_options.add_argument("--kiosk")
+    chrome_options.add_argument("--headless")  
+    chrome_options.add_argument(f"--window-size={window_size[0]},{window_size[1]}")
+    driver = webdriver.Chrome(executable_path='web/chromedriver', chrome_options=chrome_options)
+    
+    driver.get(image_url)
+    button_to_show_chart = driver.find_element_by_id(f'btn-show-chart-{library}')
+    driver.execute_script("$(arguments[0]).click();", button_to_show_chart)
+
+    image_element = driver.find_element_by_id(f'card-{library}')
+    wait(driver, 10).until(EC.presence_of_element_located((By.ID, f'card-{library}')))
+    time.sleep(2)
+    image_element.screenshot(save_path)
+    driver.quit()
+
+
+
+def get_html_content(library_name, model_name):
+    html = """ 
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>Error loading a file</h1>
+    </body>
+    </html>
+    """
+    if library_name == 'matplotlib':
+        with open(f'web/templates/show_data.html', 'r') as f:
+            html = f.read()
+    elif library_name == 'seaborn':
+        pass
+    elif library_name == 'bokeh':
+        pass
+    elif library_name == 'plotly':
+        pass
+    elif library_name == 'pygal':
+        pass
+    return html
+
+   
+

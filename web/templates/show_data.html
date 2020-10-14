@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-
 <div class="row">
     <div class="col-md-12" class="btn btn-lg btn-dark">
         {% if model_name == 'Sinus' %}
@@ -17,7 +16,7 @@
             <h3>Data from file {{ filename }} </h3>
         {% endif %}
     </div>
-    <div class="table-wrapper-scroll-y table-scrollbar col-md-6" position="fixed">
+    <div class="table-wrapper-scroll-y table-scrollbar col-md-6" position="fixed" id="points-table">
         
         <table class="table table-striped table-dark">
             <thead>
@@ -87,18 +86,18 @@
     </div>
     <div class="col-md-6">
         <div class="btn-group" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-matplotlib" aria-expanded="false" aria-controls="card-matplotlib">Matplotlib</button>
-            <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-seaborn" aria-expanded="false" aria-controls="card-seaborn">Seaborn</button>
-            <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-bokeh" aria-expanded="false" aria-controls="card-bokeh">Bokeh</button>
-            <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-plotly" aria-expanded="false" aria-controls="card-plotly">Plotly</button>
-            <button type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-pygal" aria-expanded="false" aria-controls="card-pygal">Pygal</button>
+            <button id="btn-show-chart-matplotlib" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-matplotlib" aria-expanded="false" aria-controls="card-matplotlib">Matplotlib</button>
+            <button id="btn-show-chart-seaborn" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-seaborn" aria-expanded="false" aria-controls="card-seaborn">Seaborn</button>
+            <button id="btn-show-chart-bokeh" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-bokeh" aria-expanded="false" aria-controls="card-bokeh">Bokeh</button>
+            <button id="btn-show-chart-plotly" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-plotly" aria-expanded="false" aria-controls="card-plotly">Plotly</button>
+            <button id="btn-show-chart-pygal" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-pygal" aria-expanded="false" aria-controls="card-pygal">Pygal</button>
         </div>
         <div class="collapse" id="card-matplotlib">
             <div class="card card-body text-white bg-dark">
                 <img src="{{ url_for('route_plot_mplib', model_name=model_name) }}">
                 </br>
                 <form method="GET" action="{{ url_for('route_download_mplib', model_name=model_name, filename='mplib_' + model_name + '.png') }}">
-                    <button type="submit" class="col-md-4 offset-4 btn btn-info" >Download image and source code.</button>
+                    <button type="submit" class="col-md-4 offset-4 btn btn-info">Download image and source code.</button>
                 </form>
             </div>
         </div>
