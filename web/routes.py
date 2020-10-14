@@ -1,11 +1,5 @@
 import io
 import os
-import sys
-import math
-import random
-import inspect
-import pdfcrowd
-
 
 from flask import Flask
 from flask import render_template
@@ -13,36 +7,17 @@ from flask import url_for
 from flask import flash
 from flask import redirect
 from flask import Response
-from flask import make_response
+
 from datetime import datetime
-from PIL import Image
 from io import BytesIO
-
-
-
-
-
-
 
 from web import app
 from web import db
 
-from web.models import Sinus
-from web.models import SinusCoefs
+from web.import_models import *
 
-from web.models import Cosinus
-from web.models import CosinusCoefs
+from web.import_forms import *
 
-from web.models import SquareRoot
-from web.models import SquareRootCoefs
-
-from web.models import FileDataPoint
-
-
-from web.forms import DataForm
-from web.forms import SqrtForm
-from web.forms import FromFileForm
-from web.forms import SquareFuncForm
 
 
 from web.tool_utils import files_count
@@ -51,19 +26,17 @@ from web.tool_utils import make_chart_seaborn
 from web.tool_utils import make_chart_bokeh
 from web.tool_utils import make_chart_plotly
 from web.tool_utils import make_chart_pygal
-
 from web.tool_utils import make_points
 from web.tool_utils import str_to_class
 from web.tool_utils import get_data_from_file
-from web.tool_utils import export_png
 from web.tool_utils import download_image
 from web.tool_utils import get_current_time
 from web.tool_utils import save_source_code
-from web.tool_utils import get_html_content
+
+from bokeh.embed import components as bokeh_components
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from bokeh.embed import components
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 
 import chart_studio.tools as plotly_tools
@@ -71,35 +44,40 @@ import chart_studio.tools as plotly_tools
 
 @app.route('/data/plot/matplotlib/<string:model_name>')
 def route_plot_mplib(model_name):
+    """ Returns the Response consisting the matplotlib chart image. """
     fig = make_chart_mplib(model_name)
     output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
+    FigureCanvasAgg(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
 
 @app.route('/data/plot/seaborn/<string:model_name>')
 def route_plot_seaborn(model_name):
+    """ Returns the Response consisting the Seaborn chart image. """
     fig = make_chart_seaborn(model_name)
     output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
+    FigureCanvasAgg(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
 
 
 @app.route("/")
 @app.route("/home")
 def home():
+    """ Renders home page. """
     return render_template('home.html')
 
 
 # C
 @app.route("/data/add/main")
 def route_add_data_main():
+    """ Renders main entry point for inserting the data. """
     fromfile_form = FromFileForm()
     return render_template('add_data_main.html', form=fromfile_form)
 
 
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
 def route_add_data(model_name):
+    """ Inserts points to the database to the specific model based on values from forms."""
     defaults = ['Sinus', 'Cosinus', 'Exponential']
     if model_name in defaults:
         form = DataForm()
@@ -133,14 +111,14 @@ def route_add_data(model_name):
         db.session.commit()
         make_points(db, form, model_name=model_name, step=step_value)
         db.session.commit()
-        flash(
-            f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
+        flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name))
     return render_template('add_data.html', form=form, model_name=model_name)
 
 
 @app.route("/data/add/fromfile", methods=['GET', 'POST'])
 def route_add_data_from_file():
+    """ End point for adding the data from file."""
     form = FromFileForm()
     filename = form.filename.data
 
@@ -159,11 +137,17 @@ def route_add_data_from_file():
 # R
 @app.route("/data/show/main")
 def route_show_data_main():
+    """ Renders main web page on which you can choose different models. """
     return render_template('show_data_main.html')
 
 
 @app.route("/data/show/<string:model_name>")
 def route_show_data(model_name):
+    """ 
+    Renders end point on which are shown:
+    data table with all points for specific model,
+    five charts for each library: Matplotlib, Seaborn, Bokeh, Plotly and Pygal.
+    """
     Model = str_to_class(model_name)
     no_coefs_models = ['FileDataPoint']
 
@@ -179,7 +163,7 @@ def route_show_data(model_name):
         kwargs['coefs'] = ModelCoefs.get_coefs()
 
     chart = make_chart_bokeh(model_name)
-    script_bokeh, div_bokeh = components(chart)
+    script_bokeh, div_bokeh = bokeh_components(chart)
     kwargs["script_bokeh"] = script_bokeh
     kwargs["div_bokeh"] = div_bokeh
 
@@ -196,6 +180,7 @@ def route_show_data(model_name):
 # D
 @app.route("/data/delete/<string:model_name>/<int:point_id>", methods=['POST'])
 def route_delete_point(model_name, point_id):
+    """ Deletes chosen point from the database and redirects again on `route_show_data` route. """
     point = str_to_class(model_name).query.get_or_404(point_id)
     db.session.delete(point)
     db.session.commit()
@@ -232,6 +217,7 @@ def route_summary():
 
 ''' Download images and codes section '''
 
+
 @app.route("/data/download/<string:library_name>/<string:model_name>", methods=['GET', 'POST'])
 def route_download_src_img(library_name, model_name):
     """ Downloads image and code for given chart library name. """
@@ -250,8 +236,7 @@ def route_download_src_img(library_name, model_name):
 @app.route("/matplotlib")
 def route_matplotlib():
     path_to_images = os.getcwd() + '/web/static/plots'
-    mplib_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'mplib_{i}.png') for i in range(
-        1, files_count('mplib', path_to_images))]
+    mplib_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'mplib_{i}.png') for i in range(1, files_count('mplib', path_to_images))]
     return render_template('matplotlib.html', chart_images=mplib_charts)
 
 

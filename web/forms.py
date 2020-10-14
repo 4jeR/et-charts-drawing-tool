@@ -1,22 +1,23 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField 
-from wtforms import PasswordField
-from wtforms import SubmitField
+
 from wtforms import BooleanField
-from wtforms import SelectField
-from wtforms import IntegerField
 from wtforms import FloatField
+from wtforms import IntegerField
+from wtforms import PasswordField
+from wtforms import SelectField
+from wtforms import StringField 
+from wtforms import SubmitField
 
 from wtforms.validators import DataRequired
-from wtforms.validators import InputRequired
-from wtforms.validators import NumberRange
 from wtforms.validators import Email
 from wtforms.validators import EqualTo
-from wtforms.validators import ValidationError
+from wtforms.validators import InputRequired
 from wtforms.validators import Length
+from wtforms.validators import NumberRange
 from wtforms.validators import Optional
-from web.models import *
+from wtforms.validators import ValidationError
 
+from web.import_models import *
 
 
 def validate_begin_end(FormName):

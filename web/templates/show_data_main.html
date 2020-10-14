@@ -2,18 +2,18 @@
 {% block content %}
 <div id="show-data-main-container" class="row">
     <div class="offset-3 col-md-6">
-    <h1>SHOW DATA</h1>
+        <h1>Show data - pick model</h1>
     </div>
     <div class="btn-group col-md-12" role="group" aria-label="Model name">
-        <a id="link-to-sinus-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='Sinus') }}">Sinus</a>
-        <a id="link-to-cosinus-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='Cosinus') }}">Cosinus</a>
+        <a id="link-to-sinus-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='Sinus') }}">Sine</a>
+        <a id="link-to-cosinus-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='Cosinus') }}">Cosine</a>
         <a id="link-to-sqrt-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='SquareRoot') }}">Square root</a>
         <a id="link-to-exp-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='Exponential') }}">Exponential</a>
-        <a id="link-to-square-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='SquareFunc') }}">SquareFunc</a>
-        <a id="link-to-file-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='FileDataPoint') }}">Data from file</a>
+        <a id="link-to-square-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='SquareFunc') }}">Square</a>
+        <a id="link-to-file-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_show_data', model_name='FileDataPoint') }}">From file</a>
     </div>
     <div class="col-md-12" >
-        <img id="show-data-main-image" class="w-100 mr-auto ml-auto col-md-12" style="height:100%; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_3.png') }}" >
+        <img id="show-data-main-image" class="w-100 h-100 mr-auto ml-auto col-md-12" src="{{ url_for('static', filename='wallpaper_3.png') }}" >
     </div>
 </div>
 

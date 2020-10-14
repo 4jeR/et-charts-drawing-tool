@@ -1,16 +1,16 @@
 from web import db
-from math import sin
+
 from math import cos
 from math import exp 
-from math import sqrt
 from math import log
+from math import sin
+from math import sqrt
 
 
 class Sinus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     x = db.Column(db.Float, unique=False, nullable=False)
     y = db.Column(db.Float, unique=False, nullable=False)
-
 
     @staticmethod
     def make_point(x):
@@ -29,7 +29,6 @@ class SinusCoefs(db.Model):
     d = db.Column(db.Float, unique=False, nullable=False)
     step = db.Column(db.Float, unique=False, nullable=False)
 
-    
     @staticmethod
     def get_coefs():
         ''' Returns the list of all model coefficients. '''
@@ -64,7 +63,6 @@ class CosinusCoefs(db.Model):
     d = db.Column(db.Float, unique=False, nullable=False)
     step = db.Column(db.Float, unique=False, nullable=False)
 
-    
     @staticmethod
     def get_coefs():
         ''' Returns the list of all model coefficients. '''
@@ -75,11 +73,11 @@ class CosinusCoefs(db.Model):
         else:
             return ['?' for i in range(5)]
 
+
 class SquareRoot(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     x = db.Column(db.Float, unique=False, nullable=False)
     y = db.Column(db.Float, unique=False, nullable=False)
-
 
     @staticmethod
     def make_point(x):
@@ -98,7 +96,6 @@ class SquareRootCoefs(db.Model):
     d = db.Column(db.Float, unique=False, nullable=False)
     step = db.Column(db.Float, unique=False, nullable=False)
 
-    
     @staticmethod
     def get_coefs():
         ''' Returns the list of all model coefficients. '''
@@ -114,7 +111,6 @@ class Exponential(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     x = db.Column(db.Float, unique=False, nullable=False)
     y = db.Column(db.Float, unique=False, nullable=False)
-
 
     @staticmethod
     def make_point(x):
@@ -133,7 +129,6 @@ class ExponentialCoefs(db.Model):
     d = db.Column(db.Float, unique=False, nullable=False)
     step = db.Column(db.Float, unique=False, nullable=False)
 
-    
     @staticmethod
     def get_coefs():
         ''' Returns the list of all model coefficients. '''
@@ -150,7 +145,6 @@ class SquareFunc(db.Model):
     x = db.Column(db.Float, unique=False, nullable=False)
     y = db.Column(db.Float, unique=False, nullable=False)
 
-
     @staticmethod
     def make_point(x):
         ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
@@ -166,7 +160,6 @@ class SquareFuncCoefs(db.Model):
     p = db.Column(db.Float, unique=False, nullable=False)
     q = db.Column(db.Float, unique=False, nullable=False)
     step = db.Column(db.Float, unique=False, nullable=False)
-
     
     @staticmethod
     def get_coefs():
@@ -177,8 +170,6 @@ class SquareFuncCoefs(db.Model):
             return [coefs_ok.a, coefs_ok.p, coefs_ok.q, coefs_ok.step] 
         else:
             return ['?' for i in range(5)]
-
-
 
 
 class FileDataPoint(db.Model):

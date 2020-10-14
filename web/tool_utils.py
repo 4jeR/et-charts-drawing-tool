@@ -1,60 +1,34 @@
 import os
 import sys
-import requests
-import shutil 
-import inspect
-import pdfcrowd
-import pandas as pd
-import imgkit
-from datetime import datetime
 import time
+import inspect
+import pandas as pd
+from datetime import datetime
 
-from selenium.webdriver.support import expected_conditions as EC
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as EC
 
 
-from flask import render_template
 from flask import url_for
-from flask import Response
 
-from web.models import Sinus
-from web.models import SinusCoefs
+from web.import_models import *
 
-from web.models import Cosinus
-from web.models import CosinusCoefs
-
-from web.models import SquareRoot
-from web.models import SquareRootCoefs
-
-from web.models import Exponential
-from web.models import ExponentialCoefs
-
-from web.models import SquareFunc
-from web.models import SquareFuncCoefs
-
-from web.models import FileDataPoint
 
 # MATPLOTLIB
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 #SEABORN
 import seaborn as sb
 
-
-
 # BOKEH
-from bokeh.plotting import figure
-from bokeh.embed import components
-from bokeh.io import export_png
+from bokeh.plotting import figure as bokeh_figure
+
 # PLOTLY
-import plotly.express as px
 import plotly
-import plotly.graph_objs as go
+import plotly.graph_objs as plotly_go
 
 # PYGAL
 import pygal
@@ -106,7 +80,7 @@ def make_chart_bokeh(model_name):
     xx = [point.x for point in points]
     yy = [point.y for point in points]
 
-    chart = figure(title="Bokeh plot", width=500, height=450, x_axis_label='x', y_axis_label='y')
+    chart = bokeh_figure(title="Bokeh plot", width=500, height=450, x_axis_label='x', y_axis_label='y')
     chart.line(xx, yy)
     
 
@@ -119,8 +93,8 @@ def make_chart_plotly(model_name):
     xx = [point.x for point in points]
     yy = [point.y for point in points]
     chart_props = {
-        "data": [go.Line(x=xx, y=yy)],
-        "layout": go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=500, height=500, margin={"l": 20, "t": 30})
+        "data": [plotly_go.Line(x=xx, y=yy)],
+        "layout": plotly_go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=500, height=500, margin={"l": 20, "t": 30})
         
     }
     
