@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
@@ -66,19 +65,15 @@
         });
     </script>
 </head>
-    
-
 <body>
     <div class="row" style="margin-top: 100px;"></div>
     <header>
         <nav class="navbar navbar-dark bg-dark navbar-expand-md">
             <div class="navbar-main-menu col-md-6">
-                
                 <div class="btn-group col-md-2">
                     <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Libraries
                     </button>
-                    
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="{{ url_for('route_matplotlib') }}">Matplotlib</a>
                         <a class="dropdown-item" href="{{ url_for('route_seaborn') }}">Seaborn</a>
