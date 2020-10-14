@@ -9,12 +9,66 @@
 	<meta name="author" content="Bartłomiej Długosz">
     <meta http-equiv="X-Ua-Compatible" content="IE=edge">
     <link rel="shortcut icon" type="image/jpg" href="{{ url_for('static', filename='favicon.ico') }}"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        let img_sinus = "{{ url_for('static', filename='wallpaper_1.png') }}"
+        $(function() {
+            $('#link-to-sinus-model').hover(function() {
+                $('#show-data-main-image').attr('src', img_sinus);
+            }, function() {
+                $('#show-data-main-image').attr('src', img_sinus);
+            });
+        });
+
+        let img_cosinus = "{{ url_for('static', filename='wallpaper_2.png') }}"
+        $(function() {
+            $('#link-to-cosinus-model').hover(function() {
+                $('#show-data-main-image').attr('src', img_cosinus);
+            }, function() {
+                $('#show-data-main-image').attr('src', img_cosinus);
+            });
+        });
+
+        let img_sqrt = "{{ url_for('static', filename='wallpaper_3.png') }}"
+        $(function() {
+            $('#link-to-sqrt-model').hover(function() {
+                $('#show-data-main-image').attr('src', img_sqrt);
+            }, function() {
+                $('#show-data-main-image').attr('src', img_sqrt);
+            });
+        });
+
+        let img_exp = "{{ url_for('static', filename='wallpaper_4.png') }}"
+        $(function() {
+            $('#link-to-exp-model').hover(function() {
+                $('#show-data-main-image').attr('src', img_exp);
+            }, function() {
+                $('#show-data-main-image').attr('src', img_exp);
+            });
+        });
+
+        let img_square = "{{ url_for('static', filename='wallpaper_1.png') }}"
+        $(function() {
+            $('#link-to-square-model').hover(function() {
+                $('#show-data-main-image').attr('src', img_square);
+            }, function() {
+                $('#show-data-main-image').attr('src', img_square);
+            });
+        });
+
+        let img_file = "{{ url_for('static', filename='wallpaper_2.png') }}"
+        $(function() {
+            $('#link-to-file-model').hover(function() {
+                $('#show-data-main-image').attr('src', img_file);
+            }, function() {
+                $('#show-data-main-image').attr('src', img_file);
+            });
+        });
+    </script>
 </head>
-    
     
 
 <body>
-    
     <div class="row" style="margin-top: 100px;"></div>
     <header>
         <nav class="navbar navbar-dark bg-dark navbar-expand-md">
@@ -47,16 +101,16 @@
             <div id="banner" class="carousel slide col-md-2 " data-ride="carousel" data-interval="2100" >
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                        <img class="w-100 mr-auto ml-auto" style="height:70px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_1.png') }}" >
+                        <img class="w-100 mr-auto ml-auto" style="height:80px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_1.png') }}" >
                     </div>
                     <div class="carousel-item">
-                        <img class="w-100 mr-auto ml-auto" style="height:70px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_2.png') }}" >
+                        <img class="w-100 mr-auto ml-auto" style="height:80px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_2.png') }}" >
                     </div>
                     <div class="carousel-item">
-                        <img class="w-100 mr-auto ml-auto" style="height:70px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_3.png') }}" >
+                        <img class="w-100 mr-auto ml-auto" style="height:80px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_3.png') }}" >
                     </div>
                     <div class="carousel-item">
-                        <img class="w-100 mr-auto ml-auto" style="height:70px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_4.png') }}" >
+                        <img class="w-100 mr-auto ml-auto" style="height:80px; margin: 0 auto" src="{{ url_for('static', filename='wallpaper_4.png') }}" >
                     </div>
                 </div>
             </div>

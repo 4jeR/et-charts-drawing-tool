@@ -55,8 +55,8 @@ header span-header{
 }
 
 header .navbar{
-    max-height: 90px;
-    min-height: 90px;
+    max-height: 100px;
+    min-height: 100px;
 }
 
 .navbar-nav > li:first-child{
@@ -88,4 +88,10 @@ header .navbar{
 ::-webkit-scrollbar-thumb {
     background: rgb(46, 25, 0);
     border-radius: 55px;
+}
+
+
+
+#link-to-sinus-model:hover > #show-data-main-image{
+    background-color: brown;
 }

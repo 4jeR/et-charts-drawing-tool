@@ -89,10 +89,10 @@ def make_chart_seaborn(model_name):
 
     Model = str_to_class(model_name)
     points = Model.query.all()
-
     data = [
-        {'x': point.x, model_name: point.y} for point in points
+        {model_name: point.x, model_name: point.y} for point in points
     ]
+    
     df = pd.DataFrame(data=data)
     sb.lineplot(data=df, ax=axis)
     
@@ -176,9 +176,9 @@ def get_current_time():
     return datetime.now().strftime("%m-%d_%H-%M-%S")
 
 
-def save_source_code(library, model_name, filename, time):
+def save_source_code(library, model_name, filename, current_time):
     code = inspect.getsource(str_to_class(f'make_chart_{library}'))
-    fname_nopng = time + '_' + filename.split('.')[0]  
+    fname_nopng = current_time + '_' + filename.split('.')[0]  
     with open(f'web/downloads/codes/{fname_nopng}.py', 'w') as f:
         f.write(code) 
 
@@ -187,7 +187,7 @@ def download_image(library, model_name, filename, current_time):
     image_url = 'http://localhost:5000/' + url_for('route_show_data', model_name=model_name)
     save_path = f'web/downloads/images/{current_time}_{filename}'
     window_size = (1920, 1080)
-    # setup
+    
     wait = WebDriverWait
 
     chrome_options = Options()
