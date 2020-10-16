@@ -10,25 +10,25 @@
     <link rel="shortcut icon" type="image/jpg" href="{{ url_for('static', filename='favicon.ico') }}"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        let img_sinus = "{{ url_for('static', filename='wallpaper_1.png') }}"
+        const img_sine = "{{ url_for('static', filename='wallpaper_1.png') }}"
         $(function() {
             $('#link-to-sinus-model').hover(function() {
-                $('#show-data-main-image').attr('src', img_sinus);
+                $('#show-data-main-image').attr('src', img_sine);
             }, function() {
-                $('#show-data-main-image').attr('src', img_sinus);
+                $('#show-data-main-image').attr('src', img_sine);
             });
         });
 
-        let img_cosinus = "{{ url_for('static', filename='wallpaper_2.png') }}"
+        const img_cosine = "{{ url_for('static', filename='wallpaper_2.png') }}"
         $(function() {
             $('#link-to-cosinus-model').hover(function() {
-                $('#show-data-main-image').attr('src', img_cosinus);
+                $('#show-data-main-image').attr('src', img_cosine);
             }, function() {
-                $('#show-data-main-image').attr('src', img_cosinus);
+                $('#show-data-main-image').attr('src', img_cosine);
             });
         });
 
-        let img_sqrt = "{{ url_for('static', filename='wallpaper_3.png') }}"
+        const img_sqrt = "{{ url_for('static', filename='wallpaper_3.png') }}"
         $(function() {
             $('#link-to-sqrt-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_sqrt);
@@ -37,7 +37,7 @@
             });
         });
 
-        let img_exp = "{{ url_for('static', filename='wallpaper_4.png') }}"
+        const img_exp = "{{ url_for('static', filename='wallpaper_4.png') }}"
         $(function() {
             $('#link-to-exp-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_exp);
@@ -46,7 +46,7 @@
             });
         });
 
-        let img_square = "{{ url_for('static', filename='wallpaper_1.png') }}"
+        const img_square = "{{ url_for('static', filename='wallpaper_1.png') }}"
         $(function() {
             $('#link-to-square-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_square);
@@ -55,7 +55,7 @@
             });
         });
 
-        let img_file = "{{ url_for('static', filename='wallpaper_2.png') }}"
+        const img_file = "{{ url_for('static', filename='wallpaper_2.png') }}"
         $(function() {
             $('#link-to-file-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_file);
