@@ -21,7 +21,7 @@ from web.import_forms import *
 
 
 from web.tool_utils import files_count
-from web.tool_utils import make_chart_mplib
+from web.tool_utils import make_chart_matplotlib
 from web.tool_utils import make_chart_seaborn
 from web.tool_utils import make_chart_bokeh
 from web.tool_utils import make_chart_plotly
@@ -43,9 +43,9 @@ import chart_studio.tools as plotly_tools
 
 
 @app.route('/data/plot/matplotlib/<string:model_name>')
-def route_plot_mplib(model_name):
+def route_plot_matplotlib(model_name):
     """ Returns the Response consisting the matplotlib chart image. """
-    fig = make_chart_mplib(model_name)
+    fig = make_chart_matplotlib(model_name)
     output = io.BytesIO()
     FigureCanvasAgg(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -199,8 +199,8 @@ def route_delete_all_points(model_name):
     no_coefs_models = ['FileDataPoint']
 
     if model_name not in no_coefs_models:
-        ModelCoefs = str_to_class(model_name+'Coefs')
-        coefs = str_to_class(model_name + 'Coefs').query.first()
+        ModelCoefs = str_to_class(model_name + 'Coefs')
+        coefs = ModelCoefs.query.first()
         if coefs:
             db.session.delete(coefs)
     for point in all_points:
@@ -218,18 +218,20 @@ def route_summary():
 ''' Download images and codes section '''
 
 
-@app.route("/data/download/<string:library_name>/<string:model_name>", methods=['GET', 'POST'])
-def route_download_src_img(library_name, model_name):
+
+@app.route("/data/download/<string:library_name>/<string:model_name>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
+def route_download_src_img(library_name, model_name, save_img, save_src):
     """ Downloads image and code for given chart library name. """
     now = get_current_time()
-    filename_png = f'{library_name}_{model_name}.png'
-    filename_py = f'{library_name}_{model_name}.py'
 
-    download_image(library_name, model_name, filename_png, now)
-    flash(f'{library_name} chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename_png}.', 'success')
-
-    save_source_code(library_name, model_name, filename_png, now)
-    flash(f'{library_name} chart {model_name} code has been saved at web/downloads/codes/{now}_{filename_py}.', 'success')
+    if save_img == '1':
+        filename_png = f'{library_name}_{model_name}.png'
+        download_image(library_name, model_name, now)
+        flash(f'{library_name} chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename_png}.', 'success')
+    if save_src == '1':
+        filename_py = f'{library_name}_{model_name}.py'
+        save_source_code(library_name, model_name, now)
+        flash(f'{library_name} chart {model_name} code has been saved at web/downloads/codes/{now}_{filename_py}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 

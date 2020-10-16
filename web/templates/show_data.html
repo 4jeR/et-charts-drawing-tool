@@ -92,49 +92,87 @@
             <button id="btn-show-chart-pygal" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-pygal" aria-expanded="false" aria-controls="card-pygal">Pygal</button>
         </div>
         <div class="collapse" id="card-matplotlib">
-            <div class="card card-body text-white bg-dark">
-                <img src="{{ url_for('route_plot_mplib', model_name=model_name) }}">
-                </br>
-                <form method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name) }}">
-                    <button type="submit" class="col-md-4 offset-4 btn btn-info">Download image and source code.</button>
+            <div class="row card card-body text-white bg-dark" id="card-matplotlib-ss">
+                <img src="{{ url_for('route_plot_matplotlib', model_name=model_name) }}">
+            </div>
+            <div class="row text-white bg-dark mb-2">
+                <form class="col-md-4 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='0', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get code</button>
+                </form>
+                <form class="col-md-4 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='1', save_src='0') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get image</button>
+                </form>
+                <form class="col-md-4 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='1', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get both</button>
                 </form>
             </div>
         </div>
         <div class="collapse" id="card-seaborn">
-            <div class="card card-body text-white bg-dark" >
+            <div class="row card card-body text-white bg-dark" id="card-seaborn-ss">
                 <img src="{{ url_for('route_plot_seaborn', model_name=model_name) }}">
                 </br>
-                <form method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name) }}">
-                    <button type="submit" class="col-md-4 offset-4 btn btn-info">Download image and source code.</button>
+            </div>
+            <div class="row text-white bg-dark mb-2">
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, save_img='0', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get code</button>
+                </form>
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, save_img='1', save_src='0') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get image</button>
+                </form>
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, save_img='1', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get both</button>
                 </form>
             </div>
         </div>
         <div class="collapse" id="card-bokeh">
-            <div class="card card-body text-white bg-dark">
+            <div class="row card card-body text-white bg-dark" id="card-bokeh-ss">
                 {{ div_bokeh | safe }}
-                </br>
-                <form method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name) }}">
-                    <button type="submit" class="col-md-4 offset-4 btn btn-info">Download image and source code.</button>
-                </form>
                 {{ script_bokeh | safe }}
+            </div>
+            <div class="row text-white bg-dark mb-2">
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, save_img='0', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get code</button>
+                </form>
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, save_img='1', save_src='0') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get image</button>
+                </form>
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, save_img='1', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get both</button>
+                </form>
             </div>
         </div>
         <div class="collapse" id="card-plotly">
-            <div class="card card-body text-white bg-dark">
+            <div class="row card card-body text-white bg-dark" id="card-plotly-ss">
                 {{ script_plotly | safe}}
                 {{ div_plotly | safe }}
                 </br>
-                <form method="GET" action="{{ url_for('route_download_src_img', library_name='plotly', model_name=model_name) }}">
-                    <button type="submit" class="col-md-4 offset-4 btn btn-info">Download image and source code.</button>
+            </div>
+            <div class="row text-white bg-dark mb-2">
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='plotly', model_name=model_name, save_img='0', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get code</button>
+                </form>
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='plotly', model_name=model_name, save_img='1', save_src='0') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get image</button>
+                </form>
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='plotly', model_name=model_name, save_img='1', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get both</button>
                 </form>
             </div>
         </div>
         <div class="collapse" id="card-pygal">
-            <div class="card card-body text-white bg-dark">
+            <div class="row card card-body text-white bg-dark" id="card-pygal-ss">
                 <embed type="image/svg+xml" src= {{ src_pygal | safe }} />
                 </br>
-                <form method="GET" action="{{ url_for('route_download_src_img', library_name='plotly', model_name=model_name) }}">
-                    <button type="submit" class="col-md-4 offset-4 btn btn-info">Download image and source code.</button>
+            </div>
+            <div class="row text-white bg-dark mb-2">
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='pygal', model_name=model_name, save_img='0', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get code</button>
+                </form>
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='pygal', model_name=model_name, save_img='1', save_src='0') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get image</button>
+                </form>
+                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='pygal', model_name=model_name, save_img='1', save_src='1') }}">
+                    <button type="submit" class="col-md-12 btn btn-danger text-light">get both</button>
                 </form>
             </div>
         </div>
