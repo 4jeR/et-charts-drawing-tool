@@ -33,23 +33,59 @@ import plotly.graph_objs as plotly_go
 # PYGAL
 import pygal
 
-def str_to_class(string):
-    return getattr(sys.modules[__name__], string)
+def str_to_object(string_name):
+    ''' Returns the string_name as object (function, class, etc.).'''
+    return getattr(sys.modules[__name__], string_name)
 
 
 def make_chart_matplotlib(model_name):
-    fig = Figure(figsize=(5.0, 5.0))
-    axis = fig.add_subplot(1, 1, 1)
-    axis.grid(True)
-    Model = str_to_class(model_name)
+    ''' Fetches the data from database and makes chart figure that will be shown on the webpage '''
+    
+    ''' Get data for plotting '''
+    Model = str_to_object(model_name)
 
     points = Model.query.all()
     xx = [point.x for point in points]
     yy = [point.y for point in points]
-    axis.plot(xx, yy)
-    axis.set_xlabel('x')
-    axis.set_ylabel('y')
-    axis.set_title('Matplotlib')
+
+    ''' Options for plotting '''
+    kwargs = {}
+    kwargs['color'] = 'red' # set color -> b: blue, g: green, r: red, c: cyan, m: magenta, y: yellow, k: black, w: white
+    kwargs['linewidth'] = 3 # set witdh of the line 
+    kwargs['linestyle'] = '-' #linestyle/ls:      {'-', '--', '-.', ':', ''}
+    kwargs['marker'] = '.'# markers -> {'', '.', ',', '1', '2', 's', 'x', '+'}
+
+    scatter_plot = False
+    show_grid = True
+    logscale_y = False
+    show_legend = False
+
+
+    ''' Get the figure object that will be returned '''
+    fig = Figure(figsize=(5.0, 5.0))
+    chart = fig.add_subplot(1, 1, 1)
+
+    if logscale_y:
+        chart.semilogy()  # set logscaly for  Y
+
+    chart.grid(show_grid) # grid ON/OFF
+    if show_legend:
+        chart.legend()
+
+
+    chart.set_xlabel('x')
+    chart.set_ylabel('y')
+    chart.set_title('Matplotlib')
+    
+    ''' Plot on the figure and return this object to embed in web page '''
+    if scatter_plot:
+        kwargs['s'] = 20*kwargs['linewidth'] # marker size
+        chart.scatter(xx, yy, **kwargs)
+    else:
+        kwargs['marker'] = None 
+        chart.plot(xx, yy, **kwargs)
+
+    
     return fig
 
 
@@ -61,7 +97,7 @@ def make_chart_seaborn(model_name):
     axis.grid(True)
     sb.set(style="darkgrid")
 
-    Model = str_to_class(model_name)
+    Model = str_to_object(model_name)
     points = Model.query.all()
     data = [
         {model_name: point.x, model_name: point.y} for point in points
@@ -73,21 +109,21 @@ def make_chart_seaborn(model_name):
 
 
 def make_chart_bokeh(model_name):
-    Model = str_to_class(model_name)
+    Model = str_to_object(model_name)
     points = Model.query.all()
 
     xx = [point.x for point in points]
     yy = [point.y for point in points]
 
-    chart = bokeh_figure(title="Bokeh plot", width=530, height=500, x_axis_label='x', y_axis_label='y')
-    chart.line(xx, yy)
+    bokeh_chart = bokeh_figure(title="Bokeh plot", width=530, height=500, x_axis_label='x', y_axis_label='y')
+    bokeh_chart.line(xx, yy)
     
 
-    return chart
+    return bokeh_chart
 
 
 def make_chart_plotly(model_name):
-    Model = str_to_class(model_name)
+    Model = str_to_object(model_name)
     points = Model.query.all()
     
     xx = [point.x for point in points]
@@ -102,7 +138,7 @@ def make_chart_plotly(model_name):
     
 
 def make_chart_pygal(model_name):
-    Model = str_to_class(model_name)
+    Model = str_to_object(model_name)
     points = Model.query.all()
 
 
@@ -119,10 +155,10 @@ def files_count(lib_name='', path_to_images='.'):
 
 def make_points(db, form, model_name, step):
     x_range = int((1.0)/step * (form.end.data - form.begin.data))+1
-    current_points = set([point.x for point in str_to_class(model_name).query.all()])
+    current_points = set([point.x for point in str_to_object(model_name).query.all()])
     for i in range(x_range):
         dx = i*step
-        pt = str_to_class(model_name).make_point(form.begin.data+dx)
+        pt = str_to_object(model_name).make_point(form.begin.data+dx)
         if pt.x not in current_points:
             db.session.add(pt)
 
@@ -152,7 +188,7 @@ def get_current_time():
 
 
 def save_source_code(library_name, model_name, current_time):
-    code = inspect.getsource(str_to_class(f'make_chart_{library_name}'))
+    code = inspect.getsource(str_to_object(f'make_chart_{library_name}'))
     
 
     filename = f'{current_time}_{library_name}_{model_name}'  

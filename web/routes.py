@@ -14,10 +14,7 @@ from io import BytesIO
 from web import app
 from web import db
 
-from web.import_models import *
-
 from web.import_forms import *
-
 
 
 from web.tool_utils import files_count
@@ -27,7 +24,7 @@ from web.tool_utils import make_chart_bokeh
 from web.tool_utils import make_chart_plotly
 from web.tool_utils import make_chart_pygal
 from web.tool_utils import make_points
-from web.tool_utils import str_to_class
+from web.tool_utils import str_to_object
 from web.tool_utils import get_data_from_file
 from web.tool_utils import download_image
 from web.tool_utils import get_current_time
@@ -87,7 +84,7 @@ def route_add_data(model_name):
         form = SquareFuncForm()
 
     if form.validate_on_submit():
-        ModelCoefs = str_to_class(model_name + 'Coefs')
+        ModelCoefs = str_to_object(model_name + 'Coefs')
         step_value = form.step.data if form.step.data is not None else 0.3
 
         ''' if form has exact structure as this: begin,end,a,b,c,d,step'''
@@ -148,11 +145,11 @@ def route_show_data(model_name):
     data table with all points for specific model,
     five charts for each library: Matplotlib, Seaborn, Bokeh, Plotly and Pygal.
     """
-    Model = str_to_class(model_name)
-    no_coefs_models = ['FileDataPoint']
+    Model = str_to_object(model_name)
+    no_coefs_models = ['FileDataPoint'] # TODO: custom user input model - as factory class generator?
 
     if model_name not in no_coefs_models:
-        ModelCoefs = str_to_class(model_name+'Coefs')
+        ModelCoefs = str_to_object(model_name+'Coefs')
 
     points = Model.query.all()
     if not points:
@@ -173,7 +170,11 @@ def route_show_data(model_name):
     chart = make_chart_pygal(model_name)
     kwargs["src_pygal"] = chart.render_data_uri()
 
-    return render_template('show_data.html', points=points, model_name=model_name, **kwargs)
+    kwforms = {}
+
+    kwforms['matplotlib_form'] = MatplotlibOptionsForm()
+
+    return render_template('show_data.html', points=points, model_name=model_name, **kwargs, **kwforms)
 # U
 
 
@@ -181,11 +182,11 @@ def route_show_data(model_name):
 @app.route("/data/delete/<string:model_name>/<int:point_id>", methods=['POST'])
 def route_delete_point(model_name, point_id):
     """ Deletes chosen point from the database and redirects again on `route_show_data` route. """
-    point = str_to_class(model_name).query.get_or_404(point_id)
+    point = str_to_object(model_name).query.get_or_404(point_id)
     db.session.delete(point)
     db.session.commit()
-    if not str_to_class(model_name).query.all():
-        db.session.delete(str_to_class(model_name + 'Coefs').query.first())
+    if not str_to_object(model_name).query.all():
+        db.session.delete(str_to_object(model_name + 'Coefs').query.first())
         db.session.commit()
     flash(
         f'Point ({point.id}) has been succesfully removed from the database.', 'success')
@@ -194,12 +195,12 @@ def route_delete_point(model_name, point_id):
 
 @app.route("/data/delete/all/<string:model_name>", methods=['POST'])
 def route_delete_all_points(model_name):
-    Model = str_to_class(model_name)
+    Model = str_to_object(model_name)
     all_points = Model.query.all()
     no_coefs_models = ['FileDataPoint']
 
     if model_name not in no_coefs_models:
-        ModelCoefs = str_to_class(model_name + 'Coefs')
+        ModelCoefs = str_to_object(model_name + 'Coefs')
         coefs = ModelCoefs.query.first()
         if coefs:
             db.session.delete(coefs)
@@ -242,8 +243,7 @@ def route_matplotlib():
 @app.route("/seaborn")
 def route_seaborn():
     path_to_images = os.getcwd() + '/web/static/plots'
-    sb_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'sborn_{i}.png') for i in range(
-        1, files_count('sborn', path_to_images))]
+    sb_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'sborn_{i}.png') for i in range(1, files_count('sborn', path_to_images))]
     return render_template('seaborn.html', chart_images=sb_charts)
 
 

@@ -14,3 +14,7 @@ from web.models import SquareFunc
 from web.models import SquareFuncCoefs
 
 from web.models import FileDataPoint
+
+
+
+from web.models import MatplotlibPlotOptions

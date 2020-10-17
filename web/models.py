@@ -16,8 +16,8 @@ class Sinus(db.Model):
     def make_point(x):
         ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
         coefs = SinusCoefs.query.first()
-        xx = float(x)
-        yy = float(coefs.a*sin(coefs.b*x - coefs.c) + coefs.d)
+        xx = float(round(x, 3))
+        yy = float(round(coefs.a*sin(coefs.b*x - coefs.c) + coefs.d, 3)) 
         return Sinus(x=xx, y=yy)
 
 
@@ -50,8 +50,8 @@ class Cosinus(db.Model):
     def make_point(x):
         ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
         coefs = CosinusCoefs.query.first()
-        xx = float(x)
-        yy = float(coefs.a*cos(coefs.b*x - coefs.c) + coefs.d)
+        xx = float(round(x, 3))
+        yy = float(round(coefs.a*cos(coefs.b*x - coefs.c) + coefs.d, 3))
         return Cosinus(x=xx, y=yy)
 
 
@@ -83,8 +83,8 @@ class SquareRoot(db.Model):
     def make_point(x):
         ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
         coefs = SquareRootCoefs.query.first()
-        xx = float(x)
-        yy = float(coefs.a*sqrt(coefs.b*x - coefs.c) + coefs.d)
+        xx = float(round(x, 3))
+        yy = float(round(coefs.a*sqrt(coefs.b*x - coefs.c) + coefs.d, 3))
         return SquareRoot(x=xx, y=yy)
 
 
@@ -116,8 +116,8 @@ class Exponential(db.Model):
     def make_point(x):
         ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
         coefs = ExponentialCoefs.query.first()
-        xx = float(x)
-        yy = float(coefs.a*exp(coefs.b*(x - coefs.c)) + coefs.d)
+        xx = float(round(x, 3))
+        yy = float(round(coefs.a*exp(coefs.b*(x - coefs.c)) + coefs.d, 3))
         return Exponential(x=xx, y=yy)
 
 
@@ -149,8 +149,8 @@ class SquareFunc(db.Model):
     def make_point(x):
         ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
         coefs = SquareFuncCoefs.query.first()
-        xx = float(x)
-        yy = float(coefs.a*((x - coefs.p)**2) + coefs.q)
+        xx = float(round(x, 3))
+        yy = float(round(coefs.a*((x - coefs.p)**2) + coefs.q, 3))
         return SquareFunc(x=xx, y=yy)
 
 
@@ -180,4 +180,19 @@ class FileDataPoint(db.Model):
     @staticmethod
     def make_point(xx, yy):
         ''' Returns the FileDataPoint (x, y). '''
-        return FileDataPoint(x=float(xx), y=float(yy))
+        return FileDataPoint(x=float(round(xx, 3)), y=float(round(yy, 3)))
+
+
+class MatplotlibPlotOptions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    color = db.Column(db.String, unique=False, nullable=False)
+    line_width = db.Column(db.Integer, unique=False, nullable=False)
+    line_style = db.Column(db.String, unique=False, nullable=False)
+    marker = db.Column(db.String, unique=False, nullable=False)
+
+    flag_scatter_plot = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_show_grid = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_show_legend = db.Column(db.Boolean, unique=False, nullable=False)
+    

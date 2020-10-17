@@ -17,8 +17,6 @@ from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
-from web.import_models import *
-
 
 def validate_begin_end(FormName):
     def _validate_begin_end(form, field):
@@ -79,5 +77,19 @@ class SquareFuncForm(FlaskForm):
 
 class FromFileForm(FlaskForm):
     filename = StringField('Filename:',  validators=[DataRequired(), Length(min=3, max=40)])
+    
+    submit = SubmitField('Add data')
+
+
+class MatplotlibOptionsForm(FlaskForm):
+    color =  StringField('Color:', validators=[DataRequired(), Length(min=1, max=20)])
+    line_width = IntegerField("Line width:", validators=[DataRequired()])
+    line_style = StringField('Line style:',  validators=[DataRequired(), Length(min=1, max=10)])
+    marker = StringField('Marker:',  validators=[DataRequired(), Length(min=1, max=10)])
+
+    flag_scatter_plot = BooleanField("Scatter:")
+    flag_show_grid = BooleanField("Grid:")
+    flag_logscale_y = BooleanField("Log scale:")
+    flag_show_legend = BooleanField("Show legend:")
     
     submit = SubmitField('Add data')

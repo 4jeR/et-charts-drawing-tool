@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
+    <!-- MathJax - equation -->
     <div class="col-md-12" class="btn btn-lg btn-dark">
         {% if model_name == 'Sinus' %}
             <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
@@ -16,19 +17,12 @@
             <h3>Data from file {{ filename }} </h3>
         {% endif %}
     </div>
-    <div class="table-wrapper-scroll-y table-scrollbar col-md-6" position="fixed" id="points-table">
-        
+
+    <!-- Data table -->
+    <div class="table-wrapper-scroll-y table-scrollbar col-md-3" position="fixed" id="points-table">
         <table class="table table-striped table-dark">
             <thead>
                 <tr>
-                    <!--
-                    <th scope="col">
-                        <form action="{{ url_for('route_add_data', model_name=model_name) }}" method="POST">
-                            <input class="btn btn-danger" type="submit" value="Add data">
-                        </form>
-                        
-                    </th>
-                    -->
                     <td scope="col" align="center">
                         <form action="{{ url_for('route_delete_all_points', model_name=model_name) }}" method="POST">
                             <input class="btn btn-danger" type="submit" value="Delete all">
@@ -83,7 +77,9 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-6">
+
+    <!-- Charts menu -->
+    <div class="col-md-9">
         <div class="btn-group" role="group" aria-label="Basic example">
             <button id="btn-show-chart-matplotlib" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-matplotlib" aria-expanded="false" aria-controls="card-matplotlib">Matplotlib</button>
             <button id="btn-show-chart-seaborn" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-seaborn" aria-expanded="false" aria-controls="card-seaborn">Seaborn</button>
@@ -92,8 +88,60 @@
             <button id="btn-show-chart-pygal" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-pygal" aria-expanded="false" aria-controls="card-pygal">Pygal</button>
         </div>
         <div class="collapse" id="card-matplotlib">
-            <div class="row card card-body text-white bg-dark" id="card-matplotlib-ss">
-                <img src="{{ url_for('route_plot_matplotlib', model_name=model_name) }}">
+            <div class="row card-group bg-dark text-white">
+                <div class="card col-md-8 ">
+                    <div class="card-body text-white bg-dark" id="card-matplotlib-ss">
+                        <img src="{{ url_for('route_plot_matplotlib', model_name=model_name) }}">
+                    </div>
+                </div>
+                <div class="card col-md-4 text-primary">
+                    <div class="card-body text-white bg-dark">
+                        <form class="form-horizontal col-md-12" role="form" method="GET" action="#">
+                            {% if matplotlib_form is defined %}
+                                {{ matplotlib_form.hidden_tag() }}
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.color.label(for="Color") }}</b>
+                                    {{ matplotlib_form.color(id="color") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.line_width.label(for="Line width:") }}</b>
+                                    {{ matplotlib_form.line_width(id="line_width") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.line_style.label(for="Line style:") }}</b>
+                                    {{ matplotlib_form.line_style(id="line_style") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.marker.label(for="Marker") }}</b>
+                                    {{ matplotlib_form.marker(id="marker") }}
+                                </div>
+        
+        
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.flag_scatter_plot.label(for="Scatter:") }}</b>
+                                    {{ matplotlib_form.flag_scatter_plot(id="flag_scatter_plot") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.flag_show_grid.label(for="Grid:") }}</b>
+                                    {{ matplotlib_form.flag_show_grid(id="flag_show_grid") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.flag_logscale_y.label(for="Log scale:") }}</b>
+                                    {{ matplotlib_form.flag_logscale_y(id="flag_logscale_y") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.flag_show_legend.label(for="Show legend:") }}</b>
+                                    {{ matplotlib_form.flag_show_legend(id="flag_show_legend") }}
+                                </div>
+                            {% endif %}
+                            <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row text-white bg-dark">
+                
             </div>
             <div class="row text-white bg-dark mb-2">
                 <form class="col-md-4 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='0', save_src='1') }}">
@@ -178,7 +226,6 @@
         </div>
     </div>
 </div>
-
 
 <script type="text/javascript" src="../js/download.js"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"></script>
