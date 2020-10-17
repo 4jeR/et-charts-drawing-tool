@@ -87,6 +87,7 @@
             <button id="btn-show-chart-plotly" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-plotly" aria-expanded="false" aria-controls="card-plotly">Plotly</button>
             <button id="btn-show-chart-pygal" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-pygal" aria-expanded="false" aria-controls="card-pygal">Pygal</button>
         </div>
+        <!-- Matplotlib cards -->
         <div class="collapse" id="card-matplotlib">
             <div class="row card-group bg-dark text-white">
                 <div class="card col-md-8 ">
@@ -139,10 +140,6 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="row text-white bg-dark">
-                
-            </div>
             <div class="row text-white bg-dark mb-2">
                 <form class="col-md-4 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='0', save_src='1') }}">
                     <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
@@ -155,10 +152,23 @@
                 </form>
             </div>
         </div>
+
+        <!-- Seaborn cards -->
         <div class="collapse" id="card-seaborn">
-            <div class="row card card-body text-white bg-dark" id="card-seaborn-ss">
-                <img src="{{ url_for('route_plot_seaborn', model_name=model_name) }}">
-                </br>
+            <div class="row card-group bg-dark text-white">
+                <div class="card col-md-8 text-primary">
+                    <div class="card card-body text-white bg-dark" id="card-seaborn-ss">
+                        <img src="{{ url_for('route_plot_seaborn', model_name=model_name) }}">
+                    </div>
+                </div>
+                <div class="card col-md-4 text-primary">
+                    <div class="card-body text-white bg-dark">
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
+                            <h1>TODO...</h1>
+                            <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
+                        </form>
+                    </div>
+                </div>
             </div>
             <div class="row text-white bg-dark mb-2">
                 <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, save_img='0', save_src='1') }}">
@@ -172,10 +182,24 @@
                 </form>
             </div>
         </div>
+
+        <!-- Bokeh cards -->
         <div class="collapse" id="card-bokeh">
-            <div class="row card card-body text-white bg-dark" id="card-bokeh-ss">
-                {{ div_bokeh | safe }}
-                {{ script_bokeh | safe }}
+            <div class="row card-group bg-dark text-white">
+                <div class="card col-md-8 text-primary">
+                    <div class="card-body text-white bg-dark" id="card-bokeh-ss">
+                        {{ div_bokeh | safe }}
+                        {{ script_bokeh | safe }}
+                    </div>
+                </div>
+                <div class="card col-md-4 text-primary">
+                    <div class="card-body text-white bg-dark">
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
+                            <h1>TODO...</h1>
+                            <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
+                        </form>
+                    </div>
+                </div>
             </div>
             <div class="row text-white bg-dark mb-2">
                 <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, save_img='0', save_src='1') }}">
@@ -189,12 +213,25 @@
                 </form>
             </div>
         </div>
+
+        <!-- Plotly cards -->
         <div class="collapse" id="card-plotly">
-            <div class="row card card-body text-white bg-dark" id="card-plotly-ss">
-                {{ script_plotly | safe}}
-                {{ div_plotly | safe }}
-                </br>
-            </div>
+            <div class="row card-group bg-dark text-white">
+                <div class="card col-md-8 text-primary">
+                    <div class="card-body text-white bg-dark" id="card-plotly-ss">
+                        {{ script_plotly | safe}}
+                        {{ div_plotly | safe }}
+                    </div>
+                </div>
+                <div class="card col-md-4 text-primary">
+                    <div class="card-body text-white bg-dark">
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
+                            <h1>TODO...</h1>
+                            <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
+                        </form>
+                    </div>
+                </div>
+            </div>  
             <div class="row text-white bg-dark mb-2">
                 <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='plotly', model_name=model_name, save_img='0', save_src='1') }}">
                     <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
@@ -207,10 +244,23 @@
                 </form>
             </div>
         </div>
+
+        <!-- Pygal cards -->
         <div class="collapse" id="card-pygal">
-            <div class="row card card-body text-white bg-dark" id="card-pygal-ss">
-                <embed type="image/svg+xml" src= {{ src_pygal | safe }} />
-                </br>
+            <div class="row card-group bg-dark text-white">
+                <div class="card col-md-8 text-primary">
+                    <div class="card-body text-white bg-dark" id="card-pygal-ss">
+                        <embed type="image/svg+xml" src= {{ src_pygal | safe }} />
+                    </div>
+                </div>
+                <div class="card col-md-4 text-primary">
+                    <div class="card-body text-white bg-dark">
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
+                            <h1>TODO...</h1>
+                            <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
+                        </form>
+                    </div>
+                </div>
             </div>
             <div class="row text-white bg-dark mb-2">
                 <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='pygal', model_name=model_name, save_img='0', save_src='1') }}">
