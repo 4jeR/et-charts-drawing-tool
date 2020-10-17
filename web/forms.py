@@ -82,10 +82,44 @@ class FromFileForm(FlaskForm):
 
 
 class MatplotlibOptionsForm(FlaskForm):
-    color =  StringField('Color:', validators=[DataRequired(), Length(min=1, max=20)])
-    line_width = IntegerField("Line width:", validators=[DataRequired()])
-    line_style = StringField('Line style:',  validators=[DataRequired(), Length(min=1, max=10)])
-    marker = StringField('Marker:',  validators=[DataRequired(), Length(min=1, max=10)])
+    
+
+    color = SelectField('Color: ', choices=[
+            ('b', 'blue'), 
+            ('g', 'green'), 
+            ('r', 'red'),
+            ('c', 'cyan'),
+            ('m', 'magenta'),
+            ('y', 'yellow'),
+            ('k', 'black'),
+            ('w', 'white')
+        ]
+    )
+
+    line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
+
+    line_style = SelectField('Style: ', choices=[
+            ('-',  'solid'), 
+            ('--', 'dashed'), 
+            (':',  'dotted'),
+            ('-.', 'dashed-dotted')
+        ]
+    )
+    # line_style = StringField('Line style:',  validators=[DataRequired(), Length(min=1, max=10)])
+    
+    # marker = StringField('Marker:',  validators=[DataRequired(), Length(min=1, max=10)])
+    marker = SelectField('Marker: ', choices=[
+            ('.', 'dot'), 
+            ('+', 'plus'),
+            ('*', 'star'),
+            ('x', 'cross'),
+            ('s', 'square'),
+            ('o', 'circle'), 
+            ('d', 'diamond'),
+            ('^', 'triangle'),
+            ('_', 'underscore')
+        ]
+    )
 
     flag_scatter_plot = BooleanField("Scatter:")
     flag_show_grid = BooleanField("Grid:")
