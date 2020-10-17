@@ -196,3 +196,21 @@ class MatplotlibPlotOptions(db.Model):
     flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
     flag_show_legend = db.Column(db.Boolean, unique=False, nullable=False)
     
+    @staticmethod
+    def get_options():
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = MatplotlibPlotOptions.query.first()
+        
+        if coefs_ok:
+            return {
+                'color': coefs_ok.color, 
+                'line_width': coefs_ok.line_width,
+                'line_style': coefs_ok.line_style,
+                'marker': coefs_ok.marker,
+                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
+                'flag_show_grid': coefs_ok.flag_show_grid,
+                'flag_logscale_y': coefs_ok.flag_logscale_y,
+                'flag_show_legend': coefs_ok.flag_show_legend
+            }
+        else:
+            return dict()

@@ -1,5 +1,6 @@
 import io
 import os
+import json
 
 from flask import Flask
 from flask import render_template
@@ -15,7 +16,7 @@ from web import app
 from web import db
 
 from web.import_forms import *
-
+from web.import_models import *
 
 from web.tool_utils import files_count
 from web.tool_utils import make_chart_matplotlib
@@ -39,10 +40,11 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 import chart_studio.tools as plotly_tools
 
 
-@app.route('/data/plot/matplotlib/<string:model_name>')
-def route_plot_matplotlib(model_name):
+@app.route('/data/plot/matplotlib/<string:model_name>/<string:options>')
+def route_plot_matplotlib(model_name, options):
     """ Returns the Response consisting the matplotlib chart image. """
-    fig = make_chart_matplotlib(model_name)
+    options_from_string = json.loads(options)
+    fig = make_chart_matplotlib(model_name, options_from_string)
     output = io.BytesIO()
     FigureCanvasAgg(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -70,6 +72,9 @@ def route_add_data_main():
     """ Renders main entry point for inserting the data. """
     fromfile_form = FromFileForm()
     return render_template('add_data_main.html', form=fromfile_form)
+
+
+
 
 
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
@@ -155,7 +160,15 @@ def route_show_data(model_name):
     if not points:
         points = []
 
+
+    kw_options = dict()
+    # parse dictionary of options from database to string
+    kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options()) 
+
+
+    ''' get all model charts'''
     kwargs = dict()
+
     if model_name != 'FileDataPoint':
         kwargs['coefs'] = ModelCoefs.get_coefs()
 
@@ -170,12 +183,44 @@ def route_show_data(model_name):
     chart = make_chart_pygal(model_name)
     kwargs["src_pygal"] = chart.render_data_uri()
 
-    kwforms = {}
-
+    kwforms = dict()
     kwforms['matplotlib_form'] = MatplotlibOptionsForm()
 
-    return render_template('show_data.html', points=points, model_name=model_name, **kwargs, **kwforms)
+    return render_template('show_data.html', points=points, model_name=model_name, **kwargs, **kwforms, **kw_options)
+
+
 # U
+@app.route("/data/change_options/<string:model_name>", methods=['GET', 'POST'])
+def route_change_options(model_name):
+    """ Inserts new option OptionsForm."""
+    matplotlib_form = MatplotlibOptionsForm()
+
+    if matplotlib_form.validate_on_submit():
+        kwargs = dict()
+        kwargs['color'] = matplotlib_form.color.data
+        kwargs['line_width'] = matplotlib_form.line_width.data
+        kwargs['line_style'] = matplotlib_form.line_style.data
+        kwargs['marker'] = matplotlib_form.marker.data
+
+        kwargs['flag_scatter_plot'] = matplotlib_form.flag_scatter_plot.data
+        kwargs['flag_show_grid'] = matplotlib_form.flag_show_grid.data
+        kwargs['flag_logscale_y'] = matplotlib_form.flag_logscale_y.data
+        kwargs['flag_show_legend'] = matplotlib_form.flag_show_legend.data
+
+        new_options = MatplotlibPlotOptions(**kwargs)
+
+        ''' replace old with new options '''
+        old_options = MatplotlibPlotOptions.query.first()
+        db.session.delete(old_options)
+        db.session.commit()
+
+        db.session.add(new_options)
+        db.session.commit()
+        flash(f'Changed options for Matplotlib!', 'success')
+        return redirect(url_for('route_show_data', model_name=model_name))
+
+
+
 
 
 # D
@@ -188,8 +233,7 @@ def route_delete_point(model_name, point_id):
     if not str_to_object(model_name).query.all():
         db.session.delete(str_to_object(model_name + 'Coefs').query.first())
         db.session.commit()
-    flash(
-        f'Point ({point.id}) has been succesfully removed from the database.', 'success')
+    flash(f'Point ({point.id}) has been succesfully removed from the database.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 

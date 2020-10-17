@@ -91,12 +91,12 @@
             <div class="row card-group bg-dark text-white">
                 <div class="card col-md-8 ">
                     <div class="card-body text-white bg-dark" id="card-matplotlib-ss">
-                        <img src="{{ url_for('route_plot_matplotlib', model_name=model_name) }}">
+                        <img src="{{ url_for('route_plot_matplotlib', model_name=model_name, options=matplotlib_options) }}">
                     </div>
                 </div>
                 <div class="card col-md-4 text-primary">
                     <div class="card-body text-white bg-dark">
-                        <form class="form-horizontal col-md-12" role="form" method="GET" action="#">
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
                             {% if matplotlib_form is defined %}
                                 {{ matplotlib_form.hidden_tag() }}
                                 <div class="form-group">

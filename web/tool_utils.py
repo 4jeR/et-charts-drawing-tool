@@ -38,7 +38,7 @@ def str_to_object(string_name):
     return getattr(sys.modules[__name__], string_name)
 
 
-def make_chart_matplotlib(model_name):
+def make_chart_matplotlib(model_name, options):
     ''' Fetches the data from database and makes chart figure that will be shown on the webpage '''
     
     ''' Get data for plotting '''
@@ -49,16 +49,18 @@ def make_chart_matplotlib(model_name):
     yy = [point.y for point in points]
 
     ''' Options for plotting '''
-    kwargs = {}
-    kwargs['color'] = 'red' # set color -> b: blue, g: green, r: red, c: cyan, m: magenta, y: yellow, k: black, w: white
-    kwargs['linewidth'] = 3 # set witdh of the line 
-    kwargs['linestyle'] = '-' #linestyle/ls:      {'-', '--', '-.', ':', ''}
-    kwargs['marker'] = '.'# markers -> {'', '.', ',', '1', '2', 's', 'x', '+'}
+    kwargs = dict()
 
-    scatter_plot = False
-    show_grid = True
-    logscale_y = False
-    show_legend = False
+    kwargs['color']     = options.get('color', 'r')               # set color -> b: blue, g: green, r: red, c: cyan, m: magenta, y: yellow, k: black, w: white
+    kwargs['linewidth'] = options.get('line_width', 2)            # set witdh of the line 
+    kwargs['linestyle'] = options.get('line_style', 'dashed')     # linestyle/ls:      {'-', '--', '-.', ':', ''}
+    kwargs['marker']    = options.get('marker', '.')              # markers -> {'', '.', ',', '1', '2', 's', 'x', '+'}
+
+    scatter_plot        = options.get('flag_scatter_plot', False) # dots or solid line
+    show_grid           = options.get('flag_show_grid', False)    # show grid or not
+    logscale_y          = options.get('flag_logscale_y', False )  # logarithmic scale
+    show_legend         = options.get('flag_show_legend', False)  # show_legend
+  
 
 
     ''' Get the figure object that will be returned '''
@@ -68,7 +70,7 @@ def make_chart_matplotlib(model_name):
     if logscale_y:
         chart.semilogy()  # set logscaly for  Y
 
-    chart.grid(show_grid) # grid ON/OFF
+    chart.grid(show_grid) 
     if show_legend:
         chart.legend()
 
