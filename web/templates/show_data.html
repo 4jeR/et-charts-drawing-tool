@@ -14,7 +14,7 @@
         {% elif model_name == 'SquareFunc' %}
             <h3>$$ y = { {{coefs[0]}}({x - {{coefs[1]}}})^2 + {{coefs[2]}}} $$</h3>
         {% elif model_name == 'FileDataPoint' %}
-            <h3>Data from file {{ filename }} </h3>
+            <h3 class="col-md-4 offset-4">Data from file {{ filename }} </h3>
         {% endif %}
     </div>
 
@@ -90,13 +90,14 @@
         <!-- Matplotlib cards -->
         <div class="collapse" id="card-matplotlib">
             <div class="row card-group bg-dark text-white">
-                <div class="card col-md-8 ">
+                <div class="card col-md-8 text-primary bg-dark border-danger border-danger">
                     <div class="card-body text-white bg-dark" id="card-matplotlib-ss">
                         <img src="{{ url_for('route_plot_matplotlib', model_name=model_name, options=matplotlib_options) }}">
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary">
+                <div class="card col-md-4 text-primary bg-dark border-danger border-danger">
                     <div class="card-body text-white bg-dark">
+                        
                         <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
                             {% if matplotlib_form is defined %}
                                 {{ matplotlib_form.hidden_tag() }}
@@ -141,13 +142,13 @@
                 </div>
             </div>
             <div class="row text-white bg-dark mb-2">
-                <form class="col-md-2 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='0', save_src='1') }}">
+                <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='0', save_src='1') }}">
                     <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
                 </form>
-                <form class="col-md-2 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='1', save_src='0') }}">
+                <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='1', save_src='0') }}">
                     <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
                 </form>
-                <form class="col-md-2 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='1', save_src='1') }}">
+                <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, save_img='1', save_src='1') }}">
                     <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
                 </form>
             </div>
@@ -156,12 +157,12 @@
         <!-- Seaborn cards -->
         <div class="collapse" id="card-seaborn">
             <div class="row card-group bg-dark text-white">
-                <div class="card col-md-8 text-primary">
+                <div class="card col-md-8 text-primary bg-dark border-danger">
                     <div class="card card-body text-white bg-dark" id="card-seaborn-ss">
                         <img src="{{ url_for('route_plot_seaborn', model_name=model_name) }}">
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary">
+                <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
                         <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
                             <h1>TODO...</h1>
@@ -186,13 +187,13 @@
         <!-- Bokeh cards -->
         <div class="collapse" id="card-bokeh">
             <div class="row card-group bg-dark text-white">
-                <div class="card col-md-8 text-primary">
+                <div class="card col-md-8 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark" id="card-bokeh-ss">
                         {{ div_bokeh | safe }}
                         {{ script_bokeh | safe }}
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary">
+                <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
                         <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
                             <h1>TODO...</h1>
@@ -217,13 +218,13 @@
         <!-- Plotly cards -->
         <div class="collapse" id="card-plotly">
             <div class="row card-group bg-dark text-white">
-                <div class="card col-md-8 text-primary">
+                <div class="card col-md-8 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark" id="card-plotly-ss">
                         {{ script_plotly | safe}}
                         {{ div_plotly | safe }}
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary">
+                <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
                         <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
                             <h1>TODO...</h1>
@@ -248,12 +249,12 @@
         <!-- Pygal cards -->
         <div class="collapse" id="card-pygal">
             <div class="row card-group bg-dark text-white">
-                <div class="card col-md-8 text-primary">
+                <div class="card col-md-8 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark" id="card-pygal-ss">
                         <embed type="image/svg+xml" src= {{ src_pygal | safe }} />
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary">
+                <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
                         <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', model_name=model_name) }}">
                             <h1>TODO...</h1>
