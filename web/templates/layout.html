@@ -15,26 +15,24 @@
         $(function() {
             $('#link-to-sinus-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_sine);
-            }, function() {
+            }/*
+        , function() {
                 $('#show-data-main-image').attr('src', img_qmark);
-            });
+            }
+        */);
         });
 
         const img_cosine = "{{ url_for('static', filename='main_cosine.png') }}"
         $(function() {
             $('#link-to-cosinus-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_cosine);
-            }, function() {
-                $('#show-data-main-image').attr('src', img_qmark);
             });
         });
-
+        
         const img_sqrt = "{{ url_for('static', filename='main_sqrt.png') }}"
         $(function() {
             $('#link-to-sqrt-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_sqrt);
-            }, function() {
-                $('#show-data-main-image').attr('src', img_qmark);
             });
         });
 
@@ -42,8 +40,6 @@
         $(function() {
             $('#link-to-exp-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_exp);
-            }, function() {
-                $('#show-data-main-image').attr('src', img_qmark);
             });
         });
 
@@ -51,8 +47,6 @@
         $(function() {
             $('#link-to-square-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_square);
-            }, function() {
-                $('#show-data-main-image').attr('src', img_qmark);
             });
         });
 
@@ -60,8 +54,6 @@
         $(function() {
             $('#link-to-file-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_file);
-            }, function() {
-                $('#show-data-main-image').attr('src', img_qmark);
             });
         });
 
@@ -69,8 +61,6 @@
         $(function() {
             $('#link-to-custom-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_custom);
-            }, function() {
-                $('#show-data-main-image').attr('src', img_qmark);
             });
         });
     </script>
