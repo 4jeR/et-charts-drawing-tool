@@ -164,7 +164,10 @@ def route_show_data(model_name):
     kw_options = dict()
     # parse dictionary of options from database to string
     kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options()) 
-
+    # kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options()) 
+    kw_options['bokeh_options'] = json.dumps(BokehPlotOptions.get_options()) 
+    # kw_options['plotly_options'] = json.dumps(PlotlyPlotOptions.get_options()) 
+    # kw_options['pygal_options'] = json.dumps(PygalPlotOptions.get_options()) 
 
     ''' get all model charts'''
     kwargs = dict()
@@ -190,8 +193,8 @@ def route_show_data(model_name):
 
 
 # U
-@app.route("/data/change_options/<string:model_name>", methods=['GET', 'POST'])
-def route_change_options(model_name):
+@app.route("/data/change_options/matplotlib/<string:model_name>", methods=['GET', 'POST'])
+def route_change_options_matplotlib(model_name):
     """ Inserts new option OptionsForm."""
     matplotlib_form = MatplotlibOptionsForm()
 
@@ -219,8 +222,40 @@ def route_change_options(model_name):
         flash(f'Changed options for Matplotlib!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name))
 
+#TODO: Seaborn options form + route
 
 
+@app.route("/data/change_options/bokeh/<string:model_name>", methods=['GET', 'POST'])
+def route_change_options_bokeh(model_name):
+    """ Inserts new option OptionsForm."""
+    bokeh_form = BokehOptionsForm()
+
+    if bokeh_form.validate_on_submit():
+        kwargs = dict()
+        kwargs['color'] = bokeh_form.color.data
+        kwargs['line_width'] = bokeh_form.line_width.data
+        kwargs['line_style'] = bokeh_form.line_style.data
+        kwargs['marker'] = bokeh_form.marker.data
+
+        kwargs['flag_scatter_plot'] = bokeh_form.flag_scatter_plot.data
+        kwargs['flag_show_grid'] = bokeh_form.flag_show_grid.data
+        kwargs['flag_logscale_y'] = bokeh_form.flag_logscale_y.data
+        kwargs['flag_show_legend'] = bokeh_form.flag_show_legend.data
+
+        new_options = BokehPlotOptions(**kwargs)
+
+        ''' replace old with new options '''
+        old_options = BokehPlotOptions.query.first()
+        db.session.delete(old_options)
+        db.session.commit()
+
+        db.session.add(new_options)
+        db.session.commit()
+        flash(f'Changed options for Bokeh!', 'success')
+        return redirect(url_for('route_show_data', model_name=model_name))
+
+#TODO: Plotly options form + route
+#TODO: Pygal options form + route
 
 
 # D

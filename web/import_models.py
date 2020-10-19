@@ -18,3 +18,4 @@ from web.models import FileDataPoint
 
 
 from web.models import MatplotlibPlotOptions
+from web.models import BokehPlotOptions

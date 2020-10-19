@@ -208,7 +208,7 @@ def download_image(library_name, model_name, current_time):
     chrome_options.add_argument(f"--window-size={window_size[0]},{window_size[1]}")
     chrome_options.add_argument("--kiosk") # for full screen -> images are caught entirely, not in half
     chrome_options.add_argument("--headless") # in background
-    driver = webdriver.Chrome(executable_path='web/chromedriver', chrome_options=chrome_options)
+    driver = webdriver.Chrome(executable_path='web/chromedriver', options=chrome_options)
     
     driver.get(image_url)
     button_to_show_chart = driver.find_element_by_id(f'btn-show-chart-{library_name}')
