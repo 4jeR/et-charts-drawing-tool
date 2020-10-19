@@ -7,6 +7,8 @@ from wtforms import PasswordField
 from wtforms import SelectField
 from wtforms import StringField 
 from wtforms import SubmitField
+from wtforms import FileField
+
 
 from wtforms.validators import DataRequired
 from wtforms.validators import Email
@@ -76,7 +78,7 @@ class SquareFuncForm(FlaskForm):
     submit = SubmitField('Add data')
 
 class FromFileForm(FlaskForm):
-    filename = StringField('Filename:',  validators=[DataRequired(), Length(min=3, max=40)])
+    filename = FileField('Filename:',  validators=[DataRequired()])
     
     submit = SubmitField('Add data')
 
