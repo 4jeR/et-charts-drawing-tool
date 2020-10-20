@@ -3,53 +3,57 @@
 <div class="row">
     <!-- MathJax - equation -->
     <div class="col-md-12" class="btn btn-lg btn-dark">
-        {% if model_name == 'Sinus' %}
-            <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
-        {% elif model_name == 'Cosinus' %}
-            <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
-        {% elif model_name == 'SquareRoot' %}
-            <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x - {{ coefs[2] }}} + {{ coefs[3] }}}$$</h3>
-        {% elif model_name == 'Exponential' %}
-            <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
-        {% elif model_name == 'SquareFunc' %}
-            <h3>$$ y = { {{coefs[0]}}({x - {{coefs[1]}}})^2 + {{coefs[2]}}} $$</h3>
-        {% elif model_name == 'FileDataPoint' %}
-            <h3 class="col-md-4 offset-4">Data from file {{ filename }} </h3>
+        {% if coefs is defined %}
+            {% if model_name == 'Sinus' %}
+                <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
+            {% elif model_name == 'Cosinus' %}
+                <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
+            {% elif model_name == 'SquareRoot' %}
+                <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x - {{ coefs[2] }}} + {{ coefs[3] }}}$$</h3>
+            {% elif model_name == 'Exponential' %}
+                <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x - {{ coefs[2] }})} + {{ coefs[3] }}}$$</h3>
+            {% elif model_name == 'SquareFunc' %}
+                <h3>$$ y = { {{coefs[0]}}({x - {{coefs[1]}}})^2 + {{coefs[2]}}} $$</h3>
+            {% endif %}
+
+            {% if model_name == 'FileDataPoint' %}
+                <h3 class="col-md-4 offset-4">Data from file {{ filename }} </h3>
+            {% endif %}
         {% endif %}
     </div>
 
     <!-- Data table -->
-    <div class="table-wrapper-scroll-y table-scrollbar col-md-3" position="fixed" id="points-table">
+    <div class="table-wrapper-scroll-y table-scrollbar col-md-3" position="fixed" id="charts-table">
         <table class="table table-striped table-dark">
             <thead>
                 <tr>
                     <td scope="col" align="center">
-                        <form action="{{ url_for('route_delete_all_points', model_name=model_name) }}" method="POST">
+                        <form action="{{ url_for('route_delete_all_charts', model_name=model_name) }}" method="POST">
                             <input class="btn btn-danger" type="submit" value="Delete all">
                         </form>
                     </td>
-                    <th scope="col" text-align="center">
-                        x
+                    <th scope="col" colspan="2" text-align="center">
+                        id
                     </th>
-                    <th scope="col" text-align="center">
-                        y
-                    </th>
+                    
                 </tr>
             </thead>
             <tbody>
-                {% if points|length > 0 %}
-                {% for point in points %}
+                {% if charts|length > 0 %}
+                {% for chart in charts %}
                     <tr>
                         <td scope="row" align="center">
-                            <form action="{{ url_for('route_delete_point', model_name=model_name, point_id=point.id) }}" method="POST">
+                            <form action="{{ url_for('route_delete_chart', model_name=model_name, chart_id=chart.id) }}" method="POST">
                                 <input class="btn btn-danger" type="submit" value="Delete">
                             </form>
                         </td>
                         <td scope="row">
-                            {{ point.x }}
+                            {{ chart.id }}
                         </td>
-                        <td scope="row">
-                            {{ point.y }}
+                        <td scope="row" align="center">
+                            <form action="{{ url_for('route_show_data', model_name=model_name, chart_id=chart.id) }}" method="POST">
+                                <input class="btn btn-danger" type="submit" value="Select">
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}
@@ -92,13 +96,13 @@
             <div class="row card-group bg-dark text-white">
                 <div class="card col-md-8 text-primary bg-dark border-danger border-danger">
                     <div class="card-body text-white bg-dark" id="card-matplotlib-ss">
-                        <img src="{{ url_for('route_plot_matplotlib', model_name=model_name, options=matplotlib_options) }}">
+                        <img src="{{ url_for('route_plot_matplotlib', model_name=model_name, chart_id=chart_id, options=matplotlib_options) }}">
                     </div>
                 </div>
                 <div class="card col-md-4 text-primary bg-dark border-danger border-danger">
                     <div class="card-body text-white bg-dark">
                         
-                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_matplotlib', model_name=model_name) }}">
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_matplotlib', model_name=model_name, chart_id=chart_id) }}">
                             {% if matplotlib_form is defined %}
                                 {{ matplotlib_form.hidden_tag() }}
                                 <div class="form-group">

@@ -2,6 +2,12 @@ import os
 import sys
 import time
 import inspect
+from math import cos
+from math import exp 
+from math import log
+from math import sin
+from math import sqrt
+
 import pandas as pd
 from datetime import datetime
 
@@ -38,22 +44,96 @@ def str_to_object(string_name):
     return getattr(sys.modules[__name__], string_name)
 
 
-def make_chart_matplotlib(model_name, options):
-    ''' Fetches the data from database and makes chart figure that will be shown on the webpage '''
-    
-    ''' Get data for plotting '''
+
+def make_points(model_name, chart_id):
     Model = str_to_object(model_name)
+    chart = Model.query.get(chart_id)
 
-    points = Model.query.all()
-    xx = [point.x for point in points]
-    yy = [point.y for point in points]
 
+    begin = getattr(chart, 'x_begin', 0)
+    end = getattr(chart, 'x_end', 1)
+    step = getattr(chart, 'step', 0.1)
+
+    a = getattr(chart, 'a', 'a')
+    b = getattr(chart, 'b', 'b')
+    c = getattr(chart, 'c', 'c')
+    d = getattr(chart, 'd', 'd')
+    p = getattr(chart, 'p', 'p')
+    q = getattr(chart, 'q', 'q')
+
+    # coefs = {float(coef) for coef in chart.get_coefs().values()}
+    
+    print("------------------------------")
+    print(f"TEST RANGE for id: {chart_id}:") 
+    print(f'start = {begin}')
+    print(f'end   = {end}')
+    print(f'step  = {step}')
+    print(f'a  = {a}')
+    print(f'b  = {b}')
+    print(f'c  = {c}')
+    print(f'd  = {d}')
+    print(f'p  = {p}')
+    print(f'q  = {q}')
+    # print(f'start = {coefs}')
+    print("------------------------------")
+
+
+    
+    
+    x_range = int((1.0)/step * (end - begin))+1
+
+    points = []
+    if model_name == 'Sinus':
+        for x in range(x_range):
+            xx = float(round(begin+x*step, 3))
+            yy = float(round(a*sin(b*xx - c) + d, 3))
+            points.append((xx, yy))
+
+    elif model_name == 'Cosinus':
+        for x in range(x_range):
+            xx = float(round(begin+x*step, 3))
+            yy = float(round(a*cos(b*xx - c) + d, 3))
+            points.append((xx, yy))
+
+    elif model_name == 'SquareRoot':
+        for x in range(x_range):
+            xx = float(round(begin+x*step, 3))
+            yy = float(round(a*sqrt(b*xx - c) + d, 3))
+            points.append((xx, yy))
+
+    elif model_name == 'Exponential':
+        for x in range(x_range):
+            xx = float(round(begin+x*step, 3))
+            yy = float(round(a*exp(b*xx - c) + d, 3))
+            points.append((xx, yy))
+
+    elif model_name == 'SquareFunc':
+        for x in range(x_range):
+            xx = float(round(begin+x*step, 3))
+            yy = float(round(a*(xx - p)**2 + q, 3))
+            points.append((xx, yy))
+
+    return points
+
+
+
+def make_chart_matplotlib(model_name, chart_id, options):
+    ''' Fetches the data from database and makes chart figure that will be shown on the webpage '''
+    ''' Get data for plotting '''
+    points = make_points(model_name, chart_id)
+
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
+
+    print("[MAKE_CHART_MATPLOTLIB]")
+    print(f"x: {xx}")
+    print(f"y: {yy}")
     ''' Options for plotting '''
     kwargs = dict()
 
     kwargs['color']     = options.get('color', 'r')               # set color -> b: blue, g: green, r: red, c: cyan, m: magenta, y: yellow, k: black, w: white
     kwargs['linewidth'] = options.get('line_width', 2)            # set witdh of the line 
-    kwargs['linestyle'] = options.get('line_style', 'dashed')     # linestyle/ls:      {'-', '--', '-.', ':', ''}
+    kwargs['linestyle'] = options.get('line_style', 'solid')     # linestyle/ls:      {'-', '--', '-.', ':', ''}
     kwargs['marker']    = options.get('marker', '.')              # markers -> {'', '.', ',', '1', '2', 's', 'x', '+'}
 
     scatter_plot        = options.get('flag_scatter_plot', False) # dots or solid line
@@ -99,10 +179,13 @@ def make_chart_seaborn(model_name):
     axis.grid(True)
     sb.set(style="darkgrid")
 
-    Model = str_to_object(model_name)
-    points = Model.query.all()
+    points = make_points(model_name)
+
+    # xx = [point[0] for point in points]
+    # yy = [point[1] for point in points]
+
     data = [
-        {model_name: point.x, model_name: point.y} for point in points
+        {model_name: point[0], model_name: point[1]} for point in points
     ]
     
     df = pd.DataFrame(data=data)
@@ -111,12 +194,13 @@ def make_chart_seaborn(model_name):
 
 
 def make_chart_bokeh(model_name):
-    Model = str_to_object(model_name)
-    points = Model.query.all()
+    # Model = str_to_object(model_name)
+    # points = Model.query.all()
 
-    xx = [point.x for point in points]
-    yy = [point.y for point in points]
-
+    # xx = [point.x for point in points]
+    # yy = [point.y for point in points]
+    xx = [x for x in range(10)]
+    yy = [y*y for y in range(10)]
     bokeh_chart = bokeh_figure(title="Bokeh plot", width=530, height=500, x_axis_label='x', y_axis_label='y')
     bokeh_chart.line(xx, yy)
     
@@ -125,11 +209,13 @@ def make_chart_bokeh(model_name):
 
 
 def make_chart_plotly(model_name):
-    Model = str_to_object(model_name)
-    points = Model.query.all()
+    # Model = str_to_object(model_name)
+    # points = Model.query.all()
     
-    xx = [point.x for point in points]
-    yy = [point.y for point in points]  
+    # xx = [point.x for point in points]
+    # yy = [point.y for point in points]
+    xx = [x for x in range(10)]
+    yy = [y*y for y in range(10)]  
     chart_props = {
         "data": [plotly_go.Line(x=xx, y=yy)],
         "layout": plotly_go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=530, height=500, margin={"l": 20, "t": 30})
@@ -140,13 +226,15 @@ def make_chart_plotly(model_name):
     
 
 def make_chart_pygal(model_name):
-    Model = str_to_object(model_name)
-    points = Model.query.all()
+    # Model = str_to_object(model_name)
+    # points = Model.query.all()
 
+    # xx = [x for x in range(10)]
+    # yy = [y*y for y in range(10)]
 
     chart = pygal.XY(show_dots=False, width=520, height=500)
     chart.title = "Pygal"
-    chart.add('y', [(point.x, point.y) for point in points])
+    # chart.add('y', [(point.x, point.y) for point in points])
 
     return chart
 
@@ -155,14 +243,6 @@ def files_count(lib_name='', path_to_images='.'):
     return len(list(filter(lambda s: s.startswith(lib_name), [f for f in os.listdir(path_to_images) if os.path.isfile(os.path.join(path_to_images, f))])))
 
 
-def make_points(db, form, model_name, step):
-    x_range = int((1.0)/step * (form.end.data - form.begin.data))+1
-    current_points = set([point.x for point in str_to_object(model_name).query.all()])
-    for i in range(x_range):
-        dx = i*step
-        pt = str_to_object(model_name).make_point(form.begin.data+dx)
-        if pt.x not in current_points:
-            db.session.add(pt)
 
 
 def get_data_from_file(filename):
@@ -222,32 +302,8 @@ def download_image(library_name, model_name, current_time):
     driver.quit()
 
 
-def get_html_content(library_name, model_name):
-    html = """ 
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
-    </head>
-    <body>
-        <h1>Error loading a file</h1>
-    </body>
-    </html>
-    """
-    if library_name == 'matplotlib':
-        with open(f'web/templates/show_data.html', 'r') as f:
-            html = f.read()
-    elif library_name == 'seaborn':
-        pass
-    elif library_name == 'bokeh':
-        pass
-    elif library_name == 'plotly':
-        pass
-    elif library_name == 'pygal':
-        pass
-    return html
 
-   
-
+def get_recently_added_record(db, model_name):
+    TableModel = str_to_object(model_name)
+    recently_added = db.session.query(TableModel).order_by(TableModel.id.desc()).first()
+    return recently_added

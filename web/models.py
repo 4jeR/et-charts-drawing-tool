@@ -1,181 +1,197 @@
 from web import db
 
-from math import cos
-from math import exp 
-from math import log
-from math import sin
-from math import sqrt
+
 
 
 class Sinus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    x = db.Column(db.Float, unique=False, nullable=False)
-    y = db.Column(db.Float, unique=False, nullable=False)
+    x_begin = db.Column(db.Float, unique=False, nullable=False)
+    x_end = db.Column(db.Float, unique=False, nullable=False)
+    step = db.Column(db.Float, unique=False, nullable=False)
 
-    @staticmethod
-    def make_point(x):
-        ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
-        coefs = SinusCoefs.query.first()
-        xx = float(round(x, 3))
-        yy = float(round(coefs.a*sin(coefs.b*x - coefs.c) + coefs.d, 3)) 
-        return Sinus(x=xx, y=yy)
-
-
-class SinusCoefs(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     a = db.Column(db.Float, unique=False, nullable=False)
     b = db.Column(db.Float, unique=False, nullable=False)
     c = db.Column(db.Float, unique=False, nullable=False)
     d = db.Column(db.Float, unique=False, nullable=False)
-    step = db.Column(db.Float, unique=False, nullable=False)
 
+    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+   
     @staticmethod
-    def get_coefs():
-        ''' Returns the list of all model coefficients. '''
-        coefs_ok = SinusCoefs.query.first()
-        
+    def get_domain_and_step(chart_id):
+        ''' Returns the range - list consisting two floats. '''
+        coefs_ok = Sinus.query.get(chart_id)
         if coefs_ok:
-            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d, coefs_ok.step] 
+            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
         else:
-            return ['?' for i in range(5)]
+            return [0, 1, 0.1]
+    
+    @staticmethod
+    def get_coefs(chart_id):
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = Sinus.query.get(chart_id)
+        if coefs_ok:
+            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
+        else:
+            return ['a', 'b', 'c', 'd']
+    
+
+
+'''   20.10.2020 
+TODO: 
+- Remodel all models below to be-like-this ^ 
+- Fix bug with deleting all charts
+- Remodel OptionsForms for each library (currently for Matplotlib) to specify only its chart id
+- Fix taking image of the chart
+- if len(charts) == 0 -> dont show cards with libraries
+- Simulate click the 'changed library' card by JavaScript (like the selenium screenshooters)
+'''
+# class Image(db.Model):
+#     __tablename__ = 'image'
+#     image_id = db.Column(db.Integer, primary_key = True)
+#     name = db.Column(db.String(8))
+#     # the one-to-one relation
+#     blindmap = relationship("Blindmap", uselist=False, backref="image")
+
+# class Blindmap(db.Model):
+#     __tablename__ = 'blindmap'
+#     module_id = db.Column(db.Integer, primary_key = True)
+#     image_id = db.Column(db.Integer, ForeignKey('image.image_id'))
 
 
 class Cosinus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    x = db.Column(db.Float, unique=False, nullable=False)
-    y = db.Column(db.Float, unique=False, nullable=False)
+    x_begin = db.Column(db.Float, unique=False, nullable=False)
+    x_end = db.Column(db.Float, unique=False, nullable=False)
+    step = db.Column(db.Float, unique=False, nullable=False)
 
-
-    @staticmethod
-    def make_point(x):
-        ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
-        coefs = CosinusCoefs.query.first()
-        xx = float(round(x, 3))
-        yy = float(round(coefs.a*cos(coefs.b*x - coefs.c) + coefs.d, 3))
-        return Cosinus(x=xx, y=yy)
-
-
-class CosinusCoefs(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     a = db.Column(db.Float, unique=False, nullable=False)
     b = db.Column(db.Float, unique=False, nullable=False)
     c = db.Column(db.Float, unique=False, nullable=False)
     d = db.Column(db.Float, unique=False, nullable=False)
-    step = db.Column(db.Float, unique=False, nullable=False)
 
+    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+   
     @staticmethod
-    def get_coefs():
-        ''' Returns the list of all model coefficients. '''
-        coefs_ok = CosinusCoefs.query.first()
-        
+    def get_domain_and_step(chart_id):
+        ''' Returns the range - list consisting two floats. '''
+        coefs_ok = Cosinus.query.get(chart_id)
         if coefs_ok:
-            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d, coefs_ok.step] 
+            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
         else:
-            return ['?' for i in range(5)]
+            return [0, 1, 0.1]
+    
+    @staticmethod
+    def get_coefs(chart_id):
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = Cosinus.query.get(chart_id)
+        if coefs_ok:
+            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
+        else:
+            return ['a', 'b', 'c', 'd']
 
 
 class SquareRoot(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    x = db.Column(db.Float, unique=False, nullable=False)
-    y = db.Column(db.Float, unique=False, nullable=False)
+    x_begin = db.Column(db.Float, unique=False, nullable=False)
+    x_end = db.Column(db.Float, unique=False, nullable=False)
+    step = db.Column(db.Float, unique=False, nullable=False)
 
-    @staticmethod
-    def make_point(x):
-        ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
-        coefs = SquareRootCoefs.query.first()
-        xx = float(round(x, 3))
-        yy = float(round(coefs.a*sqrt(coefs.b*x - coefs.c) + coefs.d, 3))
-        return SquareRoot(x=xx, y=yy)
-
-
-class SquareRootCoefs(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     a = db.Column(db.Float, unique=False, nullable=False)
     b = db.Column(db.Float, unique=False, nullable=False)
     c = db.Column(db.Float, unique=False, nullable=False)
     d = db.Column(db.Float, unique=False, nullable=False)
-    step = db.Column(db.Float, unique=False, nullable=False)
+
+    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
 
     @staticmethod
-    def get_coefs():
-        ''' Returns the list of all model coefficients. '''
-        coefs_ok = SquareRootCoefs.query.first()
-        
+    def get_domain_and_step(chart_id):
+        ''' Returns the range - list consisting two floats. '''
+        coefs_ok = SquareRoot.query.get(chart_id)
         if coefs_ok:
-            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d, coefs_ok.step] 
+            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
         else:
-            return ['?' for i in range(5)]
+            return [0, 1, 0.1]
+    
+    @staticmethod
+    def get_coefs(chart_id):
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = SquareRoot.query.get(chart_id)
+        if coefs_ok:
+            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
+        else:
+            return ['a', 'b', 'c', 'd']
 
 
 class Exponential(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    x = db.Column(db.Float, unique=False, nullable=False)
-    y = db.Column(db.Float, unique=False, nullable=False)
+    x_begin = db.Column(db.Float, unique=False, nullable=False)
+    x_end = db.Column(db.Float, unique=False, nullable=False)
+    step = db.Column(db.Float, unique=False, nullable=False)
 
-    @staticmethod
-    def make_point(x):
-        ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
-        coefs = ExponentialCoefs.query.first()
-        xx = float(round(x, 3))
-        yy = float(round(coefs.a*exp(coefs.b*(x - coefs.c)) + coefs.d, 3))
-        return Exponential(x=xx, y=yy)
-
-
-class ExponentialCoefs(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     a = db.Column(db.Float, unique=False, nullable=False)
     b = db.Column(db.Float, unique=False, nullable=False)
     c = db.Column(db.Float, unique=False, nullable=False)
     d = db.Column(db.Float, unique=False, nullable=False)
-    step = db.Column(db.Float, unique=False, nullable=False)
+
+    
+    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
 
     @staticmethod
-    def get_coefs():
-        ''' Returns the list of all model coefficients. '''
-        coefs_ok = ExponentialCoefs.query.first()
-        
+    def get_domain_and_step(chart_id):
+        ''' Returns the range - list consisting two floats. '''
+        coefs_ok = Exponential.query.get(chart_id)
         if coefs_ok:
-            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d, coefs_ok.step] 
+            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
         else:
-            return ['?' for i in range(5)]
+            return [0, 1, 0.1]
+    
+    @staticmethod
+    def get_coefs(chart_id):
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = Exponential.query.get(chart_id)
+        if coefs_ok:
+            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
+        else:
+            return ['a', 'b', 'c', 'd']
 
 
 class SquareFunc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    x = db.Column(db.Float, unique=False, nullable=False)
-    y = db.Column(db.Float, unique=False, nullable=False)
+    x_begin = db.Column(db.Float, unique=False, nullable=False)
+    x_end = db.Column(db.Float, unique=False, nullable=False)
+    step = db.Column(db.Float, unique=False, nullable=False)
 
-    @staticmethod
-    def make_point(x):
-        ''' Returns the point (x, y) where y is calculated from equation (based on model coefficients). '''
-        coefs = SquareFuncCoefs.query.first()
-        xx = float(round(x, 3))
-        yy = float(round(coefs.a*((x - coefs.p)**2) + coefs.q, 3))
-        return SquareFunc(x=xx, y=yy)
-
-
-class SquareFuncCoefs(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     a = db.Column(db.Float, unique=False, nullable=False)
     p = db.Column(db.Float, unique=False, nullable=False)
     q = db.Column(db.Float, unique=False, nullable=False)
-    step = db.Column(db.Float, unique=False, nullable=False)
-    
+
+    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+
     @staticmethod
-    def get_coefs():
-        ''' Returns the list of all model coefficients. '''
-        coefs_ok = SquareFuncCoefs.query.first()
-        
+    def get_domain_and_step(chart_id):
+        ''' Returns the range - list consisting two floats. '''
+        coefs_ok = SquareFunc.query.get(chart_id)
         if coefs_ok:
-            return [coefs_ok.a, coefs_ok.p, coefs_ok.q, coefs_ok.step] 
+            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
         else:
-            return ['?' for i in range(5)]
+            return [0, 1, 0.1]
+    
+    def get_coefs(chart_id):
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = SquareFunc.query.get(chart_id)
+        if coefs_ok:
+            return [coefs_ok.a, coefs_ok.p, coefs_ok.q]
+        else:
+            return ['a', 'p', 'q']
+
 
 
 class FileDataPoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     x = db.Column(db.Float, unique=False, nullable=False)
     y = db.Column(db.Float, unique=False, nullable=False)
+
+    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
 
     @staticmethod
     def make_point(xx, yy):
@@ -197,9 +213,9 @@ class MatplotlibPlotOptions(db.Model):
     flag_show_legend = db.Column(db.Boolean, unique=False, nullable=False)
     
     @staticmethod
-    def get_options():
+    def get_options(options_id):
         ''' Returns the list of all model coefficients. '''
-        coefs_ok = MatplotlibPlotOptions.query.first()
+        coefs_ok = MatplotlibPlotOptions.query.get(options_id)
         
         if coefs_ok:
             return {
