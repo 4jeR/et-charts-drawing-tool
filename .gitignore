@@ -10,3 +10,5 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+web/downloads/codes/*.py
+web/downloads/images/*.png
