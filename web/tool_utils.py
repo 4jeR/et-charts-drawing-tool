@@ -17,6 +17,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+import functools
 
 from flask import url_for
 
@@ -70,12 +71,12 @@ def make_points(model_name, chart_id):
             q = chart.q
 
     
-        print("------------------------------")
-        print(f"TEST RANGE for id: {chart_id}:") 
-        print(f'start = {begin}')
-        print(f'end   = {end}')
-        print(f'step  = {step}')
-        print("------------------------------")
+        # print("------------------------------")
+        # print(f"TEST RANGE for id: {chart_id}:") 
+        # print(f'start = {begin}')
+        # print(f'end   = {end}')
+        # print(f'step  = {step}')
+        # print("------------------------------")
     
         x_range = int((1.0)/step * (end - begin))+1
 
@@ -124,9 +125,9 @@ def make_chart_matplotlib(model_name, chart_id, options):
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
 
-    print("[MAKE_CHART_MATPLOTLIB]")
-    print(f"x: {xx}")
-    print(f"y: {yy}")
+    # print("[MAKE_CHART_MATPLOTLIB]")
+    # print(f"x: {xx}")
+    # print(f"y: {yy}")
     ''' Options for plotting '''
     kwargs = dict()
 
@@ -199,8 +200,6 @@ def make_chart_bokeh(model_name, chart_id, options):
 
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
-    # xx = [x for x in range(10)]
-    # yy = [y*y for y in range(10)]
     bokeh_chart = bokeh_figure(title="Bokeh plot", width=530, height=500, x_axis_label='x', y_axis_label='y')
     bokeh_chart.line(xx, yy)
     
@@ -214,8 +213,6 @@ def make_chart_plotly(model_name, chart_id, options):
     
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
-    # xx = [x for x in range(10)]
-    # yy = [y*y for y in range(10)]  
     chart_props = {
         "data": [plotly_go.Line(x=xx, y=yy)],
         "layout": plotly_go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=530, height=500, margin={"l": 20, "t": 30})
@@ -231,8 +228,6 @@ def make_chart_pygal(model_name, chart_id, options):
 
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
-    # xx = [x for x in range(10)]
-    # yy = [y*y for y in range(10)]
 
     chart = pygal.XY(show_dots=False, width=520, height=500)
     chart.title = "Pygal"
@@ -299,7 +294,7 @@ def download_image(library_name, model_name, chart_id, current_time):
     wait = WebDriverWait
     wait(driver, 10).until(EC.presence_of_element_located((By.ID, f'card-{library_name}-ss')))
     image_element = driver.find_element_by_id(f'card-{library_name}-ss')
-    time.sleep(2)
+    time.sleep(2.2)
     image_element.screenshot(save_path)
     driver.quit()
 
@@ -309,7 +304,6 @@ def get_recently_added_record(db, model_name):
     TableModel = str_to_object(model_name)
     recently_added = db.session.query(TableModel).order_by(TableModel.id.desc()).first()
     return recently_added
-
 
 
 def get_default_matplotlib_options(db):
@@ -372,7 +366,6 @@ def get_default_bokeh_options(db):
     return mplib_options
 
 
-
 def get_default_plotly_options(db):
     mplib_options = PlotlyPlotOptions.query.first()
 
@@ -413,3 +406,57 @@ def get_default_pygal_options(db):
     return mplib_options
 
 
+
+
+def clean_query(db):
+    def _decorator(func):
+        @functools.wraps(func)
+        def _wrapper(*args, **kwargs):
+            wrapper_result = func(*args, **kwargs)
+            clean_unused_matplotlib_options(db)
+            
+            return wrapper_result
+        return _wrapper
+    return _decorator
+
+
+
+
+def clean_unused_matplotlib_options(db):
+    MPO = MatplotlibPlotOptions # alias
+
+    sin_mplibs = Sinus.query.with_entities(Sinus.id_matplotlib_options)
+    sin_mplibs_ids = (id_ for id_, in sin_mplibs)
+
+    cos_mplibs = Cosinus.query.with_entities(Cosinus.id_matplotlib_options)
+    cos_mplibs_ids = (id_ for id_, in cos_mplibs)
+
+    sqrt_mplibs = SquareRoot.query.with_entities(SquareRoot.id_matplotlib_options)
+    sqrt_mplibs_ids = (id_ for id_, in sqrt_mplibs)
+
+    exp_mplibs = Exponential.query.with_entities(Exponential.id_matplotlib_options)
+    exp_mplibs_ids = (id_ for id_, in exp_mplibs)
+
+    sqf_mplibs = SquareFunc.query.with_entities(SquareFunc.id_matplotlib_options)
+    sqf_mplibs_ids = (id_ for id_, in sqf_mplibs)
+    
+    unused_ids = (
+        *sin_mplibs_ids, 
+        *cos_mplibs_ids, 
+        *sqrt_mplibs_ids, 
+        *exp_mplibs_ids, 
+        *sqf_mplibs_ids
+    )
+    options_to_delete = MPO.query.filter(
+        MPO.id.in_(
+            MPO.query.filter(
+                ~MPO.id.in_(unused_ids)
+            ).with_entities(MPO.id)
+        )
+    ).all()
+    
+
+    for option in options_to_delete:
+        db.session.delete(option)
+    
+    db.session.commit()

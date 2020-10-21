@@ -33,6 +33,10 @@ from web.tool_utils import get_current_time
 from web.tool_utils import save_source_code
 from web.tool_utils import get_data_from_file
 from web.tool_utils import get_recently_added_record
+# from web.tool_utils import clean_matplotlib_options
+from web.tool_utils import clean_query
+
+
 
 from web.tool_utils import get_default_matplotlib_options
 from web.tool_utils import get_default_seaborn_options
@@ -89,7 +93,6 @@ def route_add_data_main():
 
 
 
-
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
 def route_add_data(model_name):
     """ Inserts points to the database to the specific model based on values from forms."""
@@ -135,6 +138,7 @@ def route_add_data(model_name):
         db.session.add(model_object)
         db.session.commit()
         
+        # clean_matplotlib_options(db)
 
         chart_id = get_recently_added_record(db, model_name).id
 
@@ -167,7 +171,6 @@ def route_add_data_from_file():
 def route_show_data_main():
     """ Renders main web page on which you can choose different models. """
     return render_template('show_data_main.html')
-
 
 @app.route("/data/show/<string:model_name>", methods=['GET', 'POST'])
 @app.route("/data/show/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
@@ -228,9 +231,9 @@ def route_show_data(model_name, chart_id=-1):
     return render_template('show_data.html', model_name=model_name, chart_id=chart_id, charts=charts,  **kwargs, **kwforms, **kw_options)
 
 
-
 @app.route("/data/change_options/matplotlib/<string:model_name>", methods=['GET', 'POST'])
 @app.route("/data/change_options/matplotlib/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
+@clean_query(db=db)
 def route_change_options_matplotlib(model_name, chart_id=-1):
     """ Inserts new option OptionsForm."""
     Model = str_to_object(model_name)
@@ -266,6 +269,8 @@ def route_change_options_matplotlib(model_name, chart_id=-1):
         current_chart.id_matplotlib_options = new_options_id
 
         db.session.commit()
+
+        # clean_matplotlib_options(db)
         # select opts.id from sinus s right join matplotlib_plot_options opts on s.id_matplotlib_options = opts.id where s.id is null;
 
 
@@ -274,8 +279,8 @@ def route_change_options_matplotlib(model_name, chart_id=-1):
 
 #TODO: Seaborn options form + route
 
-
 @app.route("/data/change_options/bokeh/<string:model_name>", methods=['GET', 'POST'])
+@clean_query(db=db)
 def route_change_options_bokeh(model_name):
     """ Inserts new option OptionsForm."""
     bokeh_form = BokehOptionsForm()
@@ -310,6 +315,7 @@ def route_change_options_bokeh(model_name):
 
 # D
 @app.route("/data/delete/<string:model_name>/<int:chart_id>", methods=['POST'])
+@clean_query(db=db)
 def route_delete_chart(model_name, chart_id):
     """ Deletes chosen point from the database and redirects again on `route_show_data` route. """
     chart = str_to_object(model_name).query.get_or_404(chart_id)
@@ -323,6 +329,7 @@ def route_delete_chart(model_name, chart_id):
 
 
 @app.route("/data/delete/all/<string:model_name>", methods=['POST'])
+@clean_query(db=db)
 def route_delete_all_charts(model_name):
     Model = str_to_object(model_name)
     all_charts = Model.query.all()
