@@ -19,18 +19,26 @@ from web.import_forms import *
 from web.import_models import *
 
 from web.tool_utils import files_count
+
 from web.tool_utils import make_chart_matplotlib
 from web.tool_utils import make_chart_seaborn
 from web.tool_utils import make_chart_bokeh
 from web.tool_utils import make_chart_plotly
 from web.tool_utils import make_chart_pygal
+
 from web.tool_utils import make_points
 from web.tool_utils import str_to_object
-from web.tool_utils import get_data_from_file
 from web.tool_utils import download_image
 from web.tool_utils import get_current_time
 from web.tool_utils import save_source_code
+from web.tool_utils import get_data_from_file
 from web.tool_utils import get_recently_added_record
+
+from web.tool_utils import get_default_matplotlib_options
+from web.tool_utils import get_default_seaborn_options
+from web.tool_utils import get_default_bokeh_options
+from web.tool_utils import get_default_plotly_options
+from web.tool_utils import get_default_pygal_options
 
 
 from bokeh.embed import components as bokeh_components
@@ -53,10 +61,12 @@ def route_plot_matplotlib(model_name, options, chart_id=-1):
     return Response(output.getvalue(), mimetype='image/png')
 
 
-@app.route('/data/plot/seaborn/<string:model_name>')
-def route_plot_seaborn(model_name):
+@app.route('/data/plot/seaborn/<string:model_name>/<string:options>')
+@app.route('/data/plot/seaborn/<string:model_name>/<string:options>/<int:chart_id>')
+def route_plot_seaborn(model_name, options, chart_id=-1):
     """ Returns the Response consisting the Seaborn chart image. """
-    fig = make_chart_seaborn(model_name)
+    options_from_string = json.loads(options)
+    fig = make_chart_seaborn(model_name, chart_id, options_from_string)
     output = io.BytesIO()
     FigureCanvasAgg(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
@@ -103,24 +113,11 @@ def route_add_data(model_name):
         model_kwargs['step'] = form_step_data
 
 
-        
-        mplib_options = MatplotlibPlotOptions.query.first()
-
-        if not mplib_options:
-            kwargs = dict()
-            kwargs['color'] = 'r'
-            kwargs['line_width'] = 2
-            kwargs['line_style'] = '-'
-            kwargs['marker'] = '.'
-            kwargs['flag_scatter_plot'] = False
-            kwargs['flag_show_grid'] = True
-            kwargs['flag_logscale_y'] = False
-            kwargs['flag_show_legend'] = False
-            mplib_options = MatplotlibPlotOptions(**kwargs)
-            db.session.add(mplib_options)
-            db.session.commit()
-
-        model_kwargs['id_matplotlib_options'] = mplib_options.id
+        model_kwargs['id_matplotlib_options'] = get_default_matplotlib_options(db).id
+        model_kwargs['id_seaborn_options'] = get_default_seaborn_options(db).id
+        model_kwargs['id_bokeh_options'] = get_default_bokeh_options(db).id
+        model_kwargs['id_plotly_options'] = get_default_plotly_options(db).id
+        model_kwargs['id_pygal_options'] = get_default_pygal_options(db).id
         
          
 
@@ -185,18 +182,25 @@ def route_show_data(model_name, chart_id=-1):
 
     kw_options = dict()
 
-    ''' No models '''
     if chart_id != -1:
-        matplotlib_options_id = Model.query.get(chart_id).id_matplotlib_options
-
-        ''' get options for each library '''
+        ''' Get options for each library. '''
         # parse dictionary of options from database to string
+        matplotlib_options_id = Model.query.get(chart_id).id_matplotlib_options
         kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id)) 
-    
-    # kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options()) 
-    # kw_options['bokeh_options'] = json.dumps(BokehPlotOptions.get_options()) 
-    # kw_options['plotly_options'] = json.dumps(PlotlyPlotOptions.get_options()) 
-    # kw_options['pygal_options'] = json.dumps(PygalPlotOptions.get_options()) 
+
+        seaborn_options_id = Model.query.get(chart_id).id_seaborn_options
+        kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(seaborn_options_id)) 
+
+        bokeh_options_id = Model.query.get(chart_id).id_bokeh_options
+        kw_options['bokeh_options'] = json.dumps(BokehPlotOptions.get_options(bokeh_options_id)) 
+
+        plotly_options_id = Model.query.get(chart_id).id_plotly_options
+        kw_options['plotly_options'] = json.dumps(PlotlyPlotOptions.get_options(plotly_options_id)) 
+
+
+        pygal_options_id = Model.query.get(chart_id).id_pygal_options
+        kw_options['pygal_options'] = json.dumps(PygalPlotOptions.get_options(pygal_options_id)) 
+        
 
 
     getable_models = ['Sinus', 'Cosinus', 'SquareRoot', 'Exponential', 'SquareFunc']
@@ -207,15 +211,15 @@ def route_show_data(model_name, chart_id=-1):
     if model_name in getable_models:
         kwargs['coefs'] = Model.get_coefs(chart_id)
 
-    bokeh_chart = make_chart_bokeh(model_name)
+    bokeh_chart = make_chart_bokeh(model_name, chart_id, kw_options.get('bokeh_options', ''))
     script_bokeh, div_bokeh = bokeh_components(bokeh_chart)
     kwargs["script_bokeh"] = script_bokeh
     kwargs["div_bokeh"] = div_bokeh
 
     kwargs["script_plotly"] = '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> '
-    kwargs["div_plotly"] = make_chart_plotly(model_name)
+    kwargs["div_plotly"] = make_chart_plotly(model_name, chart_id, kw_options.get('plotly_options', ''))
 
-    pygal_chart = make_chart_pygal(model_name)
+    pygal_chart = make_chart_pygal(model_name, chart_id, kw_options.get('pygal_options', ''))
     kwargs["src_pygal"] = pygal_chart.render_data_uri()
 
     kwforms = dict()
@@ -334,18 +338,18 @@ def route_summary():
 
 
 ''' Download images and codes section '''
-@app.route("/data/download/<string:library_name>/<string:model_name>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
-def route_download_src_img(library_name, model_name, save_img, save_src):
+@app.route("/data/download/<string:library_name>/<string:model_name>/<int:chart_id>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
+def route_download_src_img(library_name, model_name, chart_id, save_img, save_src):
     """ Downloads image and code for given chart library name. """
     now = get_current_time()
 
     if save_img == '1':
         filename_png = f'{library_name}_{model_name}.png'
-        download_image(library_name, model_name, now)
+        download_image(library_name, model_name, chart_id, now)
         flash(f'{library_name} chart {model_name} model has been downloaded at web/downloads/images/{now}_{filename_png}.', 'success')
     if save_src == '1':
         filename_py = f'{library_name}_{model_name}.py'
-        save_source_code(library_name, model_name, now)
+        save_source_code(library_name, model_name, chart_id, now)
         flash(f'{library_name} chart {model_name} code has been saved at web/downloads/codes/{now}_{filename_py}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 

@@ -15,7 +15,13 @@ class Sinus(db.Model):
     d = db.Column(db.Float, unique=False, nullable=False)
 
     id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
-   
+    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
+
+
+
     @staticmethod
     def get_domain_and_step(chart_id):
         ''' Returns the range - list consisting two floats. '''
@@ -32,7 +38,7 @@ class Sinus(db.Model):
         if coefs_ok:
             return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
         else:
-            return ['a', 'b', 'c', 'd']
+            return ['?', '?', '?', '?']
     
 
 
@@ -70,6 +76,10 @@ class Cosinus(db.Model):
     d = db.Column(db.Float, unique=False, nullable=False)
 
     id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
    
     @staticmethod
     def get_domain_and_step(chart_id):
@@ -87,7 +97,7 @@ class Cosinus(db.Model):
         if coefs_ok:
             return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
         else:
-            return ['a', 'b', 'c', 'd']
+            return ['?', '?', '?', '?']
 
 
 class SquareRoot(db.Model):
@@ -102,6 +112,10 @@ class SquareRoot(db.Model):
     d = db.Column(db.Float, unique=False, nullable=False)
 
     id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
 
     @staticmethod
     def get_domain_and_step(chart_id):
@@ -119,7 +133,7 @@ class SquareRoot(db.Model):
         if coefs_ok:
             return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
         else:
-            return ['a', 'b', 'c', 'd']
+            return ['?', '?', '?', '?']
 
 
 class Exponential(db.Model):
@@ -135,6 +149,10 @@ class Exponential(db.Model):
 
     
     id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
 
     @staticmethod
     def get_domain_and_step(chart_id):
@@ -152,7 +170,7 @@ class Exponential(db.Model):
         if coefs_ok:
             return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
         else:
-            return ['a', 'b', 'c', 'd']
+            return ['?', '?', '?', '?']
 
 
 class SquareFunc(db.Model):
@@ -166,6 +184,10 @@ class SquareFunc(db.Model):
     q = db.Column(db.Float, unique=False, nullable=False)
 
     id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
 
     @staticmethod
     def get_domain_and_step(chart_id):
@@ -185,18 +207,22 @@ class SquareFunc(db.Model):
             return ['a', 'p', 'q']
 
 
-
 class FileDataPoint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     x = db.Column(db.Float, unique=False, nullable=False)
     y = db.Column(db.Float, unique=False, nullable=False)
 
     id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
 
     @staticmethod
     def make_point(xx, yy):
         ''' Returns the FileDataPoint (x, y). '''
         return FileDataPoint(x=float(round(xx, 3)), y=float(round(yy, 3)))
+
 
 
 class MatplotlibPlotOptions(db.Model):
@@ -232,6 +258,40 @@ class MatplotlibPlotOptions(db.Model):
             return dict()
 
 
+class SeabornPlotOptions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    color = db.Column(db.String, unique=False, nullable=False)
+    line_width = db.Column(db.Integer, unique=False, nullable=False)
+    line_style = db.Column(db.String, unique=False, nullable=False)
+    marker = db.Column(db.String, unique=False, nullable=False)
+
+    flag_scatter_plot = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_show_grid = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_show_legend = db.Column(db.Boolean, unique=False, nullable=False)
+    
+    @staticmethod
+    def get_options(options_id):
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = SeabornPlotOptions.query.get(options_id)
+        
+        if coefs_ok:
+            return {
+                'color': coefs_ok.color, 
+                'line_width': coefs_ok.line_width,
+                'line_style': coefs_ok.line_style,
+                'marker': coefs_ok.marker,
+                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
+                'flag_show_grid': coefs_ok.flag_show_grid,
+                'flag_logscale_y': coefs_ok.flag_logscale_y,
+                'flag_show_legend': coefs_ok.flag_show_legend
+            }
+        else:
+            return dict()
+
+
+
 class BokehPlotOptions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -246,9 +306,76 @@ class BokehPlotOptions(db.Model):
     flag_show_legend = db.Column(db.Boolean, unique=False, nullable=False)
     
     @staticmethod
-    def get_options():
+    def get_options(options_id):
         ''' Returns the list of all model coefficients. '''
-        coefs_ok = MatplotlibPlotOptions.query.first()
+        coefs_ok = BokehPlotOptions.query.get(options_id)
+        
+        if coefs_ok:
+            return {
+                'color': coefs_ok.color, 
+                'line_width': coefs_ok.line_width,
+                'line_style': coefs_ok.line_style,
+                'marker': coefs_ok.marker,
+                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
+                'flag_show_grid': coefs_ok.flag_show_grid,
+                'flag_logscale_y': coefs_ok.flag_logscale_y,
+                'flag_show_legend': coefs_ok.flag_show_legend
+            }
+        else:
+            return dict()
+
+
+class PlotlyPlotOptions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    color = db.Column(db.String, unique=False, nullable=False)
+    line_width = db.Column(db.Integer, unique=False, nullable=False)
+    line_style = db.Column(db.String, unique=False, nullable=False)
+    marker = db.Column(db.String, unique=False, nullable=False)
+
+    flag_scatter_plot = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_show_grid = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_show_legend = db.Column(db.Boolean, unique=False, nullable=False)
+    
+    @staticmethod
+    def get_options(options_id):
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = PlotlyPlotOptions.query.get(options_id)
+        
+        if coefs_ok:
+            return {
+                'color': coefs_ok.color, 
+                'line_width': coefs_ok.line_width,
+                'line_style': coefs_ok.line_style,
+                'marker': coefs_ok.marker,
+                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
+                'flag_show_grid': coefs_ok.flag_show_grid,
+                'flag_logscale_y': coefs_ok.flag_logscale_y,
+                'flag_show_legend': coefs_ok.flag_show_legend
+            }
+        else:
+            return dict()
+
+
+
+class PygalPlotOptions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    color = db.Column(db.String, unique=False, nullable=False)
+    line_width = db.Column(db.Integer, unique=False, nullable=False)
+    line_style = db.Column(db.String, unique=False, nullable=False)
+    marker = db.Column(db.String, unique=False, nullable=False)
+
+    flag_scatter_plot = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_show_grid = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
+    flag_show_legend = db.Column(db.Boolean, unique=False, nullable=False)
+    
+    @staticmethod
+    def get_options(options_id):
+        ''' Returns the list of all model coefficients. '''
+        coefs_ok = PygalPlotOptions.query.get(options_id)
         
         if coefs_ok:
             return {

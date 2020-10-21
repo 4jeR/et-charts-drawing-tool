@@ -46,72 +46,69 @@ def str_to_object(string_name):
 
 
 def make_points(model_name, chart_id):
+    points = []
     Model = str_to_object(model_name)
     chart = Model.query.get(chart_id)
+    if chart is None:
+        print(f"no chart with given id ({chart_id}).")
+    else:
+        begin = chart.x_begin
+        end = chart.x_end
+        step = chart.step
 
 
-    begin = getattr(chart, 'x_begin', 0)
-    end = getattr(chart, 'x_end', 1)
-    step = getattr(chart, 'step', 0.1)
-
-    a = getattr(chart, 'a', 'a')
-    b = getattr(chart, 'b', 'b')
-    c = getattr(chart, 'c', 'c')
-    d = getattr(chart, 'd', 'd')
-    p = getattr(chart, 'p', 'p')
-    q = getattr(chart, 'q', 'q')
-
-    # coefs = {float(coef) for coef in chart.get_coefs().values()}
-    
-    print("------------------------------")
-    print(f"TEST RANGE for id: {chart_id}:") 
-    print(f'start = {begin}')
-    print(f'end   = {end}')
-    print(f'step  = {step}')
-    print(f'a  = {a}')
-    print(f'b  = {b}')
-    print(f'c  = {c}')
-    print(f'd  = {d}')
-    print(f'p  = {p}')
-    print(f'q  = {q}')
-    # print(f'start = {coefs}')
-    print("------------------------------")
-
+        defaults = ['Sinus', 'Cosinus', 'Exponential']
+        ''' get all model charts'''
+        if model_name in defaults or model_name == 'SquareRoot':
+            a = chart.a 
+            b = chart.b 
+            c = chart.c 
+            d = chart.d
+        elif model_name == 'SquareFunc':
+            a = chart.a
+            p = chart.p
+            q = chart.q
 
     
+        print("------------------------------")
+        print(f"TEST RANGE for id: {chart_id}:") 
+        print(f'start = {begin}')
+        print(f'end   = {end}')
+        print(f'step  = {step}')
+        print("------------------------------")
     
-    x_range = int((1.0)/step * (end - begin))+1
+        x_range = int((1.0)/step * (end - begin))+1
 
-    points = []
-    if model_name == 'Sinus':
-        for x in range(x_range):
-            xx = float(round(begin+x*step, 3))
-            yy = float(round(a*sin(b*xx - c) + d, 3))
-            points.append((xx, yy))
+    
+        if model_name == 'Sinus':
+            for x in range(x_range):
+                xx = float(round(begin+x*step, 3))
+                yy = float(round(a*sin(b*xx - c) + d, 3))
+                points.append((xx, yy))
 
-    elif model_name == 'Cosinus':
-        for x in range(x_range):
-            xx = float(round(begin+x*step, 3))
-            yy = float(round(a*cos(b*xx - c) + d, 3))
-            points.append((xx, yy))
+        elif model_name == 'Cosinus':
+            for x in range(x_range):
+                xx = float(round(begin+x*step, 3))
+                yy = float(round(a*cos(b*xx - c) + d, 3))
+                points.append((xx, yy))
 
-    elif model_name == 'SquareRoot':
-        for x in range(x_range):
-            xx = float(round(begin+x*step, 3))
-            yy = float(round(a*sqrt(b*xx - c) + d, 3))
-            points.append((xx, yy))
+        elif model_name == 'SquareRoot':
+            for x in range(x_range):
+                xx = float(round(begin+x*step, 3))
+                yy = float(round(a*sqrt(b*xx - c) + d, 3))
+                points.append((xx, yy))
 
-    elif model_name == 'Exponential':
-        for x in range(x_range):
-            xx = float(round(begin+x*step, 3))
-            yy = float(round(a*exp(b*xx - c) + d, 3))
-            points.append((xx, yy))
+        elif model_name == 'Exponential':
+            for x in range(x_range):
+                xx = float(round(begin+x*step, 3))
+                yy = float(round(a*exp(b*xx - c) + d, 3))
+                points.append((xx, yy))
 
-    elif model_name == 'SquareFunc':
-        for x in range(x_range):
-            xx = float(round(begin+x*step, 3))
-            yy = float(round(a*(xx - p)**2 + q, 3))
-            points.append((xx, yy))
+        elif model_name == 'SquareFunc':
+            for x in range(x_range):
+                xx = float(round(begin+x*step, 3))
+                yy = float(round(a*(xx - p)**2 + q, 3))
+                points.append((xx, yy))
 
     return points
 
@@ -120,8 +117,10 @@ def make_points(model_name, chart_id):
 def make_chart_matplotlib(model_name, chart_id, options):
     ''' Fetches the data from database and makes chart figure that will be shown on the webpage '''
     ''' Get data for plotting '''
-    points = make_points(model_name, chart_id)
-
+    if chart_id != -1:
+        points = make_points(model_name, chart_id)
+    else:
+        points = [(x, x+2) for x in range(10)]
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
 
@@ -171,7 +170,7 @@ def make_chart_matplotlib(model_name, chart_id, options):
     return fig
 
 
-def make_chart_seaborn(model_name):
+def make_chart_seaborn(model_name, chart_id, options):
     fig = Figure(figsize=(5.0, 5.0))
     axis = fig.add_subplot(1, 1, 1)
     axis.set_title('Seaborn')
@@ -179,7 +178,7 @@ def make_chart_seaborn(model_name):
     axis.grid(True)
     sb.set(style="darkgrid")
 
-    points = make_points(model_name)
+    points = make_points(model_name, chart_id)
 
     # xx = [point[0] for point in points]
     # yy = [point[1] for point in points]
@@ -193,14 +192,15 @@ def make_chart_seaborn(model_name):
     return fig
 
 
-def make_chart_bokeh(model_name):
-    # Model = str_to_object(model_name)
-    # points = Model.query.all()
+def make_chart_bokeh(model_name, chart_id, options):
+    Model = str_to_object(model_name)
+    points = make_points(model_name, chart_id)
+    
 
-    # xx = [point.x for point in points]
-    # yy = [point.y for point in points]
-    xx = [x for x in range(10)]
-    yy = [y*y for y in range(10)]
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
+    # xx = [x for x in range(10)]
+    # yy = [y*y for y in range(10)]
     bokeh_chart = bokeh_figure(title="Bokeh plot", width=530, height=500, x_axis_label='x', y_axis_label='y')
     bokeh_chart.line(xx, yy)
     
@@ -208,14 +208,14 @@ def make_chart_bokeh(model_name):
     return bokeh_chart
 
 
-def make_chart_plotly(model_name):
-    # Model = str_to_object(model_name)
-    # points = Model.query.all()
+def make_chart_plotly(model_name, chart_id, options):
+    Model = str_to_object(model_name)
+    points = make_points(model_name, chart_id)
     
-    # xx = [point.x for point in points]
-    # yy = [point.y for point in points]
-    xx = [x for x in range(10)]
-    yy = [y*y for y in range(10)]  
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
+    # xx = [x for x in range(10)]
+    # yy = [y*y for y in range(10)]  
     chart_props = {
         "data": [plotly_go.Line(x=xx, y=yy)],
         "layout": plotly_go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=530, height=500, margin={"l": 20, "t": 30})
@@ -225,16 +225,18 @@ def make_chart_plotly(model_name):
     return chart_div_html
     
 
-def make_chart_pygal(model_name):
-    # Model = str_to_object(model_name)
-    # points = Model.query.all()
+def make_chart_pygal(model_name, chart_id, options):
+    Model = str_to_object(model_name)
+    points = make_points(model_name, chart_id)
 
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
     # xx = [x for x in range(10)]
     # yy = [y*y for y in range(10)]
 
     chart = pygal.XY(show_dots=False, width=520, height=500)
     chart.title = "Pygal"
-    # chart.add('y', [(point.x, point.y) for point in points])
+    chart.add('y', points)
 
     return chart
 
@@ -269,18 +271,18 @@ def get_current_time():
     return datetime.now().strftime("%m-%d_%H-%M-%S")
 
 
-def save_source_code(library_name, model_name, current_time):
+def save_source_code(library_name, model_name, chart_id, current_time):
     code = inspect.getsource(str_to_object(f'make_chart_{library_name}'))
     
 
-    filename = f'{current_time}_{library_name}_{model_name}'  
+    filename = f'{current_time}_{library_name}_{chart_id}_{model_name}'  
     with open(f'web/downloads/codes/{filename}.py', 'w') as f:
         f.write(code) 
 
 
-def download_image(library_name, model_name, current_time):
+def download_image(library_name, model_name, chart_id, current_time):
     filename = f'{library_name}_{model_name}.png'
-    image_url = 'http://localhost:5000/' + url_for('route_show_data', model_name=model_name)
+    image_url = 'http://localhost:5000/' + url_for('route_show_data', model_name=model_name, chart_id=chart_id)
     save_path = f'web/downloads/images/{current_time}_{filename}'
     window_size = (1920, 1080)
     
@@ -307,3 +309,107 @@ def get_recently_added_record(db, model_name):
     TableModel = str_to_object(model_name)
     recently_added = db.session.query(TableModel).order_by(TableModel.id.desc()).first()
     return recently_added
+
+
+
+def get_default_matplotlib_options(db):
+    mplib_options = MatplotlibPlotOptions.query.first()
+
+    if not mplib_options:
+        kwargs = dict()
+        kwargs['color'] = 'r'
+        kwargs['line_width'] = 2
+        kwargs['line_style'] = '-'
+        kwargs['marker'] = '.'
+        kwargs['flag_scatter_plot'] = False
+        kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_y'] = False
+        kwargs['flag_show_legend'] = False
+        mplib_options = MatplotlibPlotOptions(**kwargs)
+        db.session.add(mplib_options)
+        db.session.commit()
+    
+    return mplib_options
+
+
+def get_default_seaborn_options(db):
+    mplib_options = SeabornPlotOptions.query.first()
+
+    if not mplib_options:
+        kwargs = dict()
+        kwargs['color'] = 'r'
+        kwargs['line_width'] = 2
+        kwargs['line_style'] = '-'
+        kwargs['marker'] = '.'
+        kwargs['flag_scatter_plot'] = False
+        kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_y'] = False
+        kwargs['flag_show_legend'] = False
+        mplib_options = SeabornPlotOptions(**kwargs)
+        db.session.add(mplib_options)
+        db.session.commit()
+    
+    return mplib_options
+
+
+def get_default_bokeh_options(db):
+    mplib_options = BokehPlotOptions.query.first()
+
+    if not mplib_options:
+        kwargs = dict()
+        kwargs['color'] = 'r'
+        kwargs['line_width'] = 2
+        kwargs['line_style'] = '-'
+        kwargs['marker'] = '.'
+        kwargs['flag_scatter_plot'] = False
+        kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_y'] = False
+        kwargs['flag_show_legend'] = False
+        mplib_options = BokehPlotOptions(**kwargs)
+        db.session.add(mplib_options)
+        db.session.commit()
+    
+    return mplib_options
+
+
+
+def get_default_plotly_options(db):
+    mplib_options = PlotlyPlotOptions.query.first()
+
+    if not mplib_options:
+        kwargs = dict()
+        kwargs['color'] = 'r'
+        kwargs['line_width'] = 2
+        kwargs['line_style'] = '-'
+        kwargs['marker'] = '.'
+        kwargs['flag_scatter_plot'] = False
+        kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_y'] = False
+        kwargs['flag_show_legend'] = False
+        mplib_options = PlotlyPlotOptions(**kwargs)
+        db.session.add(mplib_options)
+        db.session.commit()
+    
+    return mplib_options
+
+
+def get_default_pygal_options(db):
+    mplib_options = PygalPlotOptions.query.first()
+
+    if not mplib_options:
+        kwargs = dict()
+        kwargs['color'] = 'r'
+        kwargs['line_width'] = 2
+        kwargs['line_style'] = '-'
+        kwargs['marker'] = '.'
+        kwargs['flag_scatter_plot'] = False
+        kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_y'] = False
+        kwargs['flag_show_legend'] = False
+        mplib_options = PygalPlotOptions(**kwargs)
+        db.session.add(mplib_options)
+        db.session.commit()
+    
+    return mplib_options
+
+
