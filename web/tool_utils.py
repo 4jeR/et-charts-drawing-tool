@@ -407,56 +407,47 @@ def get_default_pygal_options(db):
 
 
 
-
 def clean_query(db):
     def _decorator(func):
         @functools.wraps(func)
         def _wrapper(*args, **kwargs):
             wrapper_result = func(*args, **kwargs)
-            clean_unused_matplotlib_options(db)
-            
+            clean_unused_options(db)
             return wrapper_result
         return _wrapper
     return _decorator
 
 
+def clean_unused_options(db):
+    LIBS = ('matplotlib', 'seaborn', 'bokeh', 'plotly', 'pygal')
 
+    for lib in LIBS:
+        LPO = str_to_object(f'{lib.capitalize()}PlotOptions')
+        id_library_options = f'id_{lib}_options'
 
-def clean_unused_matplotlib_options(db):
-    MPO = MatplotlibPlotOptions # alias
-
-    sin_mplibs = Sinus.query.with_entities(Sinus.id_matplotlib_options)
-    sin_mplibs_ids = (id_ for id_, in sin_mplibs)
-
-    cos_mplibs = Cosinus.query.with_entities(Cosinus.id_matplotlib_options)
-    cos_mplibs_ids = (id_ for id_, in cos_mplibs)
-
-    sqrt_mplibs = SquareRoot.query.with_entities(SquareRoot.id_matplotlib_options)
-    sqrt_mplibs_ids = (id_ for id_, in sqrt_mplibs)
-
-    exp_mplibs = Exponential.query.with_entities(Exponential.id_matplotlib_options)
-    exp_mplibs_ids = (id_ for id_, in exp_mplibs)
-
-    sqf_mplibs = SquareFunc.query.with_entities(SquareFunc.id_matplotlib_options)
-    sqf_mplibs_ids = (id_ for id_, in sqf_mplibs)
-    
-    unused_ids = (
-        *sin_mplibs_ids, 
-        *cos_mplibs_ids, 
-        *sqrt_mplibs_ids, 
-        *exp_mplibs_ids, 
-        *sqf_mplibs_ids
-    )
-    options_to_delete = MPO.query.filter(
-        MPO.id.in_(
-            MPO.query.filter(
-                ~MPO.id.in_(unused_ids)
-            ).with_entities(MPO.id)
+        sin_unused_lib_ids = (id_ for id_, in Sinus.query.with_entities(getattr(Sinus, id_library_options)))
+        cos_unused_lib_ids = (id_ for id_, in Cosinus.query.with_entities(getattr(Cosinus, id_library_options)))
+        sqrt_unused_lib_ids = (id_ for id_, in SquareRoot.query.with_entities(getattr(SquareRoot, id_library_options)))
+        exp_unused_lib_ids = (id_ for id_, in Exponential.query.with_entities(getattr(Exponential, id_library_options)))
+        sqf_unused_lib_ids = (id_ for id_, in SquareFunc.query.with_entities(getattr(SquareFunc, id_library_options)))
+        
+        unused_ids = (
+            *sin_unused_lib_ids, 
+            *cos_unused_lib_ids, 
+            *sqrt_unused_lib_ids, 
+            *exp_unused_lib_ids, 
+            *sqf_unused_lib_ids
         )
-    ).all()
-    
-
-    for option in options_to_delete:
-        db.session.delete(option)
+        options_to_delete = LPO.query.filter(
+            LPO.id.in_(
+                LPO.query.filter(
+                    ~LPO.id.in_(unused_ids)
+                ).with_entities(LPO.id)
+            )
+        ).all()
+        
+        for option in options_to_delete:
+            db.session.delete(option)
     
     db.session.commit()
+
