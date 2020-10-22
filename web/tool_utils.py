@@ -140,9 +140,13 @@ def make_chart_matplotlib(model_name, chart_id, options):
     
     chart.set_facecolor(background_color)   #background, '' TODO: from options.
     
+<<<<<<< HEAD
     if logscale_x:
         chart.semilogx()  
 
+=======
+    
+>>>>>>> 9f1ae7aafb8763af1d2e9453f74d59663700e2c2
     if logscale_y:
         chart.semilogy()  
 
@@ -203,10 +207,17 @@ def make_chart_bokeh(model_name, chart_id, options):
     fig_kwargs['min_border_bottom'] = 0
 
 
+<<<<<<< HEAD
     scatter_plot = options.get('flag_scatter_plot', False)
     show_grid = options.get('flag_show_grid', True)
     logscale_x = options.get('flag_logscale_x', False)
     logscale_y = options.get('flag_logscale_y', False)
+=======
+    scatter_plot = options.get('scatter_plot', False)
+    show_grid = options.get('show_grid', True)
+    logscale_y = options.get('flag_logscale_y', False)
+    logscale_x = False # logscale_x = options.get('flag_logscale_x', False)
+>>>>>>> 9f1ae7aafb8763af1d2e9453f74d59663700e2c2
 
 
     fig_kwargs['background_fill_color'] = options.get('bg_color', 'white')  # <------------------ ?
@@ -223,6 +234,7 @@ def make_chart_bokeh(model_name, chart_id, options):
 
     bokeh_chart = bokeh_figure(**fig_kwargs)
 
+<<<<<<< HEAD
     
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
@@ -243,6 +255,28 @@ def make_chart_bokeh(model_name, chart_id, options):
         bokeh_chart.scatter(xx, yy, **chart_kwargs)
     else:
         bokeh_chart.line(xx, yy, **chart_kwargs)
+=======
+
+    
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
+
+    chart_kwargs = dict()
+    chart_kwargs['x'] = xx  
+    chart_kwargs['y'] = yy 
+    chart_kwargs['color'] = options.get('color', 'black') # many colors... <------------------ 
+    chart_kwargs['line_width'] = options.get('line_width', 2)
+    chart_kwargs['line_dash'] = options.get('line_style', 'solid') # solid' 'dashed' 'dotted' 'dotdash' 'dashdot' <------------------ 
+
+    bokeh_chart.xgrid.visible = not show_grid
+    bokeh_chart.ygrid.visible = not show_grid
+
+
+    if scatter_plot:
+        bokeh_chart.scatter(**chart_kwargs)
+    else:
+        bokeh_chart.line(**chart_kwargs)
+>>>>>>> 9f1ae7aafb8763af1d2e9453f74d59663700e2c2
 
 
         
