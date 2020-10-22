@@ -93,18 +93,30 @@ class FromFileForm(FlaskForm):
 
 class MatplotlibOptionsForm(FlaskForm):
     
-
-    color = SelectField('Color: ', choices=[
-            ('b', 'blue'), 
+    color = SelectField('Line color: ', choices=[
+            ('w', 'white'), 
             ('g', 'green'), 
             ('r', 'red'),
             ('c', 'cyan'),
             ('m', 'magenta'),
             ('y', 'yellow'),
             ('k', 'black'),
-            ('w', 'white')
+            ('b', 'blue')
         ]
     )
+
+    bg_color = SelectField('Background color: ', choices=[
+            ('#e6e6e6', 'white'),
+            ('#5b9bde', 'blue'), 
+            ('#95e678', 'green'), 
+            ('#ff4314', 'red'),
+            ('cyan', 'cyan'),
+            ('magenta', 'magenta'),
+            ('yellow', 'yellow'),
+            ('black', 'black')
+        ]
+    )
+
 
     line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
 
@@ -133,32 +145,46 @@ class MatplotlibOptionsForm(FlaskForm):
 
     flag_scatter_plot = BooleanField("Scatter:")
     flag_show_grid = BooleanField("Grid:")
-    flag_logscale_y = BooleanField("Log scale:")
+    flag_logscale_x = BooleanField("Log scale X:")
+    flag_logscale_y = BooleanField("Log scale Y:")
     flag_show_legend = BooleanField("Show legend:")
     
     submit = SubmitField('Add data')
 
 
 class BokehOptionsForm(FlaskForm):
-    color = SelectField('Color: ', choices=[
-            ('b', 'blue'), 
-            ('g', 'green'), 
-            ('r', 'red'),
-            ('c', 'cyan'),
-            ('m', 'magenta'),
-            ('y', 'yellow'),
-            ('k', 'black'),
-            ('w', 'white')
+    color = SelectField('Line color: ', choices=[
+            ('#e6e6e6', 'white'),
+            ('#5b9bde', 'blue'), 
+            ('#95e678', 'green'), 
+            ('#ff4314', 'red'),
+            ('cyan', 'cyan'),
+            ('magenta', 'magenta'),
+            ('yellow', 'yellow'),
+            ('black', 'black')
         ]
     )
+
+    bg_color = SelectField('Background color: ', choices=[
+            ('white', 'white'),
+            ('#5b9bde', 'blue'), 
+            ('#95e678', 'green'), 
+            ('#ff4314', 'red'),
+            ('cyan', 'cyan'),
+            ('magenta', 'magenta'),
+            ('yellow', 'yellow'),
+            ('black', 'black')
+        ]
+    )
+    
 
     line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
 
     line_style = SelectField('Style: ', choices=[
-            ('-',  'solid'), 
-            ('--', 'dashed'), 
-            (':',  'dotted'),
-            ('-.', 'dashed-dotted')
+            ('solid',  'solid'), 
+            ('dashed', 'dashed'), 
+            ('dotted',  'dotted'),
+            ('dashdot', 'dashed-dotted')
         ]
     )
     # line_style = StringField('Line style:',  validators=[DataRequired(), Length(min=1, max=10)])
@@ -179,7 +205,8 @@ class BokehOptionsForm(FlaskForm):
 
     flag_scatter_plot = BooleanField("Scatter:")
     flag_show_grid = BooleanField("Grid:")
-    flag_logscale_y = BooleanField("Log scale:")
+    flag_logscale_x = BooleanField("Log scale X:")
+    flag_logscale_y = BooleanField("Log scale Y:")
     flag_show_legend = BooleanField("Show legend:")
     
     submit = SubmitField('Add data')

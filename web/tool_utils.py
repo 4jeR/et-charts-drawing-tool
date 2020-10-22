@@ -37,6 +37,8 @@ from bokeh.plotting import figure as bokeh_figure
 import plotly
 import plotly.graph_objs as plotly_go
 
+
+
 # PYGAL
 import pygal
 
@@ -70,17 +72,8 @@ def make_points(model_name, chart_id):
             p = chart.p
             q = chart.q
 
-    
-        # print("------------------------------")
-        # print(f"TEST RANGE for id: {chart_id}:") 
-        # print(f'start = {begin}')
-        # print(f'end   = {end}')
-        # print(f'step  = {step}')
-        # print("------------------------------")
-    
         x_range = int((1.0)/step * (end - begin))+1
 
-    
         if model_name == 'Sinus':
             for x in range(x_range):
                 xx = float(round(begin+x*step, 3))
@@ -121,13 +114,15 @@ def make_chart_matplotlib(model_name, chart_id, options):
     if chart_id != -1:
         points = make_points(model_name, chart_id)
     else:
-        points = [(x, x+2) for x in range(10)]
+        points = []
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
 
-    # print("[MAKE_CHART_MATPLOTLIB]")
-    # print(f"x: {xx}")
-    # print(f"y: {yy}")
+    ''' Get the figure object that will be returned '''
+    fig = Figure(figsize=(5.0, 5.0))
+    chart = fig.add_subplot(1, 1, 1)
+
+
     ''' Options for plotting '''
     kwargs = dict()
 
@@ -138,19 +133,20 @@ def make_chart_matplotlib(model_name, chart_id, options):
 
     scatter_plot        = options.get('flag_scatter_plot', False) # dots or solid line
     show_grid           = options.get('flag_show_grid', False)    # show grid or not
+    logscale_x          = options.get('flag_logscale_x', False )  # logarithmic scale
     logscale_y          = options.get('flag_logscale_y', False )  # logarithmic scale
     show_legend         = options.get('flag_show_legend', False)  # show_legend
-  
-
-
-    ''' Get the figure object that will be returned '''
-    fig = Figure(figsize=(5.0, 5.0))
-    chart = fig.add_subplot(1, 1, 1)
+    background_color    = options.get('bg_color', '#dbdbdb') # 
+    
+    chart.set_facecolor(background_color)   #background, '' TODO: from options.
+    
+    if logscale_x:
+        chart.semilogx()  
 
     if logscale_y:
-        chart.semilogy()  # set logscaly for  Y
+        chart.semilogy()  
 
-    chart.grid(show_grid) 
+    chart.grid(show_grid, color='#5e5e5e') 
     if show_legend:
         chart.legend()
 
@@ -181,9 +177,6 @@ def make_chart_seaborn(model_name, chart_id, options):
 
     points = make_points(model_name, chart_id)
 
-    # xx = [point[0] for point in points]
-    # yy = [point[1] for point in points]
-
     data = [
         {model_name: point[0], model_name: point[1]} for point in points
     ]
@@ -197,13 +190,64 @@ def make_chart_bokeh(model_name, chart_id, options):
     Model = str_to_object(model_name)
     points = make_points(model_name, chart_id)
     
+    fig_kwargs = dict()
+    fig_kwargs['title'] = model_name
+    fig_kwargs['width'] = 500
+    fig_kwargs['height'] = 500
+    fig_kwargs['x_axis_label'] = 'x'
+    fig_kwargs['y_axis_label'] = 'y'
+    fig_kwargs['toolbar_location'] = None
+    fig_kwargs['min_border_left'] = 0
+    fig_kwargs['min_border_right'] = 45
+    fig_kwargs['min_border_top'] = 0
+    fig_kwargs['min_border_bottom'] = 0
 
+
+    scatter_plot = options.get('flag_scatter_plot', False)
+    show_grid = options.get('flag_show_grid', True)
+    logscale_x = options.get('flag_logscale_x', False)
+    logscale_y = options.get('flag_logscale_y', False)
+
+
+    fig_kwargs['background_fill_color'] = options.get('bg_color', 'white')  # <------------------ ?
+    if logscale_x:
+        fig_kwargs['x_axis_type'] = "log"   # linear, datetime ,mercator <------------------
+    else:
+        fig_kwargs['x_axis_type'] = "linear"   
+
+    if logscale_y:
+        fig_kwargs['y_axis_type'] = "log"   # linear, datetime ,mercator <------------------
+    else:
+        fig_kwargs['y_axis_type'] = "linear"  
+
+
+    bokeh_chart = bokeh_figure(**fig_kwargs)
+
+    
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
-    bokeh_chart = bokeh_figure(title="Bokeh plot", width=530, height=500, x_axis_label='x', y_axis_label='y')
-    bokeh_chart.line(xx, yy)
-    
 
+    chart_kwargs = dict()
+    # chart_kwargs['x'] = xx  
+    # chart_kwargs['y'] = yy 
+    chart_kwargs['color'] = options.get('color', 'black') # many colors... <------------------ 
+    chart_kwargs['line_width'] = options.get('line_width', 2)
+    chart_kwargs['line_dash'] = options.get('line_style', 'solid') # solid' 'dashed' 'dotted' 'dotdash' 'dashdot' <------------------ 
+
+    
+    bokeh_chart.xgrid.visible = show_grid
+    bokeh_chart.ygrid.visible = show_grid
+
+
+    if scatter_plot:
+        bokeh_chart.scatter(xx, yy, **chart_kwargs)
+    else:
+        bokeh_chart.line(xx, yy, **chart_kwargs)
+
+
+        
+    
+    
     return bokeh_chart
 
 
@@ -213,9 +257,12 @@ def make_chart_plotly(model_name, chart_id, options):
     
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
+
+
+
     chart_props = {
         "data": [plotly_go.Line(x=xx, y=yy)],
-        "layout": plotly_go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=530, height=500, margin={"l": 20, "t": 30})
+        "layout": plotly_go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=500, height=500, margin={"l": 20, "t": 30})
     }
     
     chart_div_html = plotly.offline.plot(chart_props, include_plotlyjs=False, output_type='div')
@@ -312,11 +359,13 @@ def get_default_matplotlib_options(db):
     if not mplib_options:
         kwargs = dict()
         kwargs['color'] = 'r'
+        kwargs['bg_color'] = '#dbdbdb'
         kwargs['line_width'] = 2
         kwargs['line_style'] = '-'
         kwargs['marker'] = '.'
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
         kwargs['flag_show_legend'] = False
         mplib_options = MatplotlibPlotOptions(**kwargs)
@@ -347,23 +396,25 @@ def get_default_seaborn_options(db):
 
 
 def get_default_bokeh_options(db):
-    mplib_options = BokehPlotOptions.query.first()
+    bokeh_options = BokehPlotOptions.query.first()
 
-    if not mplib_options:
+    if not bokeh_options:
         kwargs = dict()
-        kwargs['color'] = 'r'
+        kwargs['color'] = 'black'
+        kwargs['bg_color'] = 'white'
         kwargs['line_width'] = 2
-        kwargs['line_style'] = '-'
-        kwargs['marker'] = '.'
+        kwargs['line_style'] = 'dashed'
+        kwargs['marker'] = 'asterisk'# markers -> idk
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
         kwargs['flag_show_legend'] = False
-        mplib_options = BokehPlotOptions(**kwargs)
-        db.session.add(mplib_options)
+        bokeh_options = BokehPlotOptions(**kwargs)
+        db.session.add(bokeh_options)
         db.session.commit()
     
-    return mplib_options
+    return bokeh_options
 
 
 def get_default_plotly_options(db):
@@ -419,9 +470,15 @@ def clean_query(db):
 
 
 def clean_unused_options(db):
+    ''' 
+    After each database modification (delete, update) checks for unused 
+    library plot options (records) and removes them from the database.
+    LPO stands for LibraryPlotOption (class name)
+    '''
     LIBS = ('matplotlib', 'seaborn', 'bokeh', 'plotly', 'pygal')
 
     for lib in LIBS:
+        
         LPO = str_to_object(f'{lib.capitalize()}PlotOptions')
         id_library_options = f'id_{lib}_options'
 
