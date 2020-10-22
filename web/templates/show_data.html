@@ -146,10 +146,7 @@
                                     <b>{{ matplotlib_form.flag_logscale_y.label(for="Log scale Y:") }}</b>
                                     {{ matplotlib_form.flag_logscale_y(id="flag_logscale_y") }}
                                 </div>
-                                <div class="form-group">
-                                    <b>{{ matplotlib_form.flag_show_legend.label(for="Show legend:") }}</b>
-                                    {{ matplotlib_form.flag_show_legend(id="flag_show_legend") }}
-                                </div>
+                                
                             {% endif %}
                             <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
                         </form>
@@ -249,10 +246,6 @@
                                     <b>{{ bokeh_form.flag_logscale_y.label(for="Log scale Y:") }}</b>
                                     {{ bokeh_form.flag_logscale_y(id="flag_logscale_y") }}
                                 </div>
-                                <div class="form-group">
-                                    <b>{{ bokeh_form.flag_show_legend.label(for="Show legend:") }}</b>
-                                    {{ bokeh_form.flag_show_legend(id="flag_show_legend") }}
-                                </div>
                             {% endif %}
                             <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
                         </form>
@@ -283,8 +276,46 @@
                 </div>
                 <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
-                        <form class="form-horizontal col-md-12" method="POST" action="#">
-                            <h1>TODO...</h1>
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_plotly', model_name=model_name, chart_id=chart_id) }}">
+                            {% if plotly_form is defined %}
+                                {{ plotly_form.hidden_tag() }}
+                                <div class="form-group">
+                                    <b>{{ plotly_form.color.label(for="Line color") }}</b>
+                                    {{ plotly_form.color(id="color") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.bg_color.label(for="Background color: ") }}</b>
+                                    {{ plotly_form.bg_color(id="bg_color") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.line_width.label(for="Line width:") }}</b>
+                                    {{ plotly_form.line_width(id="line_width") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.line_style.label(for="Line style:") }}</b>
+                                    {{ plotly_form.line_style(id="line_style") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.marker.label(for="Marker") }}</b>
+                                    {{ plotly_form.marker(id="marker") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.flag_scatter_plot.label(for="Scatter:") }}</b>
+                                    {{ plotly_form.flag_scatter_plot(id="flag_scatter_plot") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.flag_show_grid.label(for="Grid:") }}</b>
+                                    {{ plotly_form.flag_show_grid(id="flag_show_grid") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.flag_logscale_x.label(for="Log scale X:") }}</b>
+                                    {{ plotly_form.flag_logscale_x(id="flag_logscale_x") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.flag_logscale_y.label(for="Log scale Y:") }}</b>
+                                    {{ plotly_form.flag_logscale_y(id="flag_logscale_y") }}
+                                </div>
+                            {% endif %}
                             <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
                         </form>
                     </div>

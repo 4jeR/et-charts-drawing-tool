@@ -38,7 +38,6 @@ import plotly
 import plotly.graph_objs as plotly_go
 
 
-
 # PYGAL
 import pygal
 
@@ -135,10 +134,9 @@ def make_chart_matplotlib(model_name, chart_id, options):
     show_grid           = options.get('flag_show_grid', False)    # show grid or not
     logscale_x          = options.get('flag_logscale_x', False )  # logarithmic scale
     logscale_y          = options.get('flag_logscale_y', False )  # logarithmic scale
-    show_legend         = options.get('flag_show_legend', False)  # show_legend
     background_color    = options.get('bg_color', '#dbdbdb') # 
     
-    chart.set_facecolor(background_color)   #background, '' TODO: from options.
+    chart.set_facecolor(background_color)   # background color
     
     if logscale_x:
         chart.semilogx()  
@@ -147,8 +145,7 @@ def make_chart_matplotlib(model_name, chart_id, options):
         chart.semilogy()  
 
     chart.grid(show_grid, color='#5e5e5e') 
-    if show_legend:
-        chart.legend()
+    
 
 
     chart.set_xlabel('x')
@@ -207,6 +204,10 @@ def make_chart_bokeh(model_name, chart_id, options):
     show_grid = options.get('flag_show_grid', True)
     logscale_x = options.get('flag_logscale_x', False)
     logscale_y = options.get('flag_logscale_y', False)
+    scatter_plot = options.get('scatter_plot', False)
+    show_grid = options.get('show_grid', True)
+    logscale_y = options.get('flag_logscale_y', False)
+    logscale_x = options.get('flag_logscale_x', False)
 
 
     fig_kwargs['background_fill_color'] = options.get('bg_color', 'white')  # <------------------ ?
@@ -223,6 +224,27 @@ def make_chart_bokeh(model_name, chart_id, options):
 
     bokeh_chart = bokeh_figure(**fig_kwargs)
 
+
+    
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
+
+    chart_kwargs = dict()
+    # chart_kwargs['x'] = xx  
+    # chart_kwargs['y'] = yy 
+    chart_kwargs['color'] = options.get('color', 'black') # many colors... <------------------ 
+    chart_kwargs['line_width'] = options.get('line_width', 2)
+    chart_kwargs['line_dash'] = options.get('line_style', 'solid') # solid' 'dashed' 'dotted' 'dotdash' 'dashdot' <------------------ 
+
+    
+    bokeh_chart.xgrid.visible = show_grid
+    bokeh_chart.ygrid.visible = show_grid
+
+
+    if scatter_plot:
+        bokeh_chart.scatter(xx, yy, **chart_kwargs)
+    else:
+        bokeh_chart.line(xx, yy, **chart_kwargs)
 
     
     xx = [point[0] for point in points]
@@ -257,17 +279,59 @@ def make_chart_plotly(model_name, chart_id, options):
     
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
-
     
+                
+    # options.get('flag_scatter_plot', False)
+    # config = {
+    #             'displayModeBar': False,
+    #             'scrollZoom': True
+    #         }
 
+    data = [
+        plotly_go.Scatter(
+            x=xx, 
+            y=yy,
+            line={
+                'color': options.get('color', 'red'),
+                'width': options.get('line_width', 2),
+                'dash':  options.get('line_style', 'solid')
+            },
+            marker={
+                'symbol': options.get('marker', 'circle'),
+                'size': 3*options.get('line_width', 2) 
+            },
+            fillcolor='black'
+        )
+    ]
 
+    layout = plotly_go.Layout(
+        title=model_name, 
+        title_x=0.5, 
+        xaxis_title="x", 
+        yaxis_title="y", 
+        width=500, 
+        height=500, 
+        margin={'l': 30, 'r': 30, 't': 40, 'b': 5},
+        plot_bgcolor=options.get('bg_color', '#dbdbdb'),
+        xaxis={
+            'showgrid': options.get('flag_show_grid', True),
+            'type': 'log' if options.get('flag_logscale_x', True) else 'linear'
+        },
+        yaxis={
+            'showgrid': options.get('flag_show_grid', True),
+            'type': 'log' if options.get('flag_logscale_y', True) else 'linear'
+        },
+        modebar={
+            'bgcolor': 'red'
+        }
+    )
 
-    chart_props = {
-        "data": [plotly_go.Line(x=xx, y=yy)],
-        "layout": plotly_go.Layout(title="Plotly chart", title_x=0.5, xaxis_title="x", yaxis_title="y", width=500, height=500, margin={"l": 20, "t": 30})
+    chart_properties = {
+        'data': data,
+        'layout': layout
     }
     
-    chart_div_html = plotly.offline.plot(chart_props, include_plotlyjs=False, output_type='div')
+    chart_div_html = plotly.offline.plot(chart_properties, include_plotlyjs=False, output_type='div', config={'displayModeBar': False})
     return chart_div_html
     
 
@@ -287,8 +351,6 @@ def make_chart_pygal(model_name, chart_id, options):
 
 def files_count(lib_name='', path_to_images='.'):
     return len(list(filter(lambda s: s.startswith(lib_name), [f for f in os.listdir(path_to_images) if os.path.isfile(os.path.join(path_to_images, f))])))
-
-
 
 
 def get_data_from_file(filename):
@@ -368,7 +430,6 @@ def get_default_matplotlib_options(db):
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
-        kwargs['flag_show_legend'] = False
         mplib_options = MatplotlibPlotOptions(**kwargs)
         db.session.add(mplib_options)
         db.session.commit()
@@ -377,9 +438,9 @@ def get_default_matplotlib_options(db):
 
 
 def get_default_seaborn_options(db):
-    mplib_options = SeabornPlotOptions.query.first()
+    seaborn_options = SeabornPlotOptions.query.first()
 
-    if not mplib_options:
+    if not seaborn_options:
         kwargs = dict()
         kwargs['color'] = 'r'
         kwargs['line_width'] = 2
@@ -388,12 +449,11 @@ def get_default_seaborn_options(db):
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_y'] = False
-        kwargs['flag_show_legend'] = False
-        mplib_options = SeabornPlotOptions(**kwargs)
-        db.session.add(mplib_options)
+        seaborn_options = SeabornPlotOptions(**kwargs)
+        db.session.add(seaborn_options)
         db.session.commit()
     
-    return mplib_options
+    return seaborn_options
 
 
 def get_default_bokeh_options(db):
@@ -402,15 +462,14 @@ def get_default_bokeh_options(db):
     if not bokeh_options:
         kwargs = dict()
         kwargs['color'] = 'black'
-        kwargs['bg_color'] = 'white'
+        kwargs['bg_color'] = '#d6d6d6'
         kwargs['line_width'] = 2
         kwargs['line_style'] = 'dashed'
-        kwargs['marker'] = 'asterisk'# markers -> idk
+        kwargs['marker'] = 'asterisk'
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
-        kwargs['flag_show_legend'] = False
         bokeh_options = BokehPlotOptions(**kwargs)
         db.session.add(bokeh_options)
         db.session.commit()
@@ -419,43 +478,45 @@ def get_default_bokeh_options(db):
 
 
 def get_default_plotly_options(db):
-    mplib_options = PlotlyPlotOptions.query.first()
+    plotly_options = PlotlyPlotOptions.query.first()
 
-    if not mplib_options:
+    if not plotly_options:
         kwargs = dict()
-        kwargs['color'] = 'r'
+        kwargs['color'] = 'red'
+        kwargs['bg_color'] = '#d6d6d6'
         kwargs['line_width'] = 2
-        kwargs['line_style'] = '-'
-        kwargs['marker'] = '.'
+        kwargs['line_style'] = 'solid'
+        kwargs['marker'] = 'circle'
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
-        kwargs['flag_show_legend'] = False
-        mplib_options = PlotlyPlotOptions(**kwargs)
-        db.session.add(mplib_options)
+        plotly_options = PlotlyPlotOptions(**kwargs)
+        db.session.add(plotly_options)
         db.session.commit()
     
-    return mplib_options
+    return plotly_options
 
 
 def get_default_pygal_options(db):
-    mplib_options = PygalPlotOptions.query.first()
+    pygal_options = PlotlyPlotOptions.query.first()
 
-    if not mplib_options:
+    if not pygal_options:
         kwargs = dict()
-        kwargs['color'] = 'r'
+        kwargs['color'] = 'red'
+        kwargs['bg_color'] = 'white'
         kwargs['line_width'] = 2
         kwargs['line_style'] = '-'
         kwargs['marker'] = '.'
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
-        kwargs['flag_show_legend'] = False
-        mplib_options = PygalPlotOptions(**kwargs)
-        db.session.add(mplib_options)
+        pygal_options = PlotlyPlotOptions(**kwargs)
+        db.session.add(pygal_options)
         db.session.commit()
     
-    return mplib_options
+    return pygal_options
 
 
 
