@@ -229,6 +229,7 @@ class MatplotlibPlotOptions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     color = db.Column(db.String, unique=False, nullable=False)
+    bg_color = db.Column(db.String, unique=False, nullable=False)
     line_width = db.Column(db.Integer, unique=False, nullable=False)
     line_style = db.Column(db.String, unique=False, nullable=False)
     marker = db.Column(db.String, unique=False, nullable=False)
@@ -246,6 +247,7 @@ class MatplotlibPlotOptions(db.Model):
         if coefs_ok:
             return {
                 'color': coefs_ok.color, 
+                'bg_color': coefs_ok.bg_color,
                 'line_width': coefs_ok.line_width,
                 'line_style': coefs_ok.line_style,
                 'marker': coefs_ok.marker,
@@ -296,6 +298,7 @@ class BokehPlotOptions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     color = db.Column(db.String, unique=False, nullable=False)
+    bg_color = db.Column(db.String, unique=False, nullable=False)
     line_width = db.Column(db.Integer, unique=False, nullable=False)
     line_style = db.Column(db.String, unique=False, nullable=False)
     marker = db.Column(db.String, unique=False, nullable=False)
@@ -313,6 +316,7 @@ class BokehPlotOptions(db.Model):
         if coefs_ok:
             return {
                 'color': coefs_ok.color, 
+                'bg_color': coefs_ok.bg_color,
                 'line_width': coefs_ok.line_width,
                 'line_style': coefs_ok.line_style,
                 'marker': coefs_ok.marker,

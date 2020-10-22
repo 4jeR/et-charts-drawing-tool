@@ -14,6 +14,7 @@ from io import BytesIO
 
 from web import app
 from web import db
+# from web import cache
 
 from web.import_forms import *
 from web.import_models import *
@@ -138,8 +139,6 @@ def route_add_data(model_name):
         db.session.add(model_object)
         db.session.commit()
         
-        # clean_matplotlib_options(db)
-
         chart_id = get_recently_added_record(db, model_name).id
 
 
@@ -189,20 +188,19 @@ def route_show_data(model_name, chart_id=-1):
         ''' Get options for each library. '''
         # parse dictionary of options from database to string
         matplotlib_options_id = Model.query.get(chart_id).id_matplotlib_options
-        kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id)) 
+        kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
 
         seaborn_options_id = Model.query.get(chart_id).id_seaborn_options
-        kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(seaborn_options_id)) 
+        kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(seaborn_options_id))
 
         bokeh_options_id = Model.query.get(chart_id).id_bokeh_options
-        kw_options['bokeh_options'] = json.dumps(BokehPlotOptions.get_options(bokeh_options_id)) 
+        kw_options['bokeh_options'] = BokehPlotOptions.get_options(bokeh_options_id) 
 
         plotly_options_id = Model.query.get(chart_id).id_plotly_options
-        kw_options['plotly_options'] = json.dumps(PlotlyPlotOptions.get_options(plotly_options_id)) 
-
+        kw_options['plotly_options'] = PlotlyPlotOptions.get_options(plotly_options_id) 
 
         pygal_options_id = Model.query.get(chart_id).id_pygal_options
-        kw_options['pygal_options'] = json.dumps(PygalPlotOptions.get_options(pygal_options_id)) 
+        kw_options['pygal_options'] = PygalPlotOptions.get_options(pygal_options_id) 
         
 
 
@@ -214,19 +212,21 @@ def route_show_data(model_name, chart_id=-1):
     if model_name in getable_models:
         kwargs['coefs'] = Model.get_coefs(chart_id)
 
-    bokeh_chart = make_chart_bokeh(model_name, chart_id, kw_options.get('bokeh_options', ''))
+    bokeh_chart = make_chart_bokeh(model_name, chart_id, kw_options.get('bokeh_options', dict()))
     script_bokeh, div_bokeh = bokeh_components(bokeh_chart)
     kwargs["script_bokeh"] = script_bokeh
     kwargs["div_bokeh"] = div_bokeh
 
     kwargs["script_plotly"] = '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> '
-    kwargs["div_plotly"] = make_chart_plotly(model_name, chart_id, kw_options.get('plotly_options', ''))
+    kwargs["div_plotly"] = make_chart_plotly(model_name, chart_id, kw_options.get('plotly_options', dict()))
 
-    pygal_chart = make_chart_pygal(model_name, chart_id, kw_options.get('pygal_options', ''))
+    pygal_chart = make_chart_pygal(model_name, chart_id, kw_options.get('pygal_options', dict()))
     kwargs["src_pygal"] = pygal_chart.render_data_uri()
 
+    ''' Pass all forms to be shown (view)'''
     kwforms = dict()
     kwforms['matplotlib_form'] = MatplotlibOptionsForm()
+    kwforms['bokeh_form'] = BokehOptionsForm()
 
     return render_template('show_data.html', model_name=model_name, chart_id=chart_id, charts=charts,  **kwargs, **kwforms, **kw_options)
 
@@ -243,6 +243,7 @@ def route_change_options_matplotlib(model_name, chart_id=-1):
     if matplotlib_form.validate_on_submit():
         kwargs = dict()
         kwargs['color'] = matplotlib_form.color.data
+        kwargs['bg_color'] = matplotlib_form.bg_color.data
         kwargs['line_width'] = matplotlib_form.line_width.data
         kwargs['line_style'] = matplotlib_form.line_style.data
         kwargs['marker'] = matplotlib_form.marker.data
@@ -270,24 +271,25 @@ def route_change_options_matplotlib(model_name, chart_id=-1):
 
         db.session.commit()
 
-        # clean_matplotlib_options(db)
-        # select opts.id from sinus s right join matplotlib_plot_options opts on s.id_matplotlib_options = opts.id where s.id is null;
-
-
         flash(f'Changed options for Matplotlib!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
 #TODO: Seaborn options form + route
 
+
 @app.route("/data/change_options/bokeh/<string:model_name>", methods=['GET', 'POST'])
+@app.route("/data/change_options/bokeh/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
 @clean_query(db=db)
-def route_change_options_bokeh(model_name):
+def route_change_options_bokeh(model_name, chart_id=-1):
     """ Inserts new option OptionsForm."""
+    Model = str_to_object(model_name)
+    ''' Get values from form. '''
     bokeh_form = BokehOptionsForm()
 
     if bokeh_form.validate_on_submit():
         kwargs = dict()
         kwargs['color'] = bokeh_form.color.data
+        kwargs['bg_color'] = bokeh_form.bg_color.data
         kwargs['line_width'] = bokeh_form.line_width.data
         kwargs['line_style'] = bokeh_form.line_style.data
         kwargs['marker'] = bokeh_form.marker.data
@@ -298,16 +300,22 @@ def route_change_options_bokeh(model_name):
         kwargs['flag_show_legend'] = bokeh_form.flag_show_legend.data
 
         new_options = BokehPlotOptions(**kwargs)
-
-        ''' replace old with new options '''
-        old_options = BokehPlotOptions.query.first()
-        db.session.delete(old_options)
-        db.session.commit()
-
+        ''' append new record '''
         db.session.add(new_options)
         db.session.commit()
+
+        ''' get lastly_added record '''
+        recently_added = get_recently_added_record(db, 'BokehPlotOptions')
+        new_options_id = recently_added.id
+
+        ''' get old options to be replaced and after replacing, delete the old'''
+        current_chart = Model.query.get(chart_id)
+
+        current_chart.id_bokeh_options = new_options_id
+
+        db.session.commit()
         flash(f'Changed options for Bokeh!', 'success')
-        return redirect(url_for('route_show_data', model_name=model_name))
+        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
 #TODO: Plotly options form + route
 #TODO: Pygal options form + route
@@ -321,9 +329,6 @@ def route_delete_chart(model_name, chart_id):
     chart = str_to_object(model_name).query.get_or_404(chart_id)
     db.session.delete(chart)
     db.session.commit()
-    # if not str_to_object(model_name).query.all():
-    #     db.session.delete(str_to_object(model_name + 'Coefs').query.first())
-    #     db.session.commit()
     flash(f'Point ({chart.id}) has been succesfully removed from the database.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
