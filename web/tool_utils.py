@@ -223,26 +223,26 @@ def make_chart_bokeh(model_name, chart_id, options):
 
     bokeh_chart = bokeh_figure(**fig_kwargs)
 
+
     
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
 
     chart_kwargs = dict()
-    # chart_kwargs['x'] = xx  
-    # chart_kwargs['y'] = yy 
+    chart_kwargs['x'] = xx  
+    chart_kwargs['y'] = yy 
     chart_kwargs['color'] = options.get('color', 'black') # many colors... <------------------ 
     chart_kwargs['line_width'] = options.get('line_width', 2)
     chart_kwargs['line_dash'] = options.get('line_style', 'solid') # solid' 'dashed' 'dotted' 'dotdash' 'dashdot' <------------------ 
 
-    
-    bokeh_chart.xgrid.visible = show_grid
-    bokeh_chart.ygrid.visible = show_grid
+    bokeh_chart.xgrid.visible = not show_grid
+    bokeh_chart.ygrid.visible = not show_grid
 
 
     if scatter_plot:
-        bokeh_chart.scatter(xx, yy, **chart_kwargs)
+        bokeh_chart.scatter(**chart_kwargs)
     else:
-        bokeh_chart.line(xx, yy, **chart_kwargs)
+        bokeh_chart.line(**chart_kwargs)
 
 
         
@@ -257,6 +257,8 @@ def make_chart_plotly(model_name, chart_id, options):
     
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
+
+    
 
 
 
@@ -344,7 +346,6 @@ def download_image(library_name, model_name, chart_id, current_time):
     time.sleep(2.2)
     image_element.screenshot(save_path)
     driver.quit()
-
 
 
 def get_recently_added_record(db, model_name):
