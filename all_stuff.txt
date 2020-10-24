@@ -1,5 +1,4 @@
 -- USING IN APP --
-
 sudo apt install python3-pip
 apt-get install postgresql-12
 pip3 install flask
@@ -15,11 +14,14 @@ pip3 install chart-studio
 pip3 install psycopg2-binary
 pip3 install selenium
 
+pip3 install lxml
+pip3 install cairosvg
+pip3 install tinycss
+pip3 install cssselect
 
 
 
--- NOT USED IN APP --
-
+-- TRIED BUT NOT USED IN APP --
 pip3 install js2py
 pip3 install pdfcrowd
 pip3 install imgkit

@@ -40,6 +40,8 @@ import plotly.graph_objs as plotly_go
 
 # PYGAL
 import pygal
+from pygal import Config as PygalConfig
+from pygal.style import Style as PygalStyle
 
 def str_to_object(string_name):
     ''' Returns the string_name as object (function, class, etc.).'''
@@ -204,11 +206,6 @@ def make_chart_bokeh(model_name, chart_id, options):
     show_grid = options.get('flag_show_grid', True)
     logscale_x = options.get('flag_logscale_x', False)
     logscale_y = options.get('flag_logscale_y', False)
-    scatter_plot = options.get('scatter_plot', False)
-    show_grid = options.get('show_grid', True)
-    logscale_y = options.get('flag_logscale_y', False)
-    logscale_x = options.get('flag_logscale_x', False)
-
 
     fig_kwargs['background_fill_color'] = options.get('bg_color', 'white')  # <------------------ ?
     if logscale_x:
@@ -280,12 +277,7 @@ def make_chart_plotly(model_name, chart_id, options):
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
     
-                
-    # options.get('flag_scatter_plot', False)
-    # config = {
-    #             'displayModeBar': False,
-    #             'scrollZoom': True
-    #         }
+               
 
     data = [
         plotly_go.Scatter(
@@ -342,8 +334,41 @@ def make_chart_pygal(model_name, chart_id, options):
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
 
-    chart = pygal.XY(show_dots=False, width=520, height=500)
-    chart.title = "Pygal"
+    ''' options '''
+    scatter_plot = options.get('flag_scatter_plot', False)  
+    show_grid = options.get('flag_show_grid', True) 
+    # logscale_x = options.get('flag_logscale_x', False) 
+    logscale_y = options.get('flag_logscale_y', False) 
+
+
+    pygal_config = PygalConfig()
+    pygal_config.show_dots = False
+
+    custom_style = PygalStyle(
+        colors=(options.get('color', 'black'),),
+        plot_background=options.get('bg_color', 'white')
+    )
+    pygal_config.style = custom_style
+
+    stroke_options = dict()
+
+    if scatter_plot:
+        pygal_config.stroke = True
+        stroke_options['dasharray'] = '10, 20'
+
+
+    if logscale_y:
+        pygal_config.logarithmic = True
+
+    stroke_options['width'] = options.get('line_width', 2)
+    pygal_config.stroke_style = stroke_options
+    pygal_config.title = "Pygal"
+    # pygal_config.fill = False    # <----------------------- ?
+
+    pygal_config.show_x_guides = show_grid
+    pygal_config.show_y_guides = show_grid
+
+    chart = pygal.XY(pygal_config, width=600, height=600)
     chart.add('y', points)
 
     return chart
@@ -499,15 +524,15 @@ def get_default_plotly_options(db):
 
 
 def get_default_pygal_options(db):
-    pygal_options = PlotlyPlotOptions.query.first()
+    pygal_options = PygalPlotOptions.query.first()
 
     if not pygal_options:
         kwargs = dict()
         kwargs['color'] = 'red'
         kwargs['bg_color'] = 'white'
         kwargs['line_width'] = 2
-        kwargs['line_style'] = '-'
-        kwargs['marker'] = '.'
+        kwargs['line_style'] = 'dashed'
+        kwargs['marker'] = 'circle'
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_x'] = False

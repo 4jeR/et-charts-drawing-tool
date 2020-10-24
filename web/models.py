@@ -374,7 +374,6 @@ class PygalPlotOptions(db.Model):
 
     flag_scatter_plot = db.Column(db.Boolean, unique=False, nullable=False)
     flag_show_grid = db.Column(db.Boolean, unique=False, nullable=False)
-    flag_logscale_x = db.Column(db.Boolean, unique=False, nullable=False)
     flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
     
     @staticmethod
@@ -385,13 +384,15 @@ class PygalPlotOptions(db.Model):
         if coefs_ok:
             return {
                 'color': coefs_ok.color, 
+                'bg_color': coefs_ok.bg_color, 
                 'line_width': coefs_ok.line_width,
                 'line_style': coefs_ok.line_style,
                 'marker': coefs_ok.marker,
                 'flag_scatter_plot': coefs_ok.flag_scatter_plot,
                 'flag_show_grid': coefs_ok.flag_show_grid,
-                'flag_logscale_x': coefs_ok.flag_logscale_x,
                 'flag_logscale_y': coefs_ok.flag_logscale_y
             }
         else:
             return dict()
+
+

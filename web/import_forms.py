@@ -6,4 +6,4 @@ from web.forms import MatplotlibOptionsForm
 # from web.forms import SeabornOptionsForm
 from web.forms import BokehOptionsForm
 from web.forms import PlotlyOptionsForm
-# from web.forms import PygalOptionsForm
+from web.forms import PygalOptionsForm

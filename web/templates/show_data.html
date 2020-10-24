@@ -344,8 +344,42 @@
                 </div>
                 <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
-                        <form class="form-horizontal col-md-12" method="POST" action="#">
-                            <h1>TODO...</h1>
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_pygal', model_name=model_name, chart_id=chart_id) }}">
+                            {% if pygal_form is defined %}
+                                {{ pygal_form.hidden_tag() }}
+                                <div class="form-group">
+                                    <b>{{ pygal_form.color.label(for="Line color") }}</b>
+                                    {{ pygal_form.color(id="color") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ pygal_form.bg_color.label(for="Background color: ") }}</b>
+                                    {{ pygal_form.bg_color(id="bg_color") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ pygal_form.line_width.label(for="Line width:") }}</b>
+                                    {{ pygal_form.line_width(id="line_width") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ pygal_form.line_style.label(for="Line style:") }}</b>
+                                    {{ pygal_form.line_style(id="line_style") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ pygal_form.marker.label(for="Marker") }}</b>
+                                    {{ pygal_form.marker(id="marker") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ pygal_form.flag_scatter_plot.label(for="Scatter:") }}</b>
+                                    {{ pygal_form.flag_scatter_plot(id="flag_scatter_plot") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ pygal_form.flag_show_grid.label(for="Grid:") }}</b>
+                                    {{ pygal_form.flag_show_grid(id="flag_show_grid") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ pygal_form.flag_logscale_y.label(for="Log scale Y:") }}</b>
+                                    {{ pygal_form.flag_logscale_y(id="flag_logscale_y") }}
+                                </div>
+                            {% endif %}
                             <button type="submit" class="col-md-12 btn btn-info">Change chart</button>
                         </form>
                     </div>
