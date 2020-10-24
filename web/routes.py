@@ -225,7 +225,7 @@ def route_show_data(model_name, chart_id=-1):
     ''' Pass all forms to be shown (view)'''
     kwforms = dict()
     kwforms['matplotlib_form'] = MatplotlibOptionsForm()
-    # kwforms['seaborn_form'] = SeabornOptionsForm()
+    kwforms['seaborn_form'] = SeabornOptionsForm()
     kwforms['bokeh_form'] = BokehOptionsForm()
     kwforms['plotly_form'] = PlotlyOptionsForm()
     kwforms['pygal_form'] = PygalOptionsForm()
@@ -276,8 +276,49 @@ def route_change_options_matplotlib(model_name, chart_id=-1):
         flash(f'Changed options for Matplotlib!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
-#TODO: Seaborn options form + route
 
+@app.route("/data/change_options/seaborn/<string:model_name>", methods=['GET', 'POST'])
+@app.route("/data/change_options/seaborn/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
+@clean_query(db=db)
+def route_change_options_seaborn(model_name, chart_id=-1):
+    """ Inserts new option OptionsForm."""
+    Model = str_to_object(model_name)
+    ''' Get values from form. '''
+    seaborn_form = SeabornOptionsForm()
+
+    if seaborn_form.validate_on_submit():
+        kwargs = dict()
+        kwargs['color'] = seaborn_form.color.data
+        kwargs['bg_color'] = seaborn_form.bg_color.data
+        kwargs['line_width'] = seaborn_form.line_width.data
+        kwargs['line_style'] = seaborn_form.line_style.data
+        kwargs['marker'] = seaborn_form.marker.data
+
+        kwargs['flag_scatter_plot'] = seaborn_form.flag_scatter_plot.data
+        kwargs['flag_show_grid'] = seaborn_form.flag_show_grid.data
+        kwargs['flag_logscale_x'] = seaborn_form.flag_logscale_x.data
+        kwargs['flag_logscale_y'] = seaborn_form.flag_logscale_y.data
+
+        ''' make new instance of options '''
+        new_options = SeabornPlotOptions(**kwargs)
+        ''' append new record '''
+        db.session.add(new_options)
+        db.session.commit()
+
+        ''' get lastly_added record '''
+        recently_added = get_recently_added_record(db, 'SeabornPlotOptions')
+        new_options_id = recently_added.id
+
+        ''' get old options to be replaced and after replacing, delete the old'''
+        current_chart = Model.query.get(chart_id)
+        
+
+        current_chart.id_seaborn_options = new_options_id
+
+        db.session.commit()
+
+        flash(f'Changed options for Seaborn!', 'success')
+        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
 @app.route("/data/change_options/bokeh/<string:model_name>", methods=['GET', 'POST'])
 @app.route("/data/change_options/bokeh/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
@@ -381,7 +422,6 @@ def route_change_options_pygal(model_name, chart_id=-1):
 
         kwargs['flag_scatter_plot'] = pygal_form.flag_scatter_plot.data
         kwargs['flag_show_grid'] = pygal_form.flag_show_grid.data
-        kwargs['flag_logscale_x'] = pygal_form.flag_logscale_x.data
         kwargs['flag_logscale_y'] = pygal_form.flag_logscale_y.data
 
         new_options = PygalPlotOptions(**kwargs)

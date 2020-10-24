@@ -147,7 +147,6 @@ def make_chart_matplotlib(model_name, chart_id, options):
         chart.semilogy()  
 
     chart.grid(show_grid, color='#5e5e5e') 
-    
 
 
     chart.set_xlabel('x')
@@ -167,28 +166,67 @@ def make_chart_matplotlib(model_name, chart_id, options):
 
 
 def make_chart_seaborn(model_name, chart_id, options):
-    fig = Figure(figsize=(5.0, 5.0))
-    axis = fig.add_subplot(1, 1, 1)
-    axis.set_title('Seaborn')
-
-    axis.grid(True)
-    sb.set(style="darkgrid")
-
-    points = make_points(model_name, chart_id)
+    if chart_id != -1:
+        points = make_points(model_name, chart_id)
+    else:
+        points = []
 
     data = [
         {model_name: point[0], model_name: point[1]} for point in points
     ]
-    
     df = pd.DataFrame(data=data)
-    sb.lineplot(data=df, ax=axis)
+    
+
+
+
+    fig = Figure(figsize=(5.0, 5.0))
+    axis = fig.add_subplot(1, 1, 1)
+    axis.set_title('Seaborn')
+
+    seaborn_style = dict()
+    flag_scatter_plot = options.get('flag_scatter_plot', False)
+    flag_show_grid = options.get('flag_show_grid', True)
+    flag_logscale_x = options.get('flag_logscale_x', False)
+    flag_logscale_y = options.get('flag_logscale_y', False)
+
+    if flag_logscale_x:
+        axis.set_xscale('log')
+
+    if flag_logscale_y:
+        axis.set_yscale('log')
+
+
+    if flag_show_grid:
+        axis.grid(True)
+        seaborn_style['style'] = 'darkgrid'
+    else:
+        axis.grid(False)
+
+    sb.set_theme(**seaborn_style)
+    
+    plot_kwargs = dict()
+    plot_kwargs['legend'] = False
+    plot_kwargs['palette'] = [options.get('color', 'black')]
+    plot_kwargs['linewidth'] = options.get('line_width', 3)
+
+    if options.get('line_style', 'solid') == 'dashed':
+        plot_kwargs['dashes'] = [(4,6)]
+
+    if flag_scatter_plot:
+        sb.scatterplot(data=df, ax=axis, **plot_kwargs)
+    else:
+        sb.lineplot(data=df, ax=axis, **plot_kwargs)
     return fig
 
 
 def make_chart_bokeh(model_name, chart_id, options):
     Model = str_to_object(model_name)
     points = make_points(model_name, chart_id)
-    
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
+
+
+
     fig_kwargs = dict()
     fig_kwargs['title'] = model_name
     fig_kwargs['width'] = 500
@@ -202,66 +240,37 @@ def make_chart_bokeh(model_name, chart_id, options):
     fig_kwargs['min_border_bottom'] = 0
 
 
-    scatter_plot = options.get('flag_scatter_plot', False)
-    show_grid = options.get('flag_show_grid', True)
-    logscale_x = options.get('flag_logscale_x', False)
-    logscale_y = options.get('flag_logscale_y', False)
+    flag_scatter_plot = options.get('flag_scatter_plot', False)
+    flag_show_grid = options.get('flag_show_grid', True)
+    flag_logscale_x = options.get('flag_logscale_x', False)
+    flag_logscale_y = options.get('flag_logscale_y', False)
 
     fig_kwargs['background_fill_color'] = options.get('bg_color', 'white')  # <------------------ ?
-    if logscale_x:
+    if flag_logscale_x:
         fig_kwargs['x_axis_type'] = "log"   # linear, datetime ,mercator <------------------
     else:
         fig_kwargs['x_axis_type'] = "linear"   
 
-    if logscale_y:
+    if flag_logscale_y:
         fig_kwargs['y_axis_type'] = "log"   # linear, datetime ,mercator <------------------
     else:
         fig_kwargs['y_axis_type'] = "linear"  
 
 
     bokeh_chart = bokeh_figure(**fig_kwargs)
-
-
+    bokeh_chart.xgrid.visible = flag_show_grid
+    bokeh_chart.ygrid.visible = flag_show_grid
     
-    xx = [point[0] for point in points]
-    yy = [point[1] for point in points]
+    plot_kwargs = dict()
+    plot_kwargs['color'] = options.get('color', 'black') # many colors... <------------------ 
+    plot_kwargs['line_width'] = options.get('line_width', 2)
+    plot_kwargs['line_dash'] = options.get('line_style', 'solid') # solid' 'dashed' 'dotted' 'dotdash' 'dashdot' <------------------ 
 
-    chart_kwargs = dict()
-    # chart_kwargs['x'] = xx  
-    # chart_kwargs['y'] = yy 
-    chart_kwargs['color'] = options.get('color', 'black') # many colors... <------------------ 
-    chart_kwargs['line_width'] = options.get('line_width', 2)
-    chart_kwargs['line_dash'] = options.get('line_style', 'solid') # solid' 'dashed' 'dotted' 'dotdash' 'dashdot' <------------------ 
-
-    
-    bokeh_chart.xgrid.visible = show_grid
-    bokeh_chart.ygrid.visible = show_grid
-
-
-    if scatter_plot:
-        bokeh_chart.scatter(xx, yy, **chart_kwargs)
+    if flag_scatter_plot:
+        bokeh_chart.scatter(xx, yy, **plot_kwargs)
     else:
-        bokeh_chart.line(xx, yy, **chart_kwargs)
+        bokeh_chart.line(xx, yy, **plot_kwargs)
 
-    
-    xx = [point[0] for point in points]
-    yy = [point[1] for point in points]
-
-    chart_kwargs = dict()
-    chart_kwargs['x'] = xx  
-    chart_kwargs['y'] = yy 
-    chart_kwargs['color'] = options.get('color', 'black') # many colors... <------------------ 
-    chart_kwargs['line_width'] = options.get('line_width', 2)
-    chart_kwargs['line_dash'] = options.get('line_style', 'solid') # solid' 'dashed' 'dotted' 'dotdash' 'dashdot' <------------------ 
-
-    bokeh_chart.xgrid.visible = not show_grid
-    bokeh_chart.ygrid.visible = not show_grid
-
-
-    if scatter_plot:
-        bokeh_chart.scatter(**chart_kwargs)
-    else:
-        bokeh_chart.line(**chart_kwargs)
 
 
         
@@ -467,12 +476,14 @@ def get_default_seaborn_options(db):
 
     if not seaborn_options:
         kwargs = dict()
-        kwargs['color'] = 'r'
+        kwargs['color'] = 'red'
+        kwargs['bg_color'] = 'white'
         kwargs['line_width'] = 2
-        kwargs['line_style'] = '-'
-        kwargs['marker'] = '.'
+        kwargs['line_style'] = 'dashed'
+        kwargs['marker'] = ''
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
+        kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
         seaborn_options = SeabornPlotOptions(**kwargs)
         db.session.add(seaborn_options)
@@ -535,9 +546,8 @@ def get_default_pygal_options(db):
         kwargs['marker'] = 'circle'
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
-        kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
-        pygal_options = PlotlyPlotOptions(**kwargs)
+        pygal_options = PygalPlotOptions(**kwargs)
         db.session.add(pygal_options)
         db.session.commit()
     

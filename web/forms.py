@@ -89,18 +89,16 @@ class FromFileForm(FlaskForm):
 
 
 
-
-
 class MatplotlibOptionsForm(FlaskForm):
     
     color = SelectField('Line color: ', choices=[
+            ('k', 'black'),
             ('w', 'white'), 
             ('g', 'green'), 
             ('r', 'red'),
             ('c', 'cyan'),
             ('m', 'magenta'),
             ('y', 'yellow'),
-            ('k', 'black'),
             ('b', 'blue')
         ]
     )
@@ -125,6 +123,62 @@ class MatplotlibOptionsForm(FlaskForm):
             ('--', 'dashed'), 
             (':',  'dotted'),
             ('-.', 'dashed-dotted')
+        ]
+    )
+    
+    marker = SelectField('Marker: ', choices=[
+            ('.', 'dot'), 
+            ('+', 'plus'),
+            ('*', 'star'),
+            ('x', 'cross'),
+            ('s', 'square'),
+            ('o', 'circle'), 
+            ('d', 'diamond'),
+            ('^', 'triangle'),
+            ('_', 'underscore')
+        ]
+    )
+
+    flag_scatter_plot = BooleanField("Scatter:")
+    flag_show_grid = BooleanField("Grid:")
+    flag_logscale_x = BooleanField("Log scale X:")
+    flag_logscale_y = BooleanField("Log scale Y:")
+    
+    submit = SubmitField('Add data')
+
+
+class SeabornOptionsForm(FlaskForm):
+    
+    color = SelectField('Line color: ', choices=[
+            ('k', 'black'),
+            ('#d1c9c9', 'white'), 
+            ('g', 'green'), 
+            ('r', 'red'),
+            ('c', 'cyan'),
+            ('m', 'magenta'),
+            ('y', 'yellow'),
+            ('b', 'blue')
+        ]
+    )
+
+    bg_color = SelectField('Background color: ', choices=[
+            ('white', 'white'),
+            ('#5b9bde', 'blue'), 
+            ('black', 'black'),
+            ('magenta', 'magenta'),
+            ('#95e678', 'green'), 
+            ('cyan', 'cyan'),
+            ('yellow', 'yellow'),
+            ('#ff4314', 'red')
+        ]
+    )
+
+
+    line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
+
+    line_style = SelectField('Style: ', choices=[
+            ('solid',  'solid'), 
+            ('dashed', 'dashed')
         ]
     )
     # line_style = StringField('Line style:',  validators=[DataRequired(), Length(min=1, max=10)])
@@ -153,14 +207,14 @@ class MatplotlibOptionsForm(FlaskForm):
 
 class BokehOptionsForm(FlaskForm):
     color = SelectField('Line color: ', choices=[
-            ('#e6e6e6', 'white'),
+            ('black', 'black'),
             ('#5b9bde', 'blue'), 
             ('#95e678', 'green'), 
             ('#ff4314', 'red'),
             ('cyan', 'cyan'),
             ('magenta', 'magenta'),
-            ('yellow', 'yellow'),
-            ('black', 'black')
+            ('#e6e6e6', 'white'),
+            ('yellow', 'yellow')
         ]
     )
 
@@ -210,17 +264,16 @@ class BokehOptionsForm(FlaskForm):
     submit = SubmitField('Add data')
 
 
-
 class PlotlyOptionsForm (FlaskForm):
     color = SelectField('Line color: ', choices=[
+            ('black', 'black'),
             ('#e6e6e6', 'white'),
             ('#5b9bde', 'blue'), 
             ('#95e678', 'green'), 
             ('#ff4314', 'red'),
             ('cyan', 'cyan'),
             ('magenta', 'magenta'),
-            ('yellow', 'yellow'),
-            ('black', 'black')
+            ('yellow', 'yellow')
         ]
     )
 
@@ -266,18 +319,16 @@ class PlotlyOptionsForm (FlaskForm):
     submit = SubmitField('Add data')
 
 
-
-
 class PygalOptionsForm (FlaskForm):
     color = SelectField('Line color: ', choices=[
+            ('black', 'black'),
             ('#e6e6e6', 'white'),
             ('#5b9bde', 'blue'), 
             ('#95e678', 'green'), 
             ('#ff4314', 'red'),
             ('cyan', 'cyan'),
             ('magenta', 'magenta'),
-            ('yellow', 'yellow'),
-            ('black', 'black')
+            ('yellow', 'yellow')
         ]
     )
 
@@ -317,7 +368,6 @@ class PygalOptionsForm (FlaskForm):
 
     flag_scatter_plot = BooleanField("Scatter:")
     flag_show_grid = BooleanField("Grid:")
-    flag_logscale_x = BooleanField("Log scale X:")
     flag_logscale_y = BooleanField("Log scale Y:")
     
     submit = SubmitField('Add data')
