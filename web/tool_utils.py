@@ -237,7 +237,6 @@ def make_chart_bokeh(model_name, chart_id, options):
     fig_kwargs['min_border_top'] = 0
     fig_kwargs['min_border_bottom'] = 0
 
-
     flag_scatter_plot = options.get('flag_scatter_plot', False)
     flag_show_grid = options.get('flag_show_grid', True)
     flag_logscale_x = options.get('flag_logscale_x', False)
@@ -416,7 +415,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         yy = [point[1] for point in points]
 
         x_str = f'xx = {xx}'
-        y_str = f'yy = {yy}\n'
+        y_str = f'yy = {yy}'
 
         code = f''' 
 import matplotlib.pyplot as plt
@@ -475,7 +474,83 @@ plt.show()
     elif library_name == 'seaborn':
         pass
     elif library_name == 'bokeh':
-        pass
+        if chart_id != -1:
+            points = make_points(model_name, chart_id)
+        else:
+            points = []
+        xx = [point[0] for point in points]
+        yy = [point[1] for point in points]
+
+        x_str = f'xx = {xx}'
+        y_str = f'yy = {yy}'
+
+        code = f'''
+from bokeh.plotting import figure as bokeh_figure, show
+from bokeh.io.export import get_screenshot_as_png
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from PIL import Image
+
+{x_str}\n{y_str}\n
+
+options = {options}
+
+flag_scatter_plot = options.get('flag_scatter_plot', False)
+flag_show_grid = options.get('flag_show_grid', True)
+flag_logscale_x = options.get('flag_logscale_x', False)
+flag_logscale_y = options.get('flag_logscale_y', False)
+
+# by default
+fig_kwargs = dict()
+fig_kwargs['title'] = 'Bokeh plot' # model_name
+fig_kwargs['x_axis_label'] = 'x'
+fig_kwargs['y_axis_label'] = 'y'
+fig_kwargs['toolbar_location'] = None
+fig_kwargs['min_border_right'] = 45
+
+if flag_logscale_x:
+    fig_kwargs['x_axis_type'] = "log"
+else:
+    fig_kwargs['x_axis_type'] = "linear"   
+
+if flag_logscale_y:
+    fig_kwargs['y_axis_type'] = "log"
+else:
+    fig_kwargs['y_axis_type'] = "linear"   
+
+
+bokeh_chart = bokeh_figure(**fig_kwargs) 
+
+chart_kwargs = dict()
+chart_kwargs['x'] = xx  
+chart_kwargs['y'] = yy  
+chart_kwargs['color'] = options.get('color', 'black') 
+chart_kwargs['line_width'] = options.get('line_width', 2)
+chart_kwargs['line_dash'] = options.get('line_style', 'solid')
+
+
+if not flag_show_grid:
+    bokeh_chart.xgrid.visible = False
+    bokeh_chart.ygrid.visible = False
+
+if flag_scatter_plot:
+    chart_kwargs['marker'] = 'asterisk'
+    bokeh_chart.scatter(**chart_kwargs)
+else:
+    bokeh_chart.line(**chart_kwargs)
+
+
+chrome_options = Options()
+chrome_options.add_argument(f"--window-size={500},{500}")
+chrome_options.add_argument("--kiosk") # for full screen -> images are caught entirely, not in half
+chrome_options.add_argument("--headless") # in background
+webdriver = webdriver.Chrome(executable_path='web/chromedriver', options=chrome_options)
+
+image = get_screenshot_as_png(bokeh_chart, height=500, width=500, driver=webdriver)
+
+
+image.show()
+        '''
     elif library_name == 'plotly':
         pass
     elif library_name == 'pygal':
