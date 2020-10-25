@@ -268,7 +268,7 @@ def route_change_options_matplotlib(model_name, chart_id=-1):
         ''' get old options to be replaced and after replacing, delete the old'''
         current_chart = Model.query.get(chart_id)
         
-
+        
         current_chart.id_matplotlib_options = new_options_id
 
         db.session.commit()

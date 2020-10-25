@@ -225,8 +225,6 @@ def make_chart_bokeh(model_name, chart_id, options):
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
 
-
-
     fig_kwargs = dict()
     fig_kwargs['title'] = model_name
     fig_kwargs['width'] = 500
@@ -245,17 +243,16 @@ def make_chart_bokeh(model_name, chart_id, options):
     flag_logscale_x = options.get('flag_logscale_x', False)
     flag_logscale_y = options.get('flag_logscale_y', False)
 
-    fig_kwargs['background_fill_color'] = options.get('bg_color', 'white')  # <------------------ ?
+   
     if flag_logscale_x:
         fig_kwargs['x_axis_type'] = "log"   # linear, datetime ,mercator <------------------
     else:
         fig_kwargs['x_axis_type'] = "linear"   
 
     if flag_logscale_y:
-        fig_kwargs['y_axis_type'] = "log"   # linear, datetime ,mercator <------------------
+        fig_kwargs['y_axis_type'] = "log" 
     else:
         fig_kwargs['y_axis_type'] = "linear"  
-
 
     bokeh_chart = bokeh_figure(**fig_kwargs)
     bokeh_chart.xgrid.visible = flag_show_grid
@@ -270,11 +267,6 @@ def make_chart_bokeh(model_name, chart_id, options):
         bokeh_chart.scatter(xx, yy, **plot_kwargs)
     else:
         bokeh_chart.line(xx, yy, **plot_kwargs)
-
-
-
-        
-    
     
     return bokeh_chart
 
@@ -412,8 +404,82 @@ def get_current_time():
 
 
 def save_source_code(library_name, model_name, chart_id, current_time):
-    code = inspect.getsource(str_to_object(f'make_chart_{library_name}'))
-    
+    # code = inspect.getsource(str_to_object(f'make_chart_{library_name}'))
+    options = get_lib_options_from_model_and_chart_id(library_name, model_name, chart_id)
+
+    if library_name == 'matplotlib':
+        if chart_id != -1:
+            points = make_points(model_name, chart_id)
+        else:
+            points = []
+        xx = [point[0] for point in points]
+        yy = [point[1] for point in points]
+
+        x_str = f'xx = {xx}'
+        y_str = f'yy = {yy}\n'
+
+        code = f''' 
+import matplotlib.pyplot as plt
+plt.rcParams['toolbar'] = 'None'
+
+options = {options}
+{x_str}\n{y_str}\n
+kwargs = dict()
+
+kwargs['color']     = options.get('color', 'r')
+kwargs['linewidth'] = options.get('line_width', 2)
+kwargs['linestyle'] = options.get('line_style', 'solid')
+kwargs['marker']    = options.get('marker', '.')
+
+scatter_plot        = options.get('flag_scatter_plot', False) # dots or solid line
+show_grid           = options.get('flag_show_grid', False)    # show grid or not
+logscale_x          = options.get('flag_logscale_x', False )  # logarithmic scale
+logscale_y          = options.get('flag_logscale_y', False )  # logarithmic scale
+background_color    = options.get('bg_color', '#dbdbdb') # 
+
+fig = plt.figure()
+fig.set_size_inches(6.2, 5.0)
+chart = fig.add_subplot(1, 1, 1)
+
+if logscale_x:
+    chart.semilogx()  # set logscaly for  X
+
+if logscale_y:
+    chart.semilogy()  # set logscaly for  Y
+
+chart.grid(show_grid) # grid ON/OFF
+chart.set_facecolor(background_color)
+
+if logscale_x:
+    chart.semilogx()  
+
+if logscale_y:
+    chart.semilogy()  
+
+chart.grid(show_grid, color='#5e5e5e') 
+
+if scatter_plot:
+    kwargs['s'] = 20*kwargs['linewidth']
+    chart.scatter(xx, yy, **kwargs)
+else:
+    kwargs['marker'] = None 
+    chart.plot(xx, yy, **kwargs)
+
+chart.set_xlabel('x')
+chart.set_ylabel('y')
+chart.set_title('Matplotlib')
+
+plt.show()
+'''.lstrip('\t ')
+
+    elif library_name == 'seaborn':
+        pass
+    elif library_name == 'bokeh':
+        pass
+    elif library_name == 'plotly':
+        pass
+    elif library_name == 'pygal':
+        pass
 
     filename = f'{current_time}_{library_name}_{chart_id}_{model_name}'  
     with open(f'web/downloads/codes/{filename}.py', 'w') as f:
@@ -605,3 +671,13 @@ def clean_unused_options(db):
     
     db.session.commit()
 
+
+
+def get_lib_options_from_model_and_chart_id(library_name, model_name, chart_id):
+    Model = str_to_object(model_name)
+    LPO = str_to_object(f'{library_name.capitalize()}PlotOptions')
+    id_library_options = f'id_{library_name}_options'
+    options_id = getattr(Model.query.get(chart_id), id_library_options)
+    options = LPO.get_options(options_id)
+
+    return options
