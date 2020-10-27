@@ -337,25 +337,21 @@ def make_chart_pygal(model_name, chart_id, options):
     ''' options '''
     scatter_plot = options.get('flag_scatter_plot', False)  
     show_grid = options.get('flag_show_grid', True) 
-    # logscale_x = options.get('flag_logscale_x', False) 
     logscale_y = options.get('flag_logscale_y', False) 
 
 
     pygal_config = PygalConfig()
     pygal_config.show_dots = False
-
-    custom_style = PygalStyle(
+    pygal_config.style = PygalStyle(
         colors=(options.get('color', 'black'),),
         plot_background=options.get('bg_color', 'white')
     )
-    pygal_config.style = custom_style
 
     stroke_options = dict()
 
     if scatter_plot:
         pygal_config.stroke = True
         stroke_options['dasharray'] = '10, 20'
-
 
     if logscale_y:
         pygal_config.logarithmic = True
@@ -404,18 +400,17 @@ def get_current_time():
 
 def save_source_code(library_name, model_name, chart_id, current_time):
     options = get_lib_options_from_model_and_chart_id(library_name, model_name, chart_id)
+    if chart_id != -1:
+            points = make_points(model_name, chart_id)
+    else:
+        points = []
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
+
+    x_str = f'xx = {xx}'
+    y_str = f'yy = {yy}'
 
     if library_name == 'matplotlib':
-        if chart_id != -1:
-            points = make_points(model_name, chart_id)
-        else:
-            points = []
-        xx = [point[0] for point in points]
-        yy = [point[1] for point in points]
-
-        x_str = f'xx = {xx}'
-        y_str = f'yy = {yy}'
-
         code = f''' 
 """ THIS FILE HAD BEEN AUTO-GENERATED """
 import matplotlib.pyplot as plt
@@ -474,16 +469,6 @@ plt.show()
     elif library_name == 'seaborn':
         pass
     elif library_name == 'bokeh':
-        if chart_id != -1:
-            points = make_points(model_name, chart_id)
-        else:
-            points = []
-        xx = [point[0] for point in points]
-        yy = [point[1] for point in points]
-
-        x_str = f'xx = {xx}'
-        y_str = f'yy = {yy}'
-
         code = f'''
 """ THIS FILE HAD BEEN AUTO-GENERATED """
 
@@ -551,7 +536,55 @@ image.show()
     elif library_name == 'plotly':
         pass
     elif library_name == 'pygal':
-        pass
+        code = f''' 
+import pygal
+from pygal import Config as PygalConfig
+from pygal.style import Style as PygalStyle
+from PIL import Image
+import os
+
+options = {options}
+xx = {x_str}
+yy = {y_str}
+points = [(x, y) for x, y in zip(xx, yy)]
+
+scatter_plot = options.get('flag_scatter_plot', False)  
+show_grid = options.get('flag_show_grid', True) 
+logscale_y = options.get('flag_logscale_y', False) 
+
+
+pygal_config = PygalConfig()
+pygal_config.show_dots = False
+pygal_config.style = PygalStyle(
+    colors=(options.get('color', 'black'),),
+    plot_background=options.get('bg_color', 'white')
+)   
+
+stroke_options = dict()
+
+if scatter_plot:
+    pygal_config.stroke = True
+    stroke_options['dasharray'] = '10, 20'
+
+if logscale_y:
+    pygal_config.logarithmic = True
+
+stroke_options['width'] = options.get('line_width', 2)
+pygal_config.stroke_style = stroke_options
+pygal_config.title = "Pygal"
+# pygal_config.fill = False    # <----------------------- ?
+
+pygal_config.show_x_guides = show_grid
+pygal_config.show_y_guides = show_grid
+
+chart = pygal.XY(pygal_config)
+
+chart.add('y', points)
+chart.render_to_png('pygal.png')
+im = Image.open('pygal.png')
+os.remove("pygal.png")
+im.show()
+        '''
 
     filename = f'{current_time}_{library_name}_{chart_id}_{model_name}'  
     with open(f'web/downloads/codes/{filename}.py', 'w') as f:
