@@ -595,7 +595,71 @@ image = get_screenshot_as_png(bokeh_chart, height=500, width=500, driver=webdriv
 image.show()
         '''
     elif library_name == 'plotly':
-        pass
+        code = f'''
+import plotly
+import plotly.graph_objs as plotly_go
+import numpy as np
+
+
+{x_str}
+{y_str}
+
+
+options = {options}
+            
+
+data = [
+    plotly_go.Scatter(
+        x=xx, 
+        y=yy,
+        line=''' + '{' + '''
+            'color': options.get('color', 'red'),
+            'width': options.get('line_width', 2),
+            'dash':  options.get('line_style', 'solid')
+        },
+        marker={
+            'symbol': options.get('marker', 'circle'),
+            'size': 3*options.get('line_width', 2) 
+        },
+        fillcolor='black'
+    )
+]
+
+
+layout = plotly_go.Layout(
+    title='Plotly', 
+    title_x=0.5, 
+    xaxis_title="x", 
+    yaxis_title="y", 
+    width=500, 
+    height=500, 
+    margin={'l': 30, 'r': 30, 't': 40, 'b': 5},
+    plot_bgcolor=options.get('bg_color', '#dbdbdb'),
+    xaxis={
+        'showgrid': options.get('flag_show_grid', True),
+        'type': 'log' if options.get('flag_logscale_x', False) else 'linear'
+    },
+    yaxis={
+        'showgrid': options.get('flag_show_grid', True),
+        'type': 'log' if options.get('flag_logscale_y', False) else 'linear'
+    },
+    modebar={
+        'bgcolor': 'red'
+    }
+)
+
+chart_properties = {
+    'data': data,
+    'layout': layout
+}
+
+fig = plotly_go.Figure(
+    data=data,
+    layout=layout
+)
+fig.show()
+
+        '''
     elif library_name == 'pygal':
         code = f''' 
 """ AUTO-GENERATED FILE """

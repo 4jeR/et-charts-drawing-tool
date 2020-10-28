@@ -11,8 +11,6 @@ python3 -m pip install -U matplotlib
 pip3 install seaborn
 pip3 install bokeh
 pip3 install plotly
-    pip3 install psutil
-    pip3 install orca
 pip3 install pygal
     pip3 install chart-studio
 pip3 install psycopg2-binary
