@@ -7,7 +7,7 @@ from math import exp
 from math import log
 from math import sin
 from math import sqrt
-
+import textwrap
 import pandas as pd
 from datetime import datetime
 
@@ -47,6 +47,11 @@ def str_to_object(string_name):
     ''' Returns the string_name as object (function, class, etc.).'''
     return getattr(sys.modules[__name__], string_name)
 
+
+def formatted_code(code_str):
+    if code_str and code_str[0] == '\n':
+        code_str = code_str[1:]
+    return textwrap.dedent(code_str)
 
 
 def make_points(model_name, chart_id):
@@ -411,310 +416,303 @@ def save_source_code(library_name, model_name, chart_id, current_time):
 
     x_str = f'xx = {xx}'
     y_str = f'yy = {yy}'
-
+    
     if library_name == 'matplotlib':
         code = f''' 
-""" AUTO-GENERATED FILE """
-import matplotlib.pyplot as plt
+        """ AUTO-GENERATED FILE """
+        import matplotlib.pyplot as plt
 
-plt.rcParams['toolbar'] = 'None'
-options = {options}
-{x_str}\n{y_str}\n
-kwargs = dict()
+        plt.rcParams['toolbar'] = 'None'
+        options = {options}
+        {x_str}
+        {y_str}
+        kwargs = dict()
 
-kwargs['color']     = options.get('color', 'r')
-kwargs['linewidth'] = options.get('line_width', 2)
-kwargs['linestyle'] = options.get('line_style', 'solid')
-kwargs['marker']    = options.get('marker', '.')
+        kwargs['color']     = options.get('color', 'r')
+        kwargs['linewidth'] = options.get('line_width', 2)
+        kwargs['linestyle'] = options.get('line_style', 'solid')
+        kwargs['marker']    = options.get('marker', '.')
 
-scatter_plot        = options.get('flag_scatter_plot', False)
-show_grid           = options.get('flag_show_grid', False)
-logscale_x          = options.get('flag_logscale_x', False )
-logscale_y          = options.get('flag_logscale_y', False )
-background_color    = options.get('bg_color', '#dbdbdb')
+        scatter_plot        = options.get('flag_scatter_plot', False)
+        show_grid           = options.get('flag_show_grid', False)
+        logscale_x          = options.get('flag_logscale_x', False )
+        logscale_y          = options.get('flag_logscale_y', False )
+        background_color    = options.get('bg_color', '#dbdbdb')
 
-fig = plt.figure()
-fig.set_size_inches(6.2, 5.0)
-chart = fig.add_subplot(1, 1, 1)
+        fig = plt.figure()
+        fig.set_size_inches(6.2, 5.0)
+        chart = fig.add_subplot(1, 1, 1)
 
-if logscale_x:
-    chart.semilogx()
+        if logscale_x:
+            chart.semilogx()
 
-if logscale_y:
-    chart.semilogy()
+        if logscale_y:
+            chart.semilogy()
 
-chart.grid(show_grid)
-chart.set_facecolor(background_color)
+        chart.grid(show_grid)
+        chart.set_facecolor(background_color)
 
-if logscale_x:
-    chart.semilogx()  
+        if logscale_x:
+            chart.semilogx()  
 
-if logscale_y:
-    chart.semilogy()  
+        if logscale_y:
+            chart.semilogy()  
 
-chart.grid(show_grid, color='#5e5e5e') 
+        chart.grid(show_grid, color='#5e5e5e') 
 
-if scatter_plot:
-    kwargs['s'] = 20*kwargs['linewidth']
-    chart.scatter(xx, yy, **kwargs)
-else:
-    kwargs['marker'] = None 
-    chart.plot(xx, yy, **kwargs)
+        if scatter_plot:
+            kwargs['s'] = 20*kwargs['linewidth']
+            chart.scatter(xx, yy, **kwargs)
+        else:
+            kwargs['marker'] = None 
+            chart.plot(xx, yy, **kwargs)
 
-chart.set_xlabel('x')
-chart.set_ylabel('y')
-chart.set_title('Matplotlib')
+        chart.set_xlabel('x')
+        chart.set_ylabel('y')
+        chart.set_title('Matplotlib')
 
-plt.show()
-'''
-
+        plt.show()
+        '''
     elif library_name == 'seaborn':
         code = '''
-""" AUTO-GENERATED FILE """
-import pandas as pd
-import seaborn as sb
-import matplotlib.pyplot as plt
+        """ AUTO-GENERATED FILE """
+        import pandas as pd
+        import seaborn as sb
+        import matplotlib.pyplot as plt
 
-plt.rcParams['toolbar'] = 'None'
+        plt.rcParams['toolbar'] = 'None'
 
-data = [
-    {\' ''' + model_name + ''' \': x, \' ''' + model_name + ''' \': y} for x, y in ''' + f'zip(\n{xx}, \n{yy}\n)\n]' + f'''
-df = pd.DataFrame(data=data)
+        data = [
+            {\' ''' + model_name + ''' \': x, \' ''' + model_name + ''' \': y} for x, y in ''' + f'zip({xx}, {yy})]' + f'''
+        df = pd.DataFrame(data=data)
 
-options = {options}
-fig = plt.figure()
-axis = fig.add_subplot(1, 1, 1)
-axis.set_title('Seaborn')
-ax = plt.axes()
-ax.set_facecolor(options.get('bg_color', 'white'))
-
-
-seaborn_style = dict()
-
-flag_scatter_plot = options.get('flag_scatter_plot', False)
-flag_show_grid = options.get('flag_show_grid', True)
-flag_logscale_x = options.get('flag_logscale_x', False)
-flag_logscale_y = options.get('flag_logscale_y', False)
+        options = {options}
+        fig = plt.figure()
+        axis = fig.add_subplot(1, 1, 1)
+        axis.set_title('Seaborn')
+        ax = plt.axes()
+        ax.set_facecolor(options.get('bg_color', 'white'))
 
 
-if flag_logscale_x:
-    axis.set_xscale('log')
+        seaborn_style = dict()
 
-if flag_logscale_y:
-    axis.set_yscale('log')
-
-
-if flag_show_grid:
-    axis.grid(True)
-    seaborn_style['style'] = 'darkgrid'
-else:
-    axis.grid(False)
+        flag_scatter_plot = options.get('flag_scatter_plot', False)
+        flag_show_grid = options.get('flag_show_grid', True)
+        flag_logscale_x = options.get('flag_logscale_x', False)
+        flag_logscale_y = options.get('flag_logscale_y', False)
 
 
+        if flag_logscale_x:
+            axis.set_xscale('log')
 
-sb.set_theme(**seaborn_style)
+        if flag_logscale_y:
+            axis.set_yscale('log')
 
-plot_kwargs = dict()
-plot_kwargs['legend'] = False
-plot_kwargs['palette'] = [options.get('color', 'black')]
-plot_kwargs['linewidth'] = options.get('line_width', 3)
 
-if options.get('line_style', 'solid') == 'dashed':
-    plot_kwargs['dashes'] = [(4,6)]
+        if flag_show_grid:
+            axis.grid(True)
+            seaborn_style['style'] = 'darkgrid'
+        else:
+            axis.grid(False)
 
-if flag_scatter_plot:
-    sb.scatterplot(data=df, ax=axis, **plot_kwargs)
-else:
-    sb.lineplot(data=df, ax=axis, **plot_kwargs)
 
-plt.show()
-'''
+
+        sb.set_theme(**seaborn_style)
+
+        plot_kwargs = dict()
+        plot_kwargs['legend'] = False
+        plot_kwargs['palette'] = [options.get('color', 'black')]
+        plot_kwargs['linewidth'] = options.get('line_width', 3)
+
+        if options.get('line_style', 'solid') == 'dashed':
+            plot_kwargs['dashes'] = [(4,6)]
+
+        if flag_scatter_plot:
+            sb.scatterplot(data=df, ax=axis, **plot_kwargs)
+        else:
+            sb.lineplot(data=df, ax=axis, **plot_kwargs)
+
+        plt.show()
+        '''
     elif library_name == 'bokeh':
         code = f'''
-""" AUTO-GENERATED FILE """
+        """ AUTO-GENERATED FILE """
 
-from bokeh.plotting import figure as bokeh_figure, show
-from bokeh.io.export import get_screenshot_as_png
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from PIL import Image
+        from bokeh.plotting import figure as bokeh_figure, show
+        from bokeh.io.export import get_screenshot_as_png
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+        from PIL import Image
 
-{x_str}\n{y_str}\n
+        {x_str}
+        {y_str}
 
-options = {options}
+        options = {options}
 
-flag_scatter_plot = options.get('flag_scatter_plot', False)
-flag_show_grid = options.get('flag_show_grid', True)
-flag_logscale_x = options.get('flag_logscale_x', False)
-flag_logscale_y = options.get('flag_logscale_y', False)
+        flag_scatter_plot = options.get('flag_scatter_plot', False)
+        flag_show_grid = options.get('flag_show_grid', True)
+        flag_logscale_x = options.get('flag_logscale_x', False)
+        flag_logscale_y = options.get('flag_logscale_y', False)
 
-fig_kwargs = dict()
-fig_kwargs['title'] = 'Bokeh plot'
-fig_kwargs['x_axis_label'] = 'x'
-fig_kwargs['y_axis_label'] = 'y'
-fig_kwargs['toolbar_location'] = None
-fig_kwargs['min_border_right'] = 45
+        fig_kwargs = dict()
+        fig_kwargs['title'] = 'Bokeh plot'
+        fig_kwargs['x_axis_label'] = 'x'
+        fig_kwargs['y_axis_label'] = 'y'
+        fig_kwargs['toolbar_location'] = None
+        fig_kwargs['min_border_right'] = 45
 
-if flag_logscale_x:
-    fig_kwargs['x_axis_type'] = "log"
-else:
-    fig_kwargs['x_axis_type'] = "linear"   
+        if flag_logscale_x:
+            fig_kwargs['x_axis_type'] = "log"
+        else:
+            fig_kwargs['x_axis_type'] = "linear"   
 
-if flag_logscale_y:
-    fig_kwargs['y_axis_type'] = "log"
-else:
-    fig_kwargs['y_axis_type'] = "linear"   
+        if flag_logscale_y:
+            fig_kwargs['y_axis_type'] = "log"
+        else:
+            fig_kwargs['y_axis_type'] = "linear"   
 
-bokeh_chart = bokeh_figure(**fig_kwargs) 
+        bokeh_chart = bokeh_figure(**fig_kwargs) 
 
-chart_kwargs = dict()
-chart_kwargs['x'] = xx  
-chart_kwargs['y'] = yy  
-chart_kwargs['color'] = options.get('color', 'black') 
-chart_kwargs['line_width'] = options.get('line_width', 2)
-chart_kwargs['line_dash'] = options.get('line_style', 'solid')
+        chart_kwargs = dict()
+        chart_kwargs['x'] = xx  
+        chart_kwargs['y'] = yy  
+        chart_kwargs['color'] = options.get('color', 'black') 
+        chart_kwargs['line_width'] = options.get('line_width', 2)
+        chart_kwargs['line_dash'] = options.get('line_style', 'solid')
 
-if not flag_show_grid:
-    bokeh_chart.xgrid.visible = False
-    bokeh_chart.ygrid.visible = False
+        if not flag_show_grid:
+            bokeh_chart.xgrid.visible = False
+            bokeh_chart.ygrid.visible = False
 
-if flag_scatter_plot:
-    chart_kwargs['marker'] = options.get('marker', 'asterisk')
-    bokeh_chart.scatter(**chart_kwargs)
-else:
-    bokeh_chart.line(**chart_kwargs)
+        if flag_scatter_plot:
+            chart_kwargs['marker'] = options.get('marker', 'asterisk')
+            bokeh_chart.scatter(**chart_kwargs)
+        else:
+            bokeh_chart.line(**chart_kwargs)
 
-chrome_options = Options()
-chrome_options.add_argument(f"--window-size={500},{500}")
-chrome_options.add_argument("--kiosk")
-chrome_options.add_argument("--headless")
-webdriver = webdriver.Chrome(executable_path='web/chromedriver', options=chrome_options)
+        chrome_options = Options()
+        chrome_options.add_argument(f"--window-size={500},{500}")
+        chrome_options.add_argument("--kiosk")
+        chrome_options.add_argument("--headless")
+        webdriver = webdriver.Chrome(executable_path='web/chromedriver', options=chrome_options)
 
-image = get_screenshot_as_png(bokeh_chart, height=500, width=500, driver=webdriver)
+        image = get_screenshot_as_png(bokeh_chart, height=500, width=500, driver=webdriver)
 
-image.show()
-        '''
+        image.show()'''
     elif library_name == 'plotly':
         code = f'''
-import plotly
-import plotly.graph_objs as plotly_go
-import numpy as np
+        import plotly
+        import plotly.graph_objs as plotly_go
+        import numpy as np
 
+        {x_str}
+        {y_str}
 
-{x_str}
-{y_str}
+        options = {options}
+                    
+        data = [
+            plotly_go.Scatter(
+                x=xx, 
+                y=yy,
+                line=''' + '{' + '''
+                    'color': options.get('color', 'red'),
+                    'width': options.get('line_width', 2),
+                    'dash':  options.get('line_style', 'solid')
+                },
+                marker={
+                    'symbol': options.get('marker', 'circle'),
+                    'size': 3*options.get('line_width', 2) 
+                },
+                fillcolor='black'
+            )
+        ]
 
+        layout = plotly_go.Layout(
+            title='Plotly', 
+            title_x=0.5, 
+            xaxis_title="x", 
+            yaxis_title="y", 
+            width=500, 
+            height=500, 
+            margin={'l': 30, 'r': 30, 't': 40, 'b': 5},
+            plot_bgcolor=options.get('bg_color', '#dbdbdb'),
+            xaxis={
+                'showgrid': options.get('flag_show_grid', True),
+                'type': 'log' if options.get('flag_logscale_x', False) else 'linear'
+            },
+            yaxis={
+                'showgrid': options.get('flag_show_grid', True),
+                'type': 'log' if options.get('flag_logscale_y', False) else 'linear'
+            },
+            modebar={
+                'bgcolor': 'red'
+            }
+        )
 
-options = {options}
-            
+        chart_properties = {
+            'data': data,
+            'layout': layout
+        }
 
-data = [
-    plotly_go.Scatter(
-        x=xx, 
-        y=yy,
-        line=''' + '{' + '''
-            'color': options.get('color', 'red'),
-            'width': options.get('line_width', 2),
-            'dash':  options.get('line_style', 'solid')
-        },
-        marker={
-            'symbol': options.get('marker', 'circle'),
-            'size': 3*options.get('line_width', 2) 
-        },
-        fillcolor='black'
-    )
-]
-
-
-layout = plotly_go.Layout(
-    title='Plotly', 
-    title_x=0.5, 
-    xaxis_title="x", 
-    yaxis_title="y", 
-    width=500, 
-    height=500, 
-    margin={'l': 30, 'r': 30, 't': 40, 'b': 5},
-    plot_bgcolor=options.get('bg_color', '#dbdbdb'),
-    xaxis={
-        'showgrid': options.get('flag_show_grid', True),
-        'type': 'log' if options.get('flag_logscale_x', False) else 'linear'
-    },
-    yaxis={
-        'showgrid': options.get('flag_show_grid', True),
-        'type': 'log' if options.get('flag_logscale_y', False) else 'linear'
-    },
-    modebar={
-        'bgcolor': 'red'
-    }
-)
-
-chart_properties = {
-    'data': data,
-    'layout': layout
-}
-
-fig = plotly_go.Figure(
-    data=data,
-    layout=layout
-)
-fig.show()
-
-        '''
+        fig = plotly_go.Figure(
+            data=data,
+            layout=layout
+        )
+        fig.show()'''
     elif library_name == 'pygal':
         code = f''' 
-""" AUTO-GENERATED FILE """
-import pygal
-from pygal import Config as PygalConfig
-from pygal.style import Style as PygalStyle
-from PIL import Image
-import os
+        """ AUTO-GENERATED FILE """
+        import pygal
+        from pygal import Config as PygalConfig
+        from pygal.style import Style as PygalStyle
+        from PIL import Image
+        import os
 
-options = {options}
-xx = {x_str}
-yy = {y_str}
-points = [(x, y) for x, y in zip(xx, yy)]
+        options = {options}
+        xx = {x_str}
+        yy = {y_str}
+        points = [(x, y) for x, y in zip(xx, yy)]
 
-scatter_plot = options.get('flag_scatter_plot', False)  
-show_grid = options.get('flag_show_grid', True) 
-logscale_y = options.get('flag_logscale_y', False) 
+        scatter_plot = options.get('flag_scatter_plot', False)  
+        show_grid = options.get('flag_show_grid', True) 
+        logscale_y = options.get('flag_logscale_y', False) 
 
 
-pygal_config = PygalConfig()
-pygal_config.show_dots = False
-pygal_config.style = PygalStyle(
-    colors=(options.get('color', 'black'),),
-    plot_background=options.get('bg_color', '#cccccc')
-)   
+        pygal_config = PygalConfig()
+        pygal_config.show_dots = False
+        pygal_config.style = PygalStyle(
+            colors=(options.get('color', 'black'),),
+            plot_background=options.get('bg_color', '#cccccc')
+        )   
 
-stroke_options = dict()
+        stroke_options = dict()
 
-if scatter_plot:
-    pygal_config.stroke = True
-    stroke_options['dasharray'] = '10, 20'
+        if scatter_plot:
+            pygal_config.stroke = True
+            stroke_options['dasharray'] = '10, 20'
 
-if logscale_y:
-    pygal_config.logarithmic = True
+        if logscale_y:
+            pygal_config.logarithmic = True
 
-stroke_options['width'] = options.get('line_width', 2)
-pygal_config.stroke_style = stroke_options
-pygal_config.title = "Pygal"
-# pygal_config.fill = False    # <----------------------- ?
+        stroke_options['width'] = options.get('line_width', 2)
+        pygal_config.stroke_style = stroke_options
+        pygal_config.title = "Pygal"
 
-pygal_config.show_x_guides = show_grid
-pygal_config.show_y_guides = show_grid
+        pygal_config.show_x_guides = show_grid
+        pygal_config.show_y_guides = show_grid
 
-chart = pygal.XY(pygal_config)
+        chart = pygal.XY(pygal_config)
 
-chart.add('y', points)
-chart.render_to_png('pygal.png')
-im = Image.open('pygal.png')
-os.remove("pygal.png")
-im.show()
-        '''
+        chart.add('y', points)
+        chart.render_to_png('pygal.png')
+        im = Image.open('pygal.png')
+        os.remove("pygal.png")
+        im.show() '''
 
     filename = f'{current_time}_{library_name}_{chart_id}_{model_name}'  
     with open(f'web/downloads/codes/{filename}.py', 'w') as f:
-        f.write(code) 
+        f.write(formatted_code(code))
+        
 
 
 def download_image(library_name, model_name, chart_id, current_time):
