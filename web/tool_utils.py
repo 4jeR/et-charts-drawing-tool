@@ -179,9 +179,11 @@ def make_chart_seaborn(model_name, chart_id, options):
 
 
 
-    fig = Figure(figsize=(5.0, 5.0))
+    fig = Figure(figsize=(5.0, 5.0), facecolor='#ebebeb')
     axis = fig.add_subplot(1, 1, 1)
     axis.set_title('Seaborn')
+    axis.set_facecolor(options.get('bg_color', 'white'))
+    fig.set_edgecolor('red')
 
     seaborn_style = dict()
     flag_scatter_plot = options.get('flag_scatter_plot', False)
@@ -344,7 +346,7 @@ def make_chart_pygal(model_name, chart_id, options):
     pygal_config.show_dots = False
     pygal_config.style = PygalStyle(
         colors=(options.get('color', 'black'),),
-        plot_background=options.get('bg_color', 'white')
+        plot_background=options.get('bg_color', '#cccccc')
     )
 
     stroke_options = dict()
@@ -412,7 +414,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
 
     if library_name == 'matplotlib':
         code = f''' 
-""" THIS FILE HAD BEEN AUTO-GENERATED """
+""" AUTO-GENERATED FILE """
 import matplotlib.pyplot as plt
 
 plt.rcParams['toolbar'] = 'None'
@@ -467,10 +469,69 @@ plt.show()
 '''
 
     elif library_name == 'seaborn':
-        pass
+        code = '''
+""" AUTO-GENERATED FILE """
+import pandas as pd
+import seaborn as sb
+import matplotlib.pyplot as plt
+
+plt.rcParams['toolbar'] = 'None'
+
+data = [
+    {\' ''' + model_name + ''' \': x, \' ''' + model_name + ''' \': y} for x, y in ''' + f'zip(\n{xx}, \n{yy}\n)\n]' + f'''
+df = pd.DataFrame(data=data)
+
+options = {options}
+fig = plt.figure()
+axis = fig.add_subplot(1, 1, 1)
+axis.set_title('Seaborn')
+ax = plt.axes()
+ax.set_facecolor(options.get('bg_color', 'white'))
+
+
+seaborn_style = dict()
+
+flag_scatter_plot = options.get('flag_scatter_plot', False)
+flag_show_grid = options.get('flag_show_grid', True)
+flag_logscale_x = options.get('flag_logscale_x', False)
+flag_logscale_y = options.get('flag_logscale_y', False)
+
+
+if flag_logscale_x:
+    axis.set_xscale('log')
+
+if flag_logscale_y:
+    axis.set_yscale('log')
+
+
+if flag_show_grid:
+    axis.grid(True)
+    seaborn_style['style'] = 'darkgrid'
+else:
+    axis.grid(False)
+
+
+
+sb.set_theme(**seaborn_style)
+
+plot_kwargs = dict()
+plot_kwargs['legend'] = False
+plot_kwargs['palette'] = [options.get('color', 'black')]
+plot_kwargs['linewidth'] = options.get('line_width', 3)
+
+if options.get('line_style', 'solid') == 'dashed':
+    plot_kwargs['dashes'] = [(4,6)]
+
+if flag_scatter_plot:
+    sb.scatterplot(data=df, ax=axis, **plot_kwargs)
+else:
+    sb.lineplot(data=df, ax=axis, **plot_kwargs)
+
+plt.show()
+'''
     elif library_name == 'bokeh':
         code = f'''
-""" THIS FILE HAD BEEN AUTO-GENERATED """
+""" AUTO-GENERATED FILE """
 
 from bokeh.plotting import figure as bokeh_figure, show
 from bokeh.io.export import get_screenshot_as_png
@@ -537,6 +598,7 @@ image.show()
         pass
     elif library_name == 'pygal':
         code = f''' 
+""" AUTO-GENERATED FILE """
 import pygal
 from pygal import Config as PygalConfig
 from pygal.style import Style as PygalStyle
@@ -557,7 +619,7 @@ pygal_config = PygalConfig()
 pygal_config.show_dots = False
 pygal_config.style = PygalStyle(
     colors=(options.get('color', 'black'),),
-    plot_background=options.get('bg_color', 'white')
+    plot_background=options.get('bg_color', '#cccccc')
 )   
 
 stroke_options = dict()

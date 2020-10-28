@@ -104,7 +104,7 @@ class MatplotlibOptionsForm(FlaskForm):
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('#e6e6e6', 'white'),
+            ('#cccccc', 'white'),
             ('#5b9bde', 'blue'), 
             ('#95e678', 'green'), 
             ('#ff4314', 'red'),
@@ -162,7 +162,7 @@ class SeabornOptionsForm(FlaskForm):
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('white', 'white'),
+            ('#cccccc', 'white'),
             ('#5b9bde', 'blue'), 
             ('black', 'black'),
             ('magenta', 'magenta'),
@@ -219,7 +219,7 @@ class BokehOptionsForm(FlaskForm):
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('white', 'white'),
+            ('#cccccc', 'white'),
             ('#5b9bde', 'blue'), 
             ('#95e678', 'green'), 
             ('#ff4314', 'red'),
@@ -278,7 +278,7 @@ class PlotlyOptionsForm (FlaskForm):
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('white', 'white'),
+            ('#cccccc', 'white'),
             ('#5b9bde', 'blue'), 
             ('#95e678', 'green'), 
             ('#ff4314', 'red'),
@@ -333,7 +333,7 @@ class PygalOptionsForm (FlaskForm):
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('white', 'white'),
+            ('#cccccc', 'white'),
             ('#5b9bde', 'blue'), 
             ('#95e678', 'green'), 
             ('#ff4314', 'red'),
