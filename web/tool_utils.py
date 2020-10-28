@@ -1,7 +1,9 @@
 import os
 import sys
+import json
 import time
 import inspect
+
 from math import cos
 from math import exp 
 from math import log
@@ -49,12 +51,14 @@ def str_to_object(string_name):
 
 
 def formatted_code(code_str):
+    ''' Code formatter, removes trailing whitespaces making python script executable assuming code is valid. '''
     if code_str and code_str[0] == '\n':
         code_str = code_str[1:]
     return textwrap.dedent(code_str)
 
 
 def make_points(model_name, chart_id):
+    ''' Returns the list of points - tuples (x, y) from the database. '''
     points = []
     Model = str_to_object(model_name)
     chart = Model.query.get(chart_id)
@@ -112,11 +116,23 @@ def make_points(model_name, chart_id):
 
     return points
 
+def get_contrasted_colors(color_name):
+    ''' Returns contrasted colors from JSON file (light, dark) of that color. '''
+    SUPPORTED_COLORS = ("black", "white", "blue", "green", "red", "cyan", "magenta", "yellow")
+    if color_name in SUPPORTED_COLORS:
+        with open ('colors.json', 'r') as f:
+            colors = json.load(f)
+        
+        LIGHT_TONE = 0
+        DARK_TONE  = 2
 
+        return (colors.get(color_name)[LIGHT_TONE], colors.get(color_name)[DARK_TONE])
+    else:
+        raise AttributeError("[get_color] Invalid color.")
+    
 
 def make_chart_matplotlib(model_name, chart_id, options):
-    ''' Fetches the data from database and makes chart figure that will be shown on the webpage '''
-    ''' Get data for plotting '''
+    ''' Fetches the data from database and makes chart figure that will be shown on the web page. '''
     if chart_id != -1:
         points = make_points(model_name, chart_id)
     else:
@@ -128,22 +144,25 @@ def make_chart_matplotlib(model_name, chart_id, options):
     fig = Figure(figsize=(5.0, 5.0))
     chart = fig.add_subplot(1, 1, 1)
 
-
-    ''' Options for plotting '''
-    kwargs = dict()
-
-    kwargs['color']     = options.get('color', 'r')               # set color -> b: blue, g: green, r: red, c: cyan, m: magenta, y: yellow, k: black, w: white
-    kwargs['linewidth'] = options.get('line_width', 2)            # set witdh of the line 
-    kwargs['linestyle'] = options.get('line_style', 'solid')     # linestyle/ls:      {'-', '--', '-.', ':', ''}
-    kwargs['marker']    = options.get('marker', '.')              # markers -> {'', '.', ',', '1', '2', 's', 'x', '+'}
-
-    scatter_plot        = options.get('flag_scatter_plot', False) # dots or solid line
-    show_grid           = options.get('flag_show_grid', False)    # show grid or not
-    logscale_x          = options.get('flag_logscale_x', False )  # logarithmic scale
-    logscale_y          = options.get('flag_logscale_y', False )  # logarithmic scale
-    background_color    = options.get('bg_color', '#dbdbdb') # 
     
-    chart.set_facecolor(background_color)   # background color
+    if options.get('color') == options.get('bg_color'):
+        color_to_contrast = options['color']
+        options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)
+
+    kwargs = dict()
+    
+    kwargs['color']     = options.get('color', 'r')              
+    kwargs['linewidth'] = options.get('line_width', 2)           
+    kwargs['linestyle'] = options.get('line_style', 'solid')    
+    kwargs['marker']    = options.get('marker', '.')              
+
+    scatter_plot        = options.get('flag_scatter_plot', False)
+    show_grid           = options.get('flag_show_grid', False)    
+    logscale_x          = options.get('flag_logscale_x', False )
+    logscale_y          = options.get('flag_logscale_y', False )
+    background_color    = options.get('bg_color', '#dbdbdb')
+    
+    chart.set_facecolor(background_color)
     
     if logscale_x:
         chart.semilogx()  
@@ -151,8 +170,10 @@ def make_chart_matplotlib(model_name, chart_id, options):
     if logscale_y:
         chart.semilogy()  
 
-    chart.grid(show_grid, color='#5e5e5e') 
-
+    if show_grid:
+        chart.grid(color='#5e5e5e') 
+    else:
+        chart.grid(False)
 
     chart.set_xlabel('x')
     chart.set_ylabel('y')
@@ -243,7 +264,7 @@ def make_chart_bokeh(model_name, chart_id, options):
     fig_kwargs['min_border_right'] = 45
     fig_kwargs['min_border_top'] = 0
     fig_kwargs['min_border_bottom'] = 0
-
+    fig_kwargs['background_fill_color'] = options.get('bg_color', '#cccccc')
     flag_scatter_plot = options.get('flag_scatter_plot', False)
     flag_show_grid = options.get('flag_show_grid', True)
     flag_logscale_x = options.get('flag_logscale_x', False)
@@ -594,7 +615,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         chrome_options.add_argument(f"--window-size={500},{500}")
         chrome_options.add_argument("--kiosk")
         chrome_options.add_argument("--headless")
-        webdriver = webdriver.Chrome(executable_path='web/chromedriver', options=chrome_options)
+        webdriver = webdriver.Chrome(executable_path='web/utils/chromedriver', options=chrome_options)
 
         image = get_screenshot_as_png(bokeh_chart, height=500, width=500, driver=webdriver)
 
@@ -725,7 +746,7 @@ def download_image(library_name, model_name, chart_id, current_time):
     chrome_options.add_argument(f"--window-size={window_size[0]},{window_size[1]}")
     chrome_options.add_argument("--kiosk") # for full screen -> images are caught entirely, not in half
     chrome_options.add_argument("--headless") # in background
-    driver = webdriver.Chrome(executable_path='web/chromedriver', options=chrome_options)
+    driver = webdriver.Chrome(executable_path='web/utils/chromedriver', options=chrome_options)
     
     driver.get(image_url)
     button_to_show_chart = driver.find_element_by_id(f'btn-show-chart-{library_name}')

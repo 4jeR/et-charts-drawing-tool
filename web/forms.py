@@ -58,16 +58,6 @@ class SqrtForm(FlaskForm):
 
     submit = SubmitField('Add data')
 
-    '''
-    def validate(self):
-        min_value = -self.coef_c.data / self.coef_b.data  
-        if self.begin.data < min_value or self.end.data < min_value:
-            return False
-        else: 
-            return True
-        raise ValidationError(f'Min value must be atleast {min_value}')
-    '''
-
 
 class SquareFuncForm(FlaskForm):
     begin = FloatField('begin', validators=[InputRequired()])
@@ -92,26 +82,26 @@ class FromFileForm(FlaskForm):
 class MatplotlibOptionsForm(FlaskForm):
     
     color = SelectField('Line color: ', choices=[
-            ('k', 'black'),
-            ('w', 'white'), 
-            ('g', 'green'), 
-            ('r', 'red'),
-            ('c', 'cyan'),
-            ('m', 'magenta'),
-            ('y', 'yellow'),
-            ('b', 'blue')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('#cccccc', 'white'),
-            ('#5b9bde', 'blue'), 
-            ('#95e678', 'green'), 
-            ('#ff4314', 'red'),
-            ('cyan', 'cyan'),
-            ('magenta', 'magenta'),
-            ('yellow', 'yellow'),
-            ('black', 'black')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
 
@@ -119,10 +109,10 @@ class MatplotlibOptionsForm(FlaskForm):
     line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
 
     line_style = SelectField('Style: ', choices=[
-            ('-',  'solid'), 
-            ('--', 'dashed'), 
-            (':',  'dotted'),
-            ('-.', 'dashed-dotted')
+            ('solid',  'solid'), 
+            ('dashed', 'dashed'), 
+            ('dotted',  'dotted'),
+            ('dashed-dotted', 'dashed-dotted')
         ]
     )
     
@@ -150,29 +140,28 @@ class MatplotlibOptionsForm(FlaskForm):
 class SeabornOptionsForm(FlaskForm):
     
     color = SelectField('Line color: ', choices=[
-            ('k', 'black'),
-            ('#d1c9c9', 'white'), 
-            ('g', 'green'), 
-            ('r', 'red'),
-            ('c', 'cyan'),
-            ('m', 'magenta'),
-            ('y', 'yellow'),
-            ('b', 'blue')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('#cccccc', 'white'),
-            ('#5b9bde', 'blue'), 
-            ('black', 'black'),
-            ('magenta', 'magenta'),
-            ('#95e678', 'green'), 
-            ('cyan', 'cyan'),
-            ('yellow', 'yellow'),
-            ('#ff4314', 'red')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
-
 
     line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
 
@@ -181,9 +170,7 @@ class SeabornOptionsForm(FlaskForm):
             ('dashed', 'dashed')
         ]
     )
-    # line_style = StringField('Line style:',  validators=[DataRequired(), Length(min=1, max=10)])
-    
-    # marker = StringField('Marker:',  validators=[DataRequired(), Length(min=1, max=10)])
+
     marker = SelectField('Marker: ', choices=[
             ('.', 'dot'), 
             ('+', 'plus'),
@@ -207,29 +194,28 @@ class SeabornOptionsForm(FlaskForm):
 
 class BokehOptionsForm(FlaskForm):
     color = SelectField('Line color: ', choices=[
-            ('black', 'black'),
-            ('#5b9bde', 'blue'), 
-            ('#95e678', 'green'), 
-            ('#ff4314', 'red'),
-            ('cyan', 'cyan'),
-            ('magenta', 'magenta'),
-            ('#e6e6e6', 'white'),
-            ('yellow', 'yellow')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('#cccccc', 'white'),
-            ('#5b9bde', 'blue'), 
-            ('#95e678', 'green'), 
-            ('#ff4314', 'red'),
-            ('cyan', 'cyan'),
-            ('magenta', 'magenta'),
-            ('yellow', 'yellow'),
-            ('black', 'black')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
-    
 
     line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
 
@@ -240,9 +226,7 @@ class BokehOptionsForm(FlaskForm):
             ('dashdot', 'dashed-dotted')
         ]
     )
-    # line_style = StringField('Line style:',  validators=[DataRequired(), Length(min=1, max=10)])
     
-    # marker = StringField('Marker:',  validators=[DataRequired(), Length(min=1, max=10)])
     marker = SelectField('Marker: ', choices=[
             ('.', 'dot'), 
             ('+', 'plus'),
@@ -266,26 +250,26 @@ class BokehOptionsForm(FlaskForm):
 
 class PlotlyOptionsForm (FlaskForm):
     color = SelectField('Line color: ', choices=[
-            ('black', 'black'),
-            ('#e6e6e6', 'white'),
-            ('#5b9bde', 'blue'), 
-            ('#95e678', 'green'), 
-            ('#ff4314', 'red'),
-            ('cyan', 'cyan'),
-            ('magenta', 'magenta'),
-            ('yellow', 'yellow')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('#cccccc', 'white'),
-            ('#5b9bde', 'blue'), 
-            ('#95e678', 'green'), 
-            ('#ff4314', 'red'),
-            ('cyan', 'cyan'),
-            ('magenta', 'magenta'),
-            ('yellow', 'yellow'),
-            ('black', 'black')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
     
@@ -321,26 +305,26 @@ class PlotlyOptionsForm (FlaskForm):
 
 class PygalOptionsForm (FlaskForm):
     color = SelectField('Line color: ', choices=[
-            ('black', 'black'),
-            ('#e6e6e6', 'white'),
-            ('#5b9bde', 'blue'), 
-            ('#95e678', 'green'), 
-            ('#ff4314', 'red'),
-            ('cyan', 'cyan'),
-            ('magenta', 'magenta'),
-            ('yellow', 'yellow')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
 
     bg_color = SelectField('Background color: ', choices=[
-            ('#cccccc', 'white'),
-            ('#5b9bde', 'blue'), 
-            ('#95e678', 'green'), 
-            ('#ff4314', 'red'),
-            ('cyan', 'cyan'),
-            ('magenta', 'magenta'),
-            ('yellow', 'yellow'),
-            ('black', 'black')
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
         ]
     )
     
