@@ -112,7 +112,7 @@ class MatplotlibOptionsForm(FlaskForm):
             ('solid',  'solid'), 
             ('dashed', 'dashed'), 
             ('dotted',  'dotted'),
-            ('dashed-dotted', 'dashed-dotted')
+            ('dashdot', 'dashed-dotted')
         ]
     )
     

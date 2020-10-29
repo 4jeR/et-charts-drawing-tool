@@ -60,85 +60,108 @@ def formatted_code(code_str):
 def make_points(model_name, chart_id):
     ''' Returns the list of points - tuples (x, y) from the database. '''
     points = []
-    Model = str_to_object(model_name)
-    chart = Model.query.get(chart_id)
-    if chart is None:
-        print(f"no chart with given id ({chart_id}).")
-    else:
-        begin = chart.x_begin
-        end = chart.x_end
-        step = chart.step
+    if chart_id != -1:
+        Model = str_to_object(model_name)
+        chart = Model.query.get(chart_id)
+        if chart is None:
+            print(f"no chart with given id ({chart_id}).")
+        else:
+            begin = chart.x_begin
+            end = chart.x_end
+            step = chart.step
 
+            defaults = ['Sinus', 'Cosinus', 'Exponential']
+            
+            if model_name in defaults or model_name == 'SquareRoot':
+                a = chart.a 
+                b = chart.b 
+                c = chart.c 
+                d = chart.d
+            elif model_name == 'SquareFunc':
+                a = chart.a
+                p = chart.p
+                q = chart.q
 
-        defaults = ['Sinus', 'Cosinus', 'Exponential']
-        ''' get all model charts'''
-        if model_name in defaults or model_name == 'SquareRoot':
-            a = chart.a 
-            b = chart.b 
-            c = chart.c 
-            d = chart.d
-        elif model_name == 'SquareFunc':
-            a = chart.a
-            p = chart.p
-            q = chart.q
+            x_range = int((1.0)/step * (end - begin))+1
 
-        x_range = int((1.0)/step * (end - begin))+1
+            if model_name == 'Sinus':
+                for x in range(x_range):
+                    xx = float(round(begin+x*step, 3))
+                    yy = float(round(a*sin(b*xx - c) + d, 3))
+                    points.append((xx, yy))
 
-        if model_name == 'Sinus':
-            for x in range(x_range):
-                xx = float(round(begin+x*step, 3))
-                yy = float(round(a*sin(b*xx - c) + d, 3))
-                points.append((xx, yy))
+            elif model_name == 'Cosinus':
+                for x in range(x_range):
+                    xx = float(round(begin+x*step, 3))
+                    yy = float(round(a*cos(b*xx - c) + d, 3))
+                    points.append((xx, yy))
 
-        elif model_name == 'Cosinus':
-            for x in range(x_range):
-                xx = float(round(begin+x*step, 3))
-                yy = float(round(a*cos(b*xx - c) + d, 3))
-                points.append((xx, yy))
+            elif model_name == 'SquareRoot':
+                for x in range(x_range):
+                    xx = float(round(begin+x*step, 3))
+                    yy = float(round(a*sqrt(b*xx - c) + d, 3))
+                    points.append((xx, yy))
 
-        elif model_name == 'SquareRoot':
-            for x in range(x_range):
-                xx = float(round(begin+x*step, 3))
-                yy = float(round(a*sqrt(b*xx - c) + d, 3))
-                points.append((xx, yy))
+            elif model_name == 'Exponential':
+                for x in range(x_range):
+                    xx = float(round(begin+x*step, 3))
+                    yy = float(round(a*exp(b*xx - c) + d, 3))
+                    points.append((xx, yy))
 
-        elif model_name == 'Exponential':
-            for x in range(x_range):
-                xx = float(round(begin+x*step, 3))
-                yy = float(round(a*exp(b*xx - c) + d, 3))
-                points.append((xx, yy))
-
-        elif model_name == 'SquareFunc':
-            for x in range(x_range):
-                xx = float(round(begin+x*step, 3))
-                yy = float(round(a*(xx - p)**2 + q, 3))
-                points.append((xx, yy))
+            elif model_name == 'SquareFunc':
+                for x in range(x_range):
+                    xx = float(round(begin+x*step, 3))
+                    yy = float(round(a*(xx - p)**2 + q, 3))
+                    points.append((xx, yy))
 
     return points
 
-def get_contrasted_colors(color_name):
+def get_contrasted_colors(color_hash):
     ''' Returns contrasted colors from JSON file (light, dark) of that color. '''
-    SUPPORTED_COLORS = ("black", "white", "blue", "green", "red", "cyan", "magenta", "yellow")
-    if color_name in SUPPORTED_COLORS:
+    SUPPORTED_COLORS = {
+        "#292928": "black",
+        "#f5f5f5": "white", 
+        "#4f84bd": "blue", 
+        "#92c720": "green", 
+        "#e00f00": "red", 
+        "#05dbdb": "cyan",
+        "#d601d2": "magenta", 
+        "#f8ff6e": "yellow"
+    }
+
+    if color_hash in SUPPORTED_COLORS.keys():
         with open ('colors.json', 'r') as f:
             colors = json.load(f)
         
         LIGHT_TONE = 0
         DARK_TONE  = 2
 
-        return (colors.get(color_name)[LIGHT_TONE], colors.get(color_name)[DARK_TONE])
+        light_color = colors.get(SUPPORTED_COLORS[color_hash])[LIGHT_TONE]
+        dark_color  = colors.get(SUPPORTED_COLORS[color_hash])[DARK_TONE]
+        
+        return (light_color, dark_color)
     else:
         raise AttributeError("[get_color] Invalid color.")
     
 
-def make_chart_matplotlib(model_name, chart_id, options):
+
+
+
+def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
     ''' Fetches the data from database and makes chart figure that will be shown on the web page. '''
-    if chart_id != -1:
-        points = make_points(model_name, chart_id)
+    points = []
+    if model_name == "FileData" and data_filename and chart_id == -1:
+        xx, yy, _ = get_data_from_file(data_filename)
+        print("MATPLOTLIB MAKE CHAERT WHY NOT OK")
+        print("MATPLOTLIB MAKE CHAERT WHY NOT OK")
+        print(xx)
+        print(yy)
+        print("MATPLOTLIB MAKE CHAERT WHY NOT OK")
+        print("MATPLOTLIB MAKE CHAERT WHY NOT OK")
     else:
-        points = []
-    xx = [point[0] for point in points]
-    yy = [point[1] for point in points]
+        points = make_points(model_name, chart_id)
+        xx = [point[0] for point in points]
+        yy = [point[1] for point in points]
 
     ''' Get the figure object that will be returned '''
     fig = Figure(figsize=(5.0, 5.0))
@@ -191,20 +214,17 @@ def make_chart_matplotlib(model_name, chart_id, options):
     return fig
 
 
-def make_chart_seaborn(model_name, chart_id, options):
-    if chart_id != -1:
-        points = make_points(model_name, chart_id)
+def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
+    points = []
+    if model_name == "FileData" and data_filename and chart_id == -1:
+        pass
     else:
-        points = []
-
+        points = make_points(model_name, chart_id)
     data = [
         {model_name: point[0], model_name: point[1]} for point in points
     ]
     df = pd.DataFrame(data=data)
     
-
-
-
     fig = Figure(figsize=(5.0, 5.0), facecolor='#ebebeb')
     axis = fig.add_subplot(1, 1, 1)
     axis.set_title('Seaborn')
@@ -247,11 +267,15 @@ def make_chart_seaborn(model_name, chart_id, options):
     return fig
 
 
-def make_chart_bokeh(model_name, chart_id, options):
-    Model = str_to_object(model_name)
-    points = make_points(model_name, chart_id)
-    xx = [point[0] for point in points]
-    yy = [point[1] for point in points]
+def make_chart_bokeh(model_name, chart_id, options, x=[], y=[]):
+    points = []
+    if model_name == "FileData" and chart_id == -1:
+        xx = x.copy()
+        yy = y.copy()
+    else:
+        points = make_points(model_name, chart_id)
+        xx = [point[0] for point in points]
+        yy = [point[1] for point in points]
 
     fig_kwargs = dict()
     fig_kwargs['title'] = model_name
@@ -298,13 +322,16 @@ def make_chart_bokeh(model_name, chart_id, options):
     return bokeh_chart
 
 
-def make_chart_plotly(model_name, chart_id, options):
-    Model = str_to_object(model_name)
-    points = make_points(model_name, chart_id)
-    
-    xx = [point[0] for point in points]
-    yy = [point[1] for point in points]
-    
+def make_chart_plotly(model_name, chart_id, options, x=[], y=[]):
+    points = []
+    if model_name == "FileData" and chart_id == -1:
+        xx = x.copy()
+        yy = y.copy()
+    else:
+        points = make_points(model_name, chart_id)
+        xx = [point[0] for point in points]
+        yy = [point[1] for point in points]
+        
                
 
     data = [
@@ -355,12 +382,12 @@ def make_chart_plotly(model_name, chart_id, options):
     return chart_div_html
     
 
-def make_chart_pygal(model_name, chart_id, options):
-    Model = str_to_object(model_name)
-    points = make_points(model_name, chart_id)
-
-    xx = [point[0] for point in points]
-    yy = [point[1] for point in points]
+def make_chart_pygal(model_name, chart_id, options, x=[], y=[]):
+    points = []
+    if model_name == "FileData" and chart_id == -1:
+        points = [(xx, yy) for xx, yy in zip(x, y)]
+    else:
+        points = make_points(model_name, chart_id)
 
     ''' options '''
     scatter_plot = options.get('flag_scatter_plot', False)  
@@ -403,38 +430,46 @@ def files_count(lib_name='', path_to_images='.'):
 
 
 def get_data_from_file(filename):
+    ''' Gets data from file as a tuple of (x: list, y: list, library_options_ids: list) 
+    
+    TODO: Probably will need refactor after deployment. 
+    '''
+    options_ids = []
     x_list = []
     y_list = []
     sep = ' '
     with open(f'web/input_data/{filename}', 'r') as f:
-        supported = [' ', ',', ':', '\t', '-']
-        sep = ' '
-        check_line = f.readline()
-        for delimiter in supported:
-            if len(check_line.split(delimiter))>1:
-                sep = delimiter
-                break
-        f.seek(0)
+        options_line = f.readline().split(',') # ['1', '1', '1', '1', '1']
+        options_ids.append(int(options_line[0]))
+        options_ids.append(int(options_line[1]))
+        options_ids.append(int(options_line[2]))
+        options_ids.append(int(options_line[3]))
+        options_ids.append(int(options_line[4]))
+   
+        sep = ','
+       
         for line in f:
             x_list.append(float(line.strip().split(sep)[0]))
             y_list.append(float(line.strip().split(sep)[-1]))
 
-    return x_list, y_list
+    return x_list, y_list, options_ids
 
 
 def get_current_time():
+    ''' Returns current date in nice format. '''
     return datetime.now().strftime("%m-%d_%H-%M-%S")
 
 
 def save_source_code(library_name, model_name, chart_id, current_time):
     options = get_lib_options_from_model_and_chart_id(library_name, model_name, chart_id)
-    if chart_id != -1:
-            points = make_points(model_name, chart_id)
-    else:
-        points = []
+    if options.get('color') == options.get('bg_color'):
+        color_to_contrast = options['color']
+        options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)
+
+    points = make_points(model_name, chart_id)
     xx = [point[0] for point in points]
     yy = [point[1] for point in points]
-
+    
     x_str = f'xx = {xx}'
     y_str = f'yy = {yy}'
     
@@ -615,7 +650,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         chrome_options.add_argument(f"--window-size={500},{500}")
         chrome_options.add_argument("--kiosk")
         chrome_options.add_argument("--headless")
-        webdriver = webdriver.Chrome(executable_path='web/utils/chromedriver', options=chrome_options)
+        webdriver = webdriver.Chrome(executable_path='web/chromedriver', options=chrome_options)
 
         image = get_screenshot_as_png(bokeh_chart, height=500, width=500, driver=webdriver)
 
@@ -746,7 +781,7 @@ def download_image(library_name, model_name, chart_id, current_time):
     chrome_options.add_argument(f"--window-size={window_size[0]},{window_size[1]}")
     chrome_options.add_argument("--kiosk") # for full screen -> images are caught entirely, not in half
     chrome_options.add_argument("--headless") # in background
-    driver = webdriver.Chrome(executable_path='web/utils/chromedriver', options=chrome_options)
+    driver = webdriver.Chrome(executable_path='web/chromedriver', options=chrome_options)
     
     driver.get(image_url)
     button_to_show_chart = driver.find_element_by_id(f'btn-show-chart-{library_name}')
@@ -761,6 +796,7 @@ def download_image(library_name, model_name, chart_id, current_time):
 
 
 def get_recently_added_record(db, model_name):
+    ''' Helper method to return the most recently added record (helpful when redirecting after database modification).'''
     TableModel = str_to_object(model_name)
     recently_added = db.session.query(TableModel).order_by(TableModel.id.desc()).first()
     return recently_added

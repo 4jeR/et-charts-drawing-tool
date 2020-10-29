@@ -41,29 +41,6 @@ class Sinus(db.Model):
             return ['?', '?', '?', '?']
     
 
-
-'''   20.10.2020 
-TODO: 
-- Remodel all models below to be-like-this ^ 
-- Fix bug with deleting all charts
-- Remodel OptionsForms for each library (currently for Matplotlib) to specify only its chart id
-- Fix taking image of the chart
-- if len(charts) == 0 -> dont show cards with libraries
-- Simulate click the 'changed library' card by JavaScript (like the selenium screenshooters)
-'''
-# class Image(db.Model):
-#     __tablename__ = 'image'
-#     image_id = db.Column(db.Integer, primary_key = True)
-#     name = db.Column(db.String(8))
-#     # the one-to-one relation
-#     blindmap = relationship("Blindmap", uselist=False, backref="image")
-
-# class Blindmap(db.Model):
-#     __tablename__ = 'blindmap'
-#     module_id = db.Column(db.Integer, primary_key = True)
-#     image_id = db.Column(db.Integer, ForeignKey('image.image_id'))
-
-
 class Cosinus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     x_begin = db.Column(db.Float, unique=False, nullable=False)
@@ -205,23 +182,6 @@ class SquareFunc(db.Model):
             return [coefs_ok.a, coefs_ok.p, coefs_ok.q]
         else:
             return ['a', 'p', 'q']
-
-
-class FileDataPoint(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    x = db.Column(db.Float, unique=False, nullable=False)
-    y = db.Column(db.Float, unique=False, nullable=False)
-
-    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
-    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
-    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
-    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
-    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
-
-    @staticmethod
-    def make_point(xx, yy):
-        ''' Returns the FileDataPoint (x, y). '''
-        return FileDataPoint(x=float(round(xx, 3)), y=float(round(yy, 3)))
 
 
 

@@ -8,9 +8,6 @@ from web.models import Exponential
 
 from web.models import SquareFunc
 
-from web.models import FileDataPoint
-
-
 
 from web.models import MatplotlibPlotOptions
 from web.models import SeabornPlotOptions
