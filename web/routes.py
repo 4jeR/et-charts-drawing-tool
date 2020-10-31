@@ -97,6 +97,7 @@ def route_add_data_main():
 
 
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
+@clean_query(db=db)
 def route_add_data(model_name):
     """ Inserts points to the database to the specific model based on values from forms."""
     defaults = ['Sinus', 'Cosinus', 'Exponential']
@@ -150,6 +151,7 @@ def route_add_data(model_name):
 
 
 @app.route("/data/fromfile", methods=['GET', 'POST'])
+@clean_query(db=db)
 def route_add_data_from_file():
     """ End point for adding the data from file."""
     form = FromFileForm()
@@ -368,16 +370,22 @@ def route_change_options_matplotlib(model_name, chart_id=-1):
         recently_added = get_recently_added_record(db, 'MatplotlibPlotOptions')
         new_options_id = recently_added.id
 
-        ''' get old options to be replaced and after replacing, delete the old'''
-        current_chart = Model.query.get(chart_id)
-        
-        
-        current_chart.id_matplotlib_options = new_options_id
 
-        db.session.commit()
+        if model_name != "FileDataPoint" and chart_id != -1:
+            ''' get old options to be replaced and after replacing, delete the old'''
+            current_chart = Model.query.get(chart_id)
+            current_chart.id_matplotlib_options = new_options_id
+            db.session.commit()
+        else:
+            fpo_record = FilePlotOptions.query.first()
+            fpo_record.id_matplotlib_options = new_options_id
+            db.session.commit()
 
         flash(f'Changed options for Matplotlib!', 'success')
-        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
+        if model_name == "FileDataPoint" and chart_id == -1:
+            return redirect(url_for('route_show_data_from_file'))
+        else:
+            return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
 
 @app.route("/data/change_options/seaborn/<string:model_name>", methods=['GET', 'POST'])

@@ -120,42 +120,67 @@ def make_points(model_name, chart_id):
             points.append((point.x, point.y))
     return points
 
-def get_contrasted_colors(color_hash):
-    ''' Returns contrasted colors from JSON file (light, dark) of that color. '''
+
+def color_hash_to_string(color_hash):
     SUPPORTED_COLORS = {
         "#292928": "black",
-        "#f5f5f5": "white", 
+        "#474747": "black",
+        "#000000": "black",
+
+        "#f5f5f5": "white",
+        "#ffffff": "white",
+        "#e6e3e1": "white",
+
+        "#5b9bde": "blue", 
         "#4f84bd": "blue", 
+        "#3e77cc": "blue", 
+        
+        "#a1e024": "green", 
         "#92c720": "green", 
+        "#81b81a": "green", 
+
+        "#ff6554": "red", 
         "#e00f00": "red", 
+        "#c20d00": "red", 
+
+        "#04ebeb": "cyan",
         "#05dbdb": "cyan",
+        "#07baba": "cyan",
+
+        "#ff75f8": "magenta", 
         "#d601d2": "magenta", 
-        "#f8ff6e": "yellow"
+        "#ad01aa": "magenta", 
+
+        "#ffff7a": "yellow",
+        "#f8ff6e": "yellow",
+        "#f7ff07": "yellow"
     }
+    try:
+        return SUPPORTED_COLORS[color_hash]
+    except:
+        raise ValueError(f'[color_hash_to_string] {color_hash} is unsupported hash code.')
 
-    if color_hash in SUPPORTED_COLORS.keys():
-        with open ('colors.json', 'r') as f:
-            colors = json.load(f)
-        
-        LIGHT_TONE = 0
-        DARK_TONE  = 2
-
-        light_color = colors.get(SUPPORTED_COLORS[color_hash])[LIGHT_TONE]
-        dark_color  = colors.get(SUPPORTED_COLORS[color_hash])[DARK_TONE]
-        
-        return (light_color, dark_color)
-    else:
-        raise AttributeError("[get_color] Invalid color.")
+def get_contrasted_colors(color_hash):
+    ''' Returns contrasted colors from JSON file (light, dark) of that color. '''
     
+    with open ('colors.json', 'r') as f:
+        colors = json.load(f)
+    
+    LIGHT_TONE = 0
+    DARK_TONE  = 2
 
-
+    light_color = colors.get(color_hash_to_string(color_hash))[LIGHT_TONE]
+    dark_color  = colors.get(color_hash_to_string(color_hash))[DARK_TONE]
+    
+    return (light_color, dark_color)
+    
 
 
 def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
     ''' Fetches the data from database and makes chart figure that will be shown on the web page. '''
     points = []
     if model_name == "FileData" and data_filename and chart_id == -1:
-        xx, yy, _ = get_data_from_file(data_filename)
+        xx, yy = get_data_from_file(data_filename)
     else:
         points = make_points(model_name, chart_id)
         xx = [point[0] for point in points]
@@ -215,7 +240,7 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
 def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     points = []
     if model_name == "FileData" and data_filename and chart_id == -1:
-        xx, yy, _ = get_data_from_file(data_filename)
+        xx, yy = get_data_from_file(data_filename)
         points = [(x, y) for x, y in zip(xx, yy)]
     else:
         points = make_points(model_name, chart_id)
@@ -224,6 +249,10 @@ def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     ]
     df = pd.DataFrame(data=data)
     
+    if options.get('color') == options.get('bg_color'):
+        color_to_contrast = options.get('color', '#292928')
+        options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)
+
     fig = Figure(figsize=(5.0, 5.0), facecolor='#ebebeb')
     axis = fig.add_subplot(1, 1, 1)
     axis.set_title('Seaborn')
@@ -266,15 +295,14 @@ def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     return fig
 
 
-def make_chart_bokeh(model_name, chart_id, options, x=[], y=[]):
-    points = []
-    if model_name == "FileData" and chart_id == -1:
-        xx = x.copy()
-        yy = y.copy()
-    else:
-        points = make_points(model_name, chart_id)
-        xx = [point[0] for point in points]
-        yy = [point[1] for point in points]
+def make_chart_bokeh(model_name, chart_id, options):
+    points = make_points(model_name, chart_id)
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
+
+    if options.get('color') == options.get('bg_color'):
+        color_to_contrast = options.get('color', '#292928')
+        options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)
 
     fig_kwargs = dict()
     fig_kwargs['title'] = model_name
@@ -321,17 +349,14 @@ def make_chart_bokeh(model_name, chart_id, options, x=[], y=[]):
     return bokeh_chart
 
 
-def make_chart_plotly(model_name, chart_id, options, x=[], y=[]):
-    points = []
-    if model_name == "FileData" and chart_id == -1:
-        xx = x.copy()
-        yy = y.copy()
-    else:
-        points = make_points(model_name, chart_id)
-        xx = [point[0] for point in points]
-        yy = [point[1] for point in points]
+def make_chart_plotly(model_name, chart_id, options):
+    points = make_points(model_name, chart_id)
+    xx = [point[0] for point in points]
+    yy = [point[1] for point in points]
         
-               
+    if options.get('color') == options.get('bg_color'):
+        color_to_contrast = options.get('color', '#292928')
+        options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)         
 
     data = [
         plotly_go.Scatter(
@@ -381,14 +406,15 @@ def make_chart_plotly(model_name, chart_id, options, x=[], y=[]):
     return chart_div_html
     
 
-def make_chart_pygal(model_name, chart_id, options, x=[], y=[]):
-    points = []
-    if model_name == "FileData" and chart_id == -1:
-        points = [(xx, yy) for xx, yy in zip(x, y)]
-    else:
-        points = make_points(model_name, chart_id)
+def make_chart_pygal(model_name, chart_id, options):
+   
+    points = make_points(model_name, chart_id)
 
     ''' options '''
+    if options.get('color') == options.get('bg_color'):
+        color_to_contrast = options.get('color', '#292928')
+        options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)
+
     scatter_plot = options.get('flag_scatter_plot', False)  
     show_grid = options.get('flag_show_grid', True) 
     logscale_y = options.get('flag_logscale_y', False) 
@@ -918,16 +944,34 @@ def clean_unused_options(db):
     '''
     LIBS = ('matplotlib', 'seaborn', 'bokeh', 'plotly', 'pygal')
 
+    fpo = FilePlotOptions.query.first()
+    
+    FilePlotOptions.query.filter(FilePlotOptions.id != fpo.id).delete()
+    db.session.commit()
+    
+    used_ids = {
+        'matplotlib': fpo.id_matplotlib_options,
+        'seaborn':  fpo.id_seaborn_options,
+        'bokeh': fpo.id_bokeh_options,
+        'plotly': fpo.id_plotly_options,
+        'pygal': fpo.id_pygal_options
+    }
+        
+       
+
     for lib in LIBS:
         
         LPO = str_to_object(f'{lib.capitalize()}PlotOptions')
         id_library_options = f'id_{lib}_options'
 
-        sin_unused_lib_ids = (id_ for id_, in Sinus.query.with_entities(getattr(Sinus, id_library_options)))
-        cos_unused_lib_ids = (id_ for id_, in Cosinus.query.with_entities(getattr(Cosinus, id_library_options)))
+        
+
+
+        sin_unused_lib_ids  = (id_ for id_, in Sinus.query.with_entities(getattr(Sinus, id_library_options)))
+        cos_unused_lib_ids  = (id_ for id_, in Cosinus.query.with_entities(getattr(Cosinus, id_library_options)))
         sqrt_unused_lib_ids = (id_ for id_, in SquareRoot.query.with_entities(getattr(SquareRoot, id_library_options)))
-        exp_unused_lib_ids = (id_ for id_, in Exponential.query.with_entities(getattr(Exponential, id_library_options)))
-        sqf_unused_lib_ids = (id_ for id_, in SquareFunc.query.with_entities(getattr(SquareFunc, id_library_options)))
+        exp_unused_lib_ids  = (id_ for id_, in Exponential.query.with_entities(getattr(Exponential, id_library_options)))
+        sqf_unused_lib_ids  = (id_ for id_, in SquareFunc.query.with_entities(getattr(SquareFunc, id_library_options)))
         
         unused_ids = (
             *sin_unused_lib_ids, 
@@ -936,6 +980,7 @@ def clean_unused_options(db):
             *exp_unused_lib_ids, 
             *sqf_unused_lib_ids
         )
+
         options_to_delete = LPO.query.filter(
             LPO.id.in_(
                 LPO.query.filter(
@@ -945,7 +990,8 @@ def clean_unused_options(db):
         ).all()
         
         for option in options_to_delete:
-            db.session.delete(option)
+            if getattr(option, id.__name__) != used_ids[lib]:
+                db.session.delete(option)
     
     db.session.commit()
 
