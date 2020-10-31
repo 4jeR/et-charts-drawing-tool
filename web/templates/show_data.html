@@ -2,7 +2,7 @@
 {% block content %}
 <div class="row">
     <!-- MathJax - equation -->
-    <div class="col-md-12" class="btn btn-lg btn-dark">Chart_id = {{ chart_id }} </div>
+    <div class="col-md-12" class="btn btn-lg btn-dark">[DEBUG] Chart_id = {{ chart_id }}, model_name = {{ model_name }} </div>
 
     <div class="col-md-12"">
         {% if coefs is defined %}
@@ -26,7 +26,7 @@
         <div class="col md-12">
             <h1>No records for this model, add data!</h1>
             <form action="{{ url_for('route_add_data', model_name=model_name) }}" method="POST">
-                <input class="btn btn-danger col-md-4 offset-4" type="submit" value="Add data">
+                <input class="btn btn-danger col-md-2 offset-5" type="submit" value="Add data">
             </form>
         </div>
     {% else %}
@@ -41,10 +41,8 @@
                         </form>
                     </td>
                     <td scope="row">
-                        N/A
                     </td>
                     <td scope="row">
-                        N/A
                     </td>
                     {% endif %}
                 </tr>
@@ -167,15 +165,27 @@
                 </div>
             </div>
             <div class="row text-white bg-dark mb-2">
-                <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, chart_id=chart_id, save_img='0', save_src='1') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
-                </form>
-                <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, chart_id=chart_id, save_img='1', save_src='0') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
-                </form>
-                <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, chart_id=chart_id, save_img='1', save_src='1') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
-                </form>
+                {% if chart_id == -1 and model_name == "FileDataPoint" %}
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', save_img='0', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
+                    </form>
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', save_img='1', save_src='0') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
+                    </form>
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', save_img='1', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
+                    </form>
+                {% else %}
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, chart_id=chart_id, save_img='0', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
+                    </form>
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, chart_id=chart_id, save_img='1', save_src='0') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
+                    </form>
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', model_name=model_name, chart_id=chart_id, save_img='1', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
 
@@ -184,11 +194,7 @@
             <div class="row card-group bg-dark text-white">
                 <div class="card col-md-8 text-primary bg-dark border-danger">
                     <div class="card card-body text-white bg-dark" id="card-seaborn-ss">
-                        {% if data_filename is defined %}
-                            <img src="{{ url_for('route_plot_seaborn', model_name=model_name, options=seaborn_options, chart_id=chart_id, data_filename=data_filename) }}">
-                        {% else %}
-                            <img src="{{ url_for('route_plot_seaborn', model_name=model_name, options=seaborn_options, chart_id=chart_id) }}">
-                        {% endif %}
+                        <img src="{{ url_for('route_plot_seaborn', model_name=model_name, options=seaborn_options, chart_id=chart_id) }}">
                     </div>
                 </div>
                 <div class="card col-md-4 text-primary bg-dark border-danger">
@@ -240,15 +246,27 @@
                 </div>
             </div>
             <div class="row text-white bg-dark mb-2">
-                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, chart_id=chart_id, save_img='0', save_src='1') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
-                </form>
-                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, chart_id=chart_id, save_img='1', save_src='0') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
-                </form>
-                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, chart_id=chart_id, save_img='1', save_src='1') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
-                </form>
+                {% if chart_id == -1 and model_name == "FileDataPoint" %}
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', save_img='0', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
+                    </form>
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', save_img='1', save_src='0') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
+                    </form>
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', save_img='1', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
+                    </form>
+                {% else %}
+                    <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, chart_id=chart_id, save_img='0', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
+                    </form>
+                    <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, chart_id=chart_id, save_img='1', save_src='0') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
+                    </form>
+                    <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='seaborn', model_name=model_name, chart_id=chart_id, save_img='1', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
 
@@ -309,15 +327,27 @@
                 </div>
             </div>
             <div class="row text-white bg-dark mb-2">
-                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, chart_id=chart_id, save_img='0', save_src='1') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
-                </form>
-                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, chart_id=chart_id, save_img='1', save_src='0') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
-                </form>
-                <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, chart_id=chart_id, save_img='1', save_src='1') }}">
-                    <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
-                </form>
+                {% if chart_id == -1 and model_name == "FileDataPoint" %}
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', save_img='0', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
+                    </form>
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', save_img='1', save_src='0') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
+                    </form>
+                    <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', save_img='1', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
+                    </form>
+                {% else %}
+                    <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, chart_id=chart_id, save_img='0', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
+                    </form>
+                    <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, chart_id=chart_id, save_img='1', save_src='0') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">image</button>
+                    </form>
+                    <form class="col-md-4 pt-2 pb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='bokeh', model_name=model_name, chart_id=chart_id, save_img='1', save_src='1') }}">
+                        <button type="submit" class="col-md-12 btn btn-danger text-light">code & image</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
 

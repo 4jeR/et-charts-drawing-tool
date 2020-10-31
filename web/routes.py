@@ -183,11 +183,14 @@ def route_add_data_from_file():
         )
         db.session.add(fpo)
 
+        ''' delete old points '''
         previous_data_points = FileDataPoint.query.all()
         if previous_data_points:
             for point_record in previous_data_points:
                 db.session.delete(point_record)
             db.session.commit()
+        ''' delete old options '''
+
 
         x, y = get_data_from_file(filename)
         for xx, yy in zip(x, y):
@@ -195,7 +198,7 @@ def route_add_data_from_file():
             db.session.add(pt)
         db.session.commit()
         flash(f'Data from {filename} has been successfully added to the database!', 'success')
-        return redirect(url_for('route_show_data', model_name='FileDataPoint'))
+        return redirect(url_for('route_show_data_from_file'))
     return render_template('add_data_file.html', form=form)
 
 
@@ -205,6 +208,55 @@ def route_add_data_from_file():
 def route_show_data_main():
     """ Renders main web page on which you can choose different models. """
     return render_template('show_data_main.html')
+
+@app.route("/data/show/fromfile", methods=['GET', 'POST'])
+def route_show_data_from_file():
+    Model = str_to_object("FileDataPoint")
+    records = Model.query.all()
+
+    kw_options = dict()
+
+    ''' Get options for each library. '''
+    matplotlib_options_id = FilePlotOptions.query.first().id_matplotlib_options
+    kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
+
+    seaborn_options_id = FilePlotOptions.query.first().id_seaborn_options
+    kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(seaborn_options_id))
+
+    bokeh_options_id = FilePlotOptions.query.first().id_bokeh_options
+    kw_options['bokeh_options'] = BokehPlotOptions.get_options(bokeh_options_id) 
+
+    plotly_options_id = FilePlotOptions.query.first().id_plotly_options
+    kw_options['plotly_options'] = PlotlyPlotOptions.get_options(plotly_options_id) 
+
+    pygal_options_id = FilePlotOptions.query.first().id_pygal_options
+    kw_options['pygal_options'] = PygalPlotOptions.get_options(pygal_options_id) 
+
+
+    kwargs = dict()
+
+    bokeh_chart = make_chart_bokeh("FileDataPoint", -1, kw_options.get('bokeh_options', dict()))
+    script_bokeh, div_bokeh = bokeh_components(bokeh_chart)
+    kwargs["script_bokeh"] = script_bokeh
+    kwargs["div_bokeh"] = div_bokeh
+
+    kwargs["script_plotly"] = '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> '
+    kwargs["div_plotly"] = make_chart_plotly("FileDataPoint", -1, kw_options.get('plotly_options', dict()))
+
+    pygal_chart = make_chart_pygal("FileDataPoint", -1, kw_options.get('pygal_options', dict()))
+    kwargs["src_pygal"] = pygal_chart.render_data_uri()
+
+    ''' Pass all forms to be shown (view)'''
+    kwforms = dict()
+    kwforms['matplotlib_form'] = MatplotlibOptionsForm()
+    kwforms['seaborn_form'] = SeabornOptionsForm()
+    kwforms['bokeh_form'] = BokehOptionsForm()
+    kwforms['plotly_form'] = PlotlyOptionsForm()
+    kwforms['pygal_form'] = PygalOptionsForm()
+
+    return render_template('show_data.html', model_name="FileDataPoint", chart_id=-1, records=records,  **kwargs, **kwforms, **kw_options)
+
+
 
 @app.route("/data/show/<string:model_name>", methods=['GET', 'POST'])
 @app.route("/data/show/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
@@ -499,22 +551,25 @@ def route_change_options_pygal(model_name, chart_id=-1):
 @clean_query(db=db)
 def route_delete_chart(model_name, chart_id):
     """ Deletes chosen point from the database and redirects again on `route_show_data` route. """
-    chart = str_to_object(model_name).query.get_or_404(chart_id)
+    Model = str_to_object(model_name)
+    chart = Model.query.get_or_404(chart_id)
     db.session.delete(chart)
     db.session.commit()
-    flash(f'Point ({chart.id}) has been succesfully removed from the database.', 'success')
+    flash(f'Chart ({chart.id}) has been succesfully removed from the database.', 'success')
+    chart = get_recently_added_record(db, model_name)
+    if chart:
+        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart.id))
     return redirect(url_for('route_show_data', model_name=model_name))
 
 
 @app.route("/data/delete/all/<string:model_name>", methods=['POST'])
 @clean_query(db=db)
 def route_delete_all_charts(model_name):
-    ''' Deletes all records from model. TODO: FIX...'''
+    ''' Deletes all records from model. '''
     Model = str_to_object(model_name)
-    all_charts = Model.query.all()
-    db.session.delete(all_charts)
+    all_charts = Model.query.delete()
     db.session.commit()
-    flash(f'All charts have been deleted from {model_name}.', 'success')
+    flash(f'{all_charts} charts have been deleted from {model_name}.', 'success')
     return redirect(url_for('route_show_data', model_name=model_name))
 
 
@@ -524,8 +579,10 @@ def route_summary():
 
 
 ''' Download images and codes section '''
+@app.route("/data/download/<string:library_name>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
+@app.route("/data/download/<string:library_name>/<string:model_name>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
 @app.route("/data/download/<string:library_name>/<string:model_name>/<int:chart_id>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
-def route_download_src_img(library_name, model_name, chart_id, save_img, save_src):
+def route_download_src_img(library_name, model_name="FileDataPoint", chart_id=-1, save_img='0', save_src='0'):
     """ Downloads image and code for given chart library name. """
     now = get_current_time()
 
@@ -537,7 +594,12 @@ def route_download_src_img(library_name, model_name, chart_id, save_img, save_sr
         filename_py = f'{library_name}_{model_name}.py'
         save_source_code(library_name, model_name, chart_id, now)
         flash(f'{library_name} chart {model_name} code has been saved at web/downloads/codes/{now}_{filename_py}.', 'success')
-    return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
+    
+    if model_name == "FileDataPoint" and chart_id == -1:
+        return redirect(url_for('route_show_data_from_file'))
+    else:
+        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
+
 
 
 @app.route("/matplotlib")

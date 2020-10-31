@@ -756,13 +756,13 @@ def save_source_code(library_name, model_name, chart_id, current_time):
     with open(f'web/downloads/codes/{filename}.py', 'w') as f:
         f.write(formatted_code(code))
         
-
+# download_image('matplotlib', 'FileDataPoint', -1)
 
 def download_image(library_name, model_name, chart_id, current_time):
     filename = f'{library_name}_{model_name}.png'
-    if model_name == 'FileDataPoint' and chart_id == -1:
-        image_url = 'http://localhost:5000/data/show/FileDataPoint'
-    else:
+    if model_name == "FileDataPoint" and chart_id == -1:
+        image_url = 'http://localhost:5000/' + url_for('route_show_data_from_file')
+    else:    
         image_url = 'http://localhost:5000/' + url_for('route_show_data', model_name=model_name, chart_id=chart_id)
     save_path = f'web/downloads/images/{current_time}_{filename}'
     window_size = (1920, 1080)
@@ -897,7 +897,6 @@ def get_default_pygal_options(db, as_dict=True):
         return kwargs if as_dict else pygal_options
     
     return pygal_options
-
 
 
 def clean_query(db):
