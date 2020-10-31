@@ -17,6 +17,7 @@ from web import app
 from web import db
 # from web import cache
 
+
 from web.import_forms import *
 from web.import_models import *
 
@@ -338,220 +339,63 @@ def route_show_data(model_name, chart_id=-1):
     return render_template('show_data.html', model_name=model_name, chart_id=chart_id, records=records,  **kwargs, **kwforms, **kw_options)
 
 
-@app.route("/data/change_options/matplotlib/<string:model_name>", methods=['GET', 'POST'])
-@app.route("/data/change_options/matplotlib/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
+
+
+
+
+@app.route("/data/change_options/<string:library_name>/<string:model_name>", methods=['GET', 'POST'])
+@app.route("/data/change_options/<string:library_name>/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
 @clean_query(db=db)
-def route_change_options_matplotlib(model_name, chart_id=-1):
+def route_change_options(library_name, model_name, chart_id=-1):
     """ Inserts new option OptionsForm."""
     Model = str_to_object(model_name)
+    LPO = str_to_object(f'{library_name.capitalize()}PlotOptions')
+    LOF = str_to_object(f'{library_name.capitalize()}OptionsForm')
+    id_library_options = f'id_{library_name}_options'
+
     ''' Get values from form. '''
-    matplotlib_form = MatplotlibOptionsForm()
+    library_form = LOF()
 
-    if matplotlib_form.validate_on_submit():
+    if library_form.validate_on_submit():
         kwargs = dict()
-        kwargs['color'] = matplotlib_form.color.data
-        kwargs['bg_color'] = matplotlib_form.bg_color.data
-        kwargs['line_width'] = matplotlib_form.line_width.data
-        kwargs['line_style'] = matplotlib_form.line_style.data
-        kwargs['marker'] = matplotlib_form.marker.data
+        kwargs['color'] = library_form.color.data
+        kwargs['bg_color'] = library_form.bg_color.data
+        kwargs['line_width'] = library_form.line_width.data
+        kwargs['line_style'] = library_form.line_style.data
+        kwargs['marker'] = library_form.marker.data
 
-        kwargs['flag_scatter_plot'] = matplotlib_form.flag_scatter_plot.data
-        kwargs['flag_show_grid'] = matplotlib_form.flag_show_grid.data
-        kwargs['flag_logscale_x'] = matplotlib_form.flag_logscale_x.data
-        kwargs['flag_logscale_y'] = matplotlib_form.flag_logscale_y.data
+        kwargs['flag_scatter_plot'] = library_form.flag_scatter_plot.data
+        kwargs['flag_show_grid'] = library_form.flag_show_grid.data
 
-        ''' make new instance of options '''
-        new_options = MatplotlibPlotOptions(**kwargs)
-        ''' append new record '''
+        if library_name != 'pygal':
+            kwargs['flag_logscale_x'] = library_form.flag_logscale_x.data
+        kwargs['flag_logscale_y'] = library_form.flag_logscale_y.data
+
+        new_options = LPO(**kwargs)
         db.session.add(new_options)
         db.session.commit()
 
         ''' get lastly_added record '''
-        recently_added = get_recently_added_record(db, 'MatplotlibPlotOptions')
+        recently_added = get_recently_added_record(db, LPO.__name__)
         new_options_id = recently_added.id
 
 
         if model_name != "FileDataPoint" and chart_id != -1:
             ''' get old options to be replaced and after replacing, delete the old'''
             current_chart = Model.query.get(chart_id)
-            current_chart.id_matplotlib_options = new_options_id
+            setattr(current_chart, id_library_options, new_options_id) 
             db.session.commit()
         else:
             fpo_record = FilePlotOptions.query.first()
-            fpo_record.id_matplotlib_options = new_options_id
+            setattr(fpo_record, id_library_options, new_options_id) 
             db.session.commit()
 
-        flash(f'Changed options for Matplotlib!', 'success')
+        flash(f'Changed options for {library_name}!', 'success')
         if model_name == "FileDataPoint" and chart_id == -1:
             return redirect(url_for('route_show_data_from_file'))
         else:
             return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
-
-@app.route("/data/change_options/seaborn/<string:model_name>", methods=['GET', 'POST'])
-@app.route("/data/change_options/seaborn/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
-@clean_query(db=db)
-def route_change_options_seaborn(model_name, chart_id=-1):
-    """ Inserts new option OptionsForm."""
-    Model = str_to_object(model_name)
-    ''' Get values from form. '''
-    seaborn_form = SeabornOptionsForm()
-
-    if seaborn_form.validate_on_submit():
-        kwargs = dict()
-        kwargs['color'] = seaborn_form.color.data
-        kwargs['bg_color'] = seaborn_form.bg_color.data
-        kwargs['line_width'] = seaborn_form.line_width.data
-        kwargs['line_style'] = seaborn_form.line_style.data
-        kwargs['marker'] = seaborn_form.marker.data
-
-        kwargs['flag_scatter_plot'] = seaborn_form.flag_scatter_plot.data
-        kwargs['flag_show_grid'] = seaborn_form.flag_show_grid.data
-        kwargs['flag_logscale_x'] = seaborn_form.flag_logscale_x.data
-        kwargs['flag_logscale_y'] = seaborn_form.flag_logscale_y.data
-
-        ''' make new instance of options '''
-        new_options = SeabornPlotOptions(**kwargs)
-        ''' append new record '''
-        db.session.add(new_options)
-        db.session.commit()
-
-        ''' get lastly_added record '''
-        recently_added = get_recently_added_record(db, 'SeabornPlotOptions')
-        new_options_id = recently_added.id
-
-        ''' get old options to be replaced and after replacing, delete the old'''
-        current_chart = Model.query.get(chart_id)
-        
-
-        current_chart.id_seaborn_options = new_options_id
-
-        db.session.commit()
-
-        flash(f'Changed options for Seaborn!', 'success')
-        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
-
-@app.route("/data/change_options/bokeh/<string:model_name>", methods=['GET', 'POST'])
-@app.route("/data/change_options/bokeh/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
-@clean_query(db=db)
-def route_change_options_bokeh(model_name, chart_id=-1):
-    """ Inserts new option OptionsForm."""
-    Model = str_to_object(model_name)
-    ''' Get values from form. '''
-    bokeh_form = BokehOptionsForm()
-
-    if bokeh_form.validate_on_submit():
-        kwargs = dict()
-        kwargs['color'] = bokeh_form.color.data
-        kwargs['bg_color'] = bokeh_form.bg_color.data
-        kwargs['line_width'] = bokeh_form.line_width.data
-        kwargs['line_style'] = bokeh_form.line_style.data
-        kwargs['marker'] = bokeh_form.marker.data
-
-        kwargs['flag_scatter_plot'] = bokeh_form.flag_scatter_plot.data
-        kwargs['flag_show_grid'] = bokeh_form.flag_show_grid.data
-        kwargs['flag_logscale_x'] = bokeh_form.flag_logscale_x.data
-        kwargs['flag_logscale_y'] = bokeh_form.flag_logscale_y.data
-
-        new_options = BokehPlotOptions(**kwargs)
-        ''' append new record '''
-        db.session.add(new_options)
-        db.session.commit()
-
-        ''' get lastly_added record '''
-        recently_added = get_recently_added_record(db, 'BokehPlotOptions')
-        new_options_id = recently_added.id
-
-        ''' get old options to be replaced and after replacing, delete the old'''
-        current_chart = Model.query.get(chart_id)
-
-        current_chart.id_bokeh_options = new_options_id
-
-        db.session.commit()
-        flash(f'Changed options for Bokeh!', 'success')
-        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
-
-
-@app.route("/data/change_options/plotly/<string:model_name>", methods=['GET', 'POST'])
-@app.route("/data/change_options/plotly/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
-@clean_query(db=db)
-def route_change_options_plotly(model_name, chart_id=-1):
-    """ Inserts new option OptionsForm."""
-    Model = str_to_object(model_name)
-    ''' Get values from form. '''
-    plotly_form = PlotlyOptionsForm()
-
-    if plotly_form.validate_on_submit():
-        kwargs = dict()
-        kwargs['color'] = plotly_form.color.data
-        kwargs['bg_color'] = plotly_form.bg_color.data
-        kwargs['line_width'] = plotly_form.line_width.data
-        kwargs['line_style'] = plotly_form.line_style.data
-        kwargs['marker'] = plotly_form.marker.data
-
-        kwargs['flag_scatter_plot'] = plotly_form.flag_scatter_plot.data
-        kwargs['flag_show_grid'] = plotly_form.flag_show_grid.data
-        kwargs['flag_logscale_x'] = plotly_form.flag_logscale_x.data
-        kwargs['flag_logscale_y'] = plotly_form.flag_logscale_y.data
-
-        new_options = PlotlyPlotOptions(**kwargs)
-        ''' append new record '''
-        db.session.add(new_options)
-        db.session.commit()
-
-        ''' get lastly_added record '''
-        recently_added = get_recently_added_record(db, 'PlotlyPlotOptions')
-        new_options_id = recently_added.id
-
-        ''' get old options to be replaced and after replacing, delete the old'''
-        current_chart = Model.query.get(chart_id)
-
-        current_chart.id_plotly_options = new_options_id
-
-        db.session.commit()
-        flash(f'Changed options for Plotly!', 'success')
-        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
-
-    
-
-@app.route("/data/change_options/pygal/<string:model_name>", methods=['GET', 'POST'])
-@app.route("/data/change_options/pygal/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
-@clean_query(db=db)
-def route_change_options_pygal(model_name, chart_id=-1):
-    """ Inserts new option OptionsForm."""
-    Model = str_to_object(model_name)
-    ''' Get values from form. '''
-    pygal_form = PygalOptionsForm()
-
-    if pygal_form.validate_on_submit():
-        kwargs = dict()
-        kwargs['color'] = pygal_form.color.data
-        kwargs['bg_color'] = pygal_form.bg_color.data
-        kwargs['line_width'] = pygal_form.line_width.data
-        kwargs['line_style'] = pygal_form.line_style.data
-        kwargs['marker'] = pygal_form.marker.data
-
-        kwargs['flag_scatter_plot'] = pygal_form.flag_scatter_plot.data
-        kwargs['flag_show_grid'] = pygal_form.flag_show_grid.data
-        kwargs['flag_logscale_y'] = pygal_form.flag_logscale_y.data
-
-        new_options = PygalPlotOptions(**kwargs)
-        ''' append new record '''
-        db.session.add(new_options)
-        db.session.commit()
-
-        ''' get lastly_added record '''
-        recently_added = get_recently_added_record(db, 'PygalPlotOptions')
-        new_options_id = recently_added.id
-
-        ''' get old options to be replaced and after replacing, delete the old'''
-        current_chart = Model.query.get(chart_id)
-
-        current_chart.id_pygal_options = new_options_id
-
-        db.session.commit()
-        flash(f'Changed options for Pygal!', 'success')
-        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
 
 # D

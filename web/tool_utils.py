@@ -24,7 +24,7 @@ import functools
 from flask import url_for
 
 from web.import_models import *
-
+from web.import_forms import *
 
 # MATPLOTLIB
 from matplotlib.figure import Figure
@@ -945,28 +945,22 @@ def clean_unused_options(db):
     LIBS = ('matplotlib', 'seaborn', 'bokeh', 'plotly', 'pygal')
 
     fpo = FilePlotOptions.query.first()
+    if fpo:
+        FilePlotOptions.query.filter(FilePlotOptions.id != fpo.id).delete()
+        db.session.commit()
     
-    FilePlotOptions.query.filter(FilePlotOptions.id != fpo.id).delete()
-    db.session.commit()
-    
-    used_ids = {
-        'matplotlib': fpo.id_matplotlib_options,
-        'seaborn':  fpo.id_seaborn_options,
-        'bokeh': fpo.id_bokeh_options,
-        'plotly': fpo.id_plotly_options,
-        'pygal': fpo.id_pygal_options
-    }
-        
-       
+        used_ids = {
+            'matplotlib': fpo.id_matplotlib_options,
+            'seaborn':  fpo.id_seaborn_options,
+            'bokeh': fpo.id_bokeh_options,
+            'plotly': fpo.id_plotly_options,
+            'pygal': fpo.id_pygal_options
+        }
 
     for lib in LIBS:
-        
         LPO = str_to_object(f'{lib.capitalize()}PlotOptions')
         id_library_options = f'id_{lib}_options'
-
         
-
-
         sin_unused_lib_ids  = (id_ for id_, in Sinus.query.with_entities(getattr(Sinus, id_library_options)))
         cos_unused_lib_ids  = (id_ for id_, in Cosinus.query.with_entities(getattr(Cosinus, id_library_options)))
         sqrt_unused_lib_ids = (id_ for id_, in SquareRoot.query.with_entities(getattr(SquareRoot, id_library_options)))
@@ -990,7 +984,7 @@ def clean_unused_options(db):
         ).all()
         
         for option in options_to_delete:
-            if getattr(option, id.__name__) != used_ids[lib]:
+            if getattr(option, id.__name__) != used_ids.get(lib, -1):
                 db.session.delete(option)
     
     db.session.commit()

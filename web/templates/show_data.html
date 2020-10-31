@@ -119,9 +119,9 @@
                 <div class="card col-md-4 text-primary bg-dark border-danger border-danger">
                     <div class="card-body text-white bg-dark">
                         {% if chart_id == -1 and model_name == "FileDataPoint" %}
-                            <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_matplotlib', model_name=model_name) }}">
+                            <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='matplotlib', model_name=model_name) }}">
                         {% else %}
-                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_matplotlib', model_name=model_name, chart_id=chart_id) }}">
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='matplotlib', model_name=model_name, chart_id=chart_id) }}">
                         {% endif %}
                             {% if matplotlib_form is defined %}
                                 {{ matplotlib_form.hidden_tag() }}
@@ -204,7 +204,11 @@
                 </div>
                 <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
-                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_seaborn', model_name=model_name, chart_id=chart_id) }}">
+                        {% if chart_id == -1 and model_name == "FileDataPoint" %}
+                            <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='seaborn', model_name=model_name) }}">
+                        {% else %}
+                            <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='seaborn', model_name=model_name, chart_id=chart_id) }}">
+                        {% endif %}
                             {% if seaborn_form is defined %}
                                 {{ seaborn_form.hidden_tag() }}
                                 <div class="form-group">
@@ -286,7 +290,11 @@
                 </div>
                 <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
-                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_bokeh', model_name=model_name, chart_id=chart_id) }}">
+                        {% if chart_id == -1 and model_name == "FileDataPoint" %}
+                            <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='bokeh', model_name=model_name) }}">
+                        {% else %}
+                            <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='bokeh', model_name=model_name, chart_id=chart_id) }}">
+                        {% endif %}
                             {% if bokeh_form is defined %}
                                 {{ bokeh_form.hidden_tag() }}
                                 <div class="form-group">
@@ -367,7 +375,11 @@
                 </div>
                 <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
-                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_plotly', model_name=model_name, chart_id=chart_id) }}">
+                        {% if chart_id == -1 and model_name == "FileDataPoint" %}
+                            <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='plotly', model_name=model_name) }}">
+                        {% else %}
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='plotly', model_name=model_name, chart_id=chart_id) }}">
+                        {% endif %}
                             {% if plotly_form is defined %}
                                 {{ plotly_form.hidden_tag() }}
                                 <div class="form-group">
@@ -447,7 +459,12 @@
                 </div>
                 <div class="card col-md-4 text-primary bg-dark border-danger">
                     <div class="card-body text-white bg-dark">
-                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options_pygal', model_name=model_name, chart_id=chart_id) }}">
+                        {% if chart_id == -1 and model_name == "FileDataPoint" %}
+                            <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='pygal', model_name=model_name) }}">
+                        {% else %}
+                        <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='pygal', model_name=model_name, chart_id=chart_id) }}">
+                        {% endif %}
+                        
                             {% if pygal_form is defined %}
                                 {{ pygal_form.hidden_tag() }}
                                 <div class="form-group">
