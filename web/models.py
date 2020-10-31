@@ -201,7 +201,7 @@ class MatplotlibPlotOptions(db.Model):
     
     @staticmethod
     def get_options(options_id):
-        ''' Returns the list of all model coefficients. '''
+        ''' Returns the dictionary of options. '''
         coefs_ok = MatplotlibPlotOptions.query.get(options_id)
         
         if coefs_ok:
@@ -236,7 +236,7 @@ class SeabornPlotOptions(db.Model):
     
     @staticmethod
     def get_options(options_id):
-        ''' Returns the list of all model coefficients. '''
+        ''' Returns the dictionary of options. '''
         coefs_ok = SeabornPlotOptions.query.get(options_id)
         
         if coefs_ok:
@@ -272,7 +272,7 @@ class BokehPlotOptions(db.Model):
     
     @staticmethod
     def get_options(options_id):
-        ''' Returns the list of all model coefficients. '''
+        ''' Returns the dictionary of options. '''
         coefs_ok = BokehPlotOptions.query.get(options_id)
         
         if coefs_ok:
@@ -307,7 +307,7 @@ class PlotlyPlotOptions(db.Model):
     
     @staticmethod
     def get_options(options_id):
-        ''' Returns the list of all model coefficients. '''
+        ''' Returns the dictionary of options. '''
         coefs_ok = PlotlyPlotOptions.query.get(options_id)
         
         if coefs_ok:
@@ -342,7 +342,7 @@ class PygalPlotOptions(db.Model):
     
     @staticmethod
     def get_options(options_id):
-        ''' Returns the list of all model coefficients. '''
+        ''' Returns the dictionary of options. '''
         coefs_ok = PygalPlotOptions.query.get(options_id)
         
         if coefs_ok:
@@ -360,3 +360,25 @@ class PygalPlotOptions(db.Model):
             return dict()
 
 
+class FileDataPoint(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    x = db.Column(db.Float, unique=False, nullable=False)
+    y = db.Column(db.Float, unique=False, nullable=False)
+
+    @staticmethod
+    def make_point(xx, yy):
+        ''' Returns the FileDataPoint (x, y). '''
+        return FileDataPoint(x=float(round(xx, 3)), y=float(round(yy, 3)))
+
+
+
+
+class FilePlotOptions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
+    

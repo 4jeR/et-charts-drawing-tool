@@ -60,11 +60,6 @@ import chart_studio.tools as plotly_tools
 @app.route('/data/plot/matplotlib/<string:model_name>/<string:options>/<string:data_filename>', methods=["GET", "POST"])
 def route_plot_matplotlib(model_name, options, chart_id=-1, data_filename=''):
     """ Returns the Response consisting the matplotlib chart image. """
-    print("ROUTE MATPLOTLIB KWARGS:")
-    print(model_name)
-    print(chart_id)
-    print(data_filename)
-    print("ROUTE MATPLOTLIB KWARGS:")
     options_from_string = json.loads(options)
     fig = make_chart_matplotlib(model_name, chart_id, options_from_string, data_filename)
     output = io.BytesIO()
@@ -74,7 +69,7 @@ def route_plot_matplotlib(model_name, options, chart_id=-1, data_filename=''):
 
 @app.route('/data/plot/seaborn/<string:model_name>/<string:options>', methods=["GET", "POST"])
 @app.route('/data/plot/seaborn/<string:model_name>/<string:options>/<int:chart_id>', methods=["GET", "POST"])
-@app.route('/data/plot/matplotlib/<string:model_name>/<string:options>/<string:data_filename>', methods=["GET", "POST"])
+@app.route('/data/plot/seaborn/<string:model_name>/<string:options>/<string:data_filename>', methods=["GET", "POST"])
 def route_plot_seaborn(model_name, options, chart_id=-1, data_filename=''):
     """ Returns the Response consisting the Seaborn chart image. """
     options_from_string = json.loads(options)
@@ -124,11 +119,11 @@ def route_add_data(model_name):
         model_kwargs['step'] = form_step_data
 
 
-        model_kwargs['id_matplotlib_options'] = get_default_matplotlib_options(db).id
-        model_kwargs['id_seaborn_options'] = get_default_seaborn_options(db).id
-        model_kwargs['id_bokeh_options'] = get_default_bokeh_options(db).id
-        model_kwargs['id_plotly_options'] = get_default_plotly_options(db).id
-        model_kwargs['id_pygal_options'] = get_default_pygal_options(db).id
+        model_kwargs['id_matplotlib_options'] = get_default_matplotlib_options(db, as_dict=False).id
+        model_kwargs['id_seaborn_options'] = get_default_seaborn_options(db, as_dict=False).id
+        model_kwargs['id_bokeh_options'] = get_default_bokeh_options(db, as_dict=False).id
+        model_kwargs['id_plotly_options'] = get_default_plotly_options(db, as_dict=False).id
+        model_kwargs['id_pygal_options'] = get_default_pygal_options(db, as_dict=False).id
         
          
 
@@ -161,46 +156,48 @@ def route_add_data_from_file():
     filename = form.filename.data
 
     if form.validate_on_submit():
-        ''' get all model charts'''
-        kwargs = dict()
+
+        get_default_matplotlib_options(db)
+        mplib_id = MatplotlibPlotOptions.query.first().id
+        
+        get_default_seaborn_options(db)
+        seaborn_id = SeabornPlotOptions.query.first().id
+
+        get_default_bokeh_options(db)
+        bokeh_id = BokehPlotOptions.query.first().id
 
 
-        x, y, option_ids = get_data_from_file(filename)
-
-        file_data_options = dict()
-        file_data_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(option_ids[0]))
-        file_data_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(option_ids[1]))
-        file_data_options['bokeh_options'] = BokehPlotOptions.get_options(option_ids[2]) 
-        file_data_options['plotly_options'] = PlotlyPlotOptions.get_options(option_ids[3]) 
-        file_data_options['pygal_options'] = PygalPlotOptions.get_options(option_ids[4])
-
-        """ """
-        bokeh_chart = make_chart_bokeh("FileData", -1, file_data_options['bokeh_options'], x, y)
-        script_bokeh, div_bokeh = bokeh_components(bokeh_chart)
-        kwargs["script_bokeh"] = script_bokeh
-        kwargs["div_bokeh"] = div_bokeh
-
-        kwargs["script_plotly"] = '<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> '
-        kwargs["div_plotly"] = make_chart_plotly("FileData", -1, file_data_options['plotly_options'], x, y)
-
-        pygal_chart = make_chart_pygal("FileData", -1, file_data_options['pygal_options'], x, y)
-        kwargs["src_pygal"] = pygal_chart.render_data_uri()
+        get_default_plotly_options(db)
+        plotly_id = PlotlyPlotOptions.query.first().id
+        
+        get_default_pygal_options(db)
+        pygal_id = PlotlyPlotOptions.query.first().id
 
 
-        kwforms = dict()
-        kwforms['matplotlib_form'] = MatplotlibOptionsForm()
-        kwforms['seaborn_form'] = SeabornOptionsForm()
-        kwforms['bokeh_form'] = BokehOptionsForm()
-        kwforms['plotly_form'] = PlotlyOptionsForm()
-        kwforms['pygal_form'] = PygalOptionsForm()
+        fpo = FilePlotOptions(
+            id_matplotlib_options=mplib_id, 
+            id_seaborn_options=seaborn_id, 
+            id_bokeh_options=bokeh_id, 
+            id_plotly_options=plotly_id, 
+            id_pygal_options=pygal_id
+        )
+        db.session.add(fpo)
 
-        file_data_points = []
+        previous_data_points = FileDataPoint.query.all()
+        if previous_data_points:
+            for point_record in previous_data_points:
+                db.session.delete(point_record)
+            db.session.commit()
+
+        x, y = get_data_from_file(filename)
         for xx, yy in zip(x, y):
-            pt = (round(xx, 3), round(yy, 3))
-            file_data_points.append(pt)
-        flash(f'Data from {filename} has been successfully added!', 'success')
-        return render_template('show_data.html', model_name='FileData', chart_id=-1, data_filename=filename, file_data_points=file_data_points, **file_data_options, **kwforms, **kwargs)
+            pt = FileDataPoint.make_point(xx, yy)
+            db.session.add(pt)
+        db.session.commit()
+        flash(f'Data from {filename} has been successfully added to the database!', 'success')
+        return redirect(url_for('route_show_data', model_name='FileDataPoint'))
     return render_template('add_data_file.html', form=form)
+
 
 
 # R
@@ -217,13 +214,12 @@ def route_show_data(model_name, chart_id=-1):
     data table with all points for specific model,
     five charts for each library: Matplotlib, Seaborn, Bokeh, Plotly and Pygal.
     """
-    charts = []
-    if model_name != "FileData":
-        Model = str_to_object(model_name)
-        charts = Model.query.all()
-    kw_options = dict()
+    
+    Model = str_to_object(model_name)
+    records = Model.query.all()
 
-    if chart_id != -1 and model_name != "FileData":
+    kw_options = dict()
+    if chart_id != -1 and model_name != "FileDataPoint":
         ''' Get options for each library. '''
         matplotlib_options_id = Model.query.get(chart_id).id_matplotlib_options
         kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
@@ -239,10 +235,26 @@ def route_show_data(model_name, chart_id=-1):
 
         pygal_options_id = Model.query.get(chart_id).id_pygal_options
         kw_options['pygal_options'] = PygalPlotOptions.get_options(pygal_options_id) 
-    
+
+    elif chart_id == -1 and model_name == "FileDataPoint":
+        ''' Get options for each library. '''
+        matplotlib_options_id = FilePlotOptions.query.first().id_matplotlib_options
+        kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
+
+        seaborn_options_id = FilePlotOptions.query.first().id_seaborn_options
+        kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(seaborn_options_id))
+
+        bokeh_options_id = FilePlotOptions.query.first().id_bokeh_options
+        kw_options['bokeh_options'] = BokehPlotOptions.get_options(bokeh_options_id) 
+
+        plotly_options_id = FilePlotOptions.query.first().id_plotly_options
+        kw_options['plotly_options'] = PlotlyPlotOptions.get_options(plotly_options_id) 
+
+        pygal_options_id = FilePlotOptions.query.first().id_pygal_options
+        kw_options['pygal_options'] = PygalPlotOptions.get_options(pygal_options_id) 
+
     getable_models = ['Sinus', 'Cosinus', 'SquareRoot', 'Exponential', 'SquareFunc']
 
-    ''' get all model charts'''
     kwargs = dict()
 
     if model_name in getable_models:
@@ -269,7 +281,7 @@ def route_show_data(model_name, chart_id=-1):
     kwforms['plotly_form'] = PlotlyOptionsForm()
     kwforms['pygal_form'] = PygalOptionsForm()
 
-    return render_template('show_data.html', model_name=model_name, chart_id=chart_id, charts=charts,  **kwargs, **kwforms, **kw_options)
+    return render_template('show_data.html', model_name=model_name, chart_id=chart_id, records=records,  **kwargs, **kwforms, **kw_options)
 
 
 @app.route("/data/change_options/matplotlib/<string:model_name>", methods=['GET', 'POST'])

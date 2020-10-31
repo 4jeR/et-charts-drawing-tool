@@ -114,6 +114,10 @@ def make_points(model_name, chart_id):
                     yy = float(round(a*(xx - p)**2 + q, 3))
                     points.append((xx, yy))
 
+    elif chart_id == -1 and model_name == "FileDataPoint":
+        data_points = FileDataPoint.query.all()
+        for point in data_points:
+            points.append((point.x, point.y))
     return points
 
 def get_contrasted_colors(color_hash):
@@ -152,12 +156,6 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
     points = []
     if model_name == "FileData" and data_filename and chart_id == -1:
         xx, yy, _ = get_data_from_file(data_filename)
-        print("MATPLOTLIB MAKE CHAERT WHY NOT OK")
-        print("MATPLOTLIB MAKE CHAERT WHY NOT OK")
-        print(xx)
-        print(yy)
-        print("MATPLOTLIB MAKE CHAERT WHY NOT OK")
-        print("MATPLOTLIB MAKE CHAERT WHY NOT OK")
     else:
         points = make_points(model_name, chart_id)
         xx = [point[0] for point in points]
@@ -169,7 +167,7 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
 
     
     if options.get('color') == options.get('bg_color'):
-        color_to_contrast = options['color']
+        color_to_contrast = options.get('color', '#292928')
         options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)
 
     kwargs = dict()
@@ -217,7 +215,8 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
 def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     points = []
     if model_name == "FileData" and data_filename and chart_id == -1:
-        pass
+        xx, yy, _ = get_data_from_file(data_filename)
+        points = [(x, y) for x, y in zip(xx, yy)]
     else:
         points = make_points(model_name, chart_id)
     data = [
@@ -254,7 +253,7 @@ def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     
     plot_kwargs = dict()
     plot_kwargs['legend'] = False
-    plot_kwargs['palette'] = [options.get('color', 'black')]
+    plot_kwargs['palette'] = [options.get('color', 'black'),]
     plot_kwargs['linewidth'] = options.get('line_width', 3)
 
     if options.get('line_style', 'solid') == 'dashed':
@@ -362,11 +361,11 @@ def make_chart_plotly(model_name, chart_id, options, x=[], y=[]):
         plot_bgcolor=options.get('bg_color', '#dbdbdb'),
         xaxis={
             'showgrid': options.get('flag_show_grid', True),
-            'type': 'log' if options.get('flag_logscale_x', True) else 'linear'
+            'type': 'log' if options.get('flag_logscale_x', False) else 'linear'
         },
         yaxis={
             'showgrid': options.get('flag_show_grid', True),
-            'type': 'log' if options.get('flag_logscale_y', True) else 'linear'
+            'type': 'log' if options.get('flag_logscale_y', False) else 'linear'
         },
         modebar={
             'bgcolor': 'red'
@@ -430,29 +429,17 @@ def files_count(lib_name='', path_to_images='.'):
 
 
 def get_data_from_file(filename):
-    ''' Gets data from file as a tuple of (x: list, y: list, library_options_ids: list) 
-    
-    TODO: Probably will need refactor after deployment. 
-    '''
-    options_ids = []
+    ''' Gets data from file as a tuple of (x: list, y: list )    '''
     x_list = []
     y_list = []
     sep = ' '
     with open(f'web/input_data/{filename}', 'r') as f:
-        options_line = f.readline().split(',') # ['1', '1', '1', '1', '1']
-        options_ids.append(int(options_line[0]))
-        options_ids.append(int(options_line[1]))
-        options_ids.append(int(options_line[2]))
-        options_ids.append(int(options_line[3]))
-        options_ids.append(int(options_line[4]))
-   
         sep = ','
-       
         for line in f:
             x_list.append(float(line.strip().split(sep)[0]))
             y_list.append(float(line.strip().split(sep)[-1]))
 
-    return x_list, y_list, options_ids
+    return x_list, y_list
 
 
 def get_current_time():
@@ -773,7 +760,10 @@ def save_source_code(library_name, model_name, chart_id, current_time):
 
 def download_image(library_name, model_name, chart_id, current_time):
     filename = f'{library_name}_{model_name}.png'
-    image_url = 'http://localhost:5000/' + url_for('route_show_data', model_name=model_name, chart_id=chart_id)
+    if model_name == 'FileDataPoint' and chart_id == -1:
+        image_url = 'http://localhost:5000/data/show/FileDataPoint'
+    else:
+        image_url = 'http://localhost:5000/' + url_for('route_show_data', model_name=model_name, chart_id=chart_id)
     save_path = f'web/downloads/images/{current_time}_{filename}'
     window_size = (1920, 1080)
     
@@ -802,7 +792,7 @@ def get_recently_added_record(db, model_name):
     return recently_added
 
 
-def get_default_matplotlib_options(db):
+def get_default_matplotlib_options(db, as_dict=True):
     mplib_options = MatplotlibPlotOptions.query.first()
 
     if not mplib_options:
@@ -819,11 +809,11 @@ def get_default_matplotlib_options(db):
         mplib_options = MatplotlibPlotOptions(**kwargs)
         db.session.add(mplib_options)
         db.session.commit()
-    
+        return kwargs if as_dict else mplib_options
     return mplib_options
 
 
-def get_default_seaborn_options(db):
+def get_default_seaborn_options(db, as_dict=True):
     seaborn_options = SeabornPlotOptions.query.first()
 
     if not seaborn_options:
@@ -840,11 +830,12 @@ def get_default_seaborn_options(db):
         seaborn_options = SeabornPlotOptions(**kwargs)
         db.session.add(seaborn_options)
         db.session.commit()
-    
+        return kwargs if as_dict else seaborn_options
+
     return seaborn_options
 
 
-def get_default_bokeh_options(db):
+def get_default_bokeh_options(db, as_dict=True):
     bokeh_options = BokehPlotOptions.query.first()
 
     if not bokeh_options:
@@ -861,11 +852,11 @@ def get_default_bokeh_options(db):
         bokeh_options = BokehPlotOptions(**kwargs)
         db.session.add(bokeh_options)
         db.session.commit()
-    
+        return kwargs if as_dict else bokeh_options
     return bokeh_options
 
 
-def get_default_plotly_options(db):
+def get_default_plotly_options(db, as_dict=True):
     plotly_options = PlotlyPlotOptions.query.first()
 
     if not plotly_options:
@@ -882,13 +873,14 @@ def get_default_plotly_options(db):
         plotly_options = PlotlyPlotOptions(**kwargs)
         db.session.add(plotly_options)
         db.session.commit()
-    
+        return kwargs if as_dict else plotly_options
+
     return plotly_options
 
 
-def get_default_pygal_options(db):
+def get_default_pygal_options(db, as_dict=True):
     pygal_options = PygalPlotOptions.query.first()
-
+    
     if not pygal_options:
         kwargs = dict()
         kwargs['color'] = 'red'
@@ -902,6 +894,7 @@ def get_default_pygal_options(db):
         pygal_options = PygalPlotOptions(**kwargs)
         db.session.add(pygal_options)
         db.session.commit()
+        return kwargs if as_dict else pygal_options
     
     return pygal_options
 
