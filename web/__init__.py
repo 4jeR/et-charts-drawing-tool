@@ -15,4 +15,4 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///et_charts'
 db = SQLAlchemy(app)
 # cache = Cache(app)
 from web import routes 
-from web import tool_utils
+from web import help_utils

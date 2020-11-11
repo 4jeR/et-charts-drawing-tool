@@ -21,37 +21,33 @@ from web import db
 from web.import_forms import *
 from web.import_models import *
 
-from web.tool_utils import files_count
+from web.help_utils import files_count
 
-from web.tool_utils import make_chart_matplotlib
-from web.tool_utils import make_chart_seaborn
-from web.tool_utils import make_chart_bokeh
-from web.tool_utils import make_chart_plotly
-from web.tool_utils import make_chart_pygal
+from web.help_utils import make_chart_matplotlib
+from web.help_utils import make_chart_seaborn
+from web.help_utils import make_chart_bokeh
+from web.help_utils import make_chart_plotly
+from web.help_utils import make_chart_pygal
 
-from web.tool_utils import make_points
-from web.tool_utils import str_to_object
-from web.tool_utils import download_image
-from web.tool_utils import get_current_time
-from web.tool_utils import save_source_code
-from web.tool_utils import get_data_from_file
-from web.tool_utils import get_recently_added_record
-from web.tool_utils import clean_query
+from web.help_utils import make_points
+from web.help_utils import str_to_object
+from web.help_utils import download_image
+from web.help_utils import get_current_time
+from web.help_utils import save_source_code
+from web.help_utils import get_data_from_file
+from web.help_utils import get_recently_added_record
+from web.help_utils import clean_query
 
-
-
-from web.tool_utils import get_default_matplotlib_options
-from web.tool_utils import get_default_seaborn_options
-from web.tool_utils import get_default_bokeh_options
-from web.tool_utils import get_default_plotly_options
-from web.tool_utils import get_default_pygal_options
-
+from web.help_utils import get_default_matplotlib_options
+from web.help_utils import get_default_seaborn_options
+from web.help_utils import get_default_bokeh_options
+from web.help_utils import get_default_plotly_options
+from web.help_utils import get_default_pygal_options
 
 from bokeh.embed import components as bokeh_components
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-
 
 import chart_studio.tools as plotly_tools
 
@@ -87,14 +83,11 @@ def home():
     return render_template('home.html')
 
 
-# C
 @app.route("/data/add/main")
 def route_add_data_main():
     """ Renders main entry point for inserting the data. """
     fromfile_form = FromFileForm()
     return render_template('add_data_main.html', form=fromfile_form)
-
-
 
 
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
@@ -205,12 +198,11 @@ def route_add_data_from_file():
     return render_template('add_data_file.html', form=form)
 
 
-
-# R
 @app.route("/data/show/main")
 def route_show_data_main():
     """ Renders main web page on which you can choose different models. """
     return render_template('show_data_main.html')
+
 
 @app.route("/data/show/fromfile", methods=['GET', 'POST'])
 def route_show_data_from_file():
@@ -258,7 +250,6 @@ def route_show_data_from_file():
     kwforms['pygal_form'] = PygalOptionsForm()
 
     return render_template('show_data.html', model_name="FileDataPoint", chart_id=-1, records=records,  **kwargs, **kwforms, **kw_options)
-
 
 
 @app.route("/data/show/<string:model_name>", methods=['GET', 'POST'])
@@ -339,10 +330,6 @@ def route_show_data(model_name, chart_id=-1):
     return render_template('show_data.html', model_name=model_name, chart_id=chart_id, records=records,  **kwargs, **kwforms, **kw_options)
 
 
-
-
-
-
 @app.route("/data/change_options/<string:library_name>/<string:model_name>", methods=['GET', 'POST'])
 @app.route("/data/change_options/<string:library_name>/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
 @clean_query(db=db)
@@ -397,8 +384,6 @@ def route_change_options(library_name, model_name, chart_id=-1):
             return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
 
-
-# D
 @app.route("/data/delete/<string:model_name>/<int:chart_id>", methods=['POST'])
 @clean_query(db=db)
 def route_delete_chart(model_name, chart_id):
@@ -430,7 +415,6 @@ def route_summary():
     return render_template('summary.html')
 
 
-''' Download images and codes section '''
 @app.route("/data/download/<string:library_name>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
 @app.route("/data/download/<string:library_name>/<string:model_name>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
 @app.route("/data/download/<string:library_name>/<string:model_name>/<int:chart_id>/<string:save_img>/<string:save_src>", methods=['GET', 'POST'])
@@ -451,7 +435,6 @@ def route_download_src_img(library_name, model_name="FileDataPoint", chart_id=-1
         return redirect(url_for('route_show_data_from_file'))
     else:
         return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
-
 
 
 @app.route("/matplotlib")

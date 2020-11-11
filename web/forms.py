@@ -20,7 +20,6 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
-''' TODO: fix this function '''
 def validate_begin_end(FormName):
     def _validate_begin_end(form, field):
         min_value = -FormName.coef_c.data / FormName.coef_b.data 

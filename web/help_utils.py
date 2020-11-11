@@ -782,7 +782,6 @@ def save_source_code(library_name, model_name, chart_id, current_time):
     with open(f'web/downloads/codes/{filename}.py', 'w') as f:
         f.write(formatted_code(code))
         
-# download_image('matplotlib', 'FileDataPoint', -1)
 
 def download_image(library_name, model_name, chart_id, current_time):
     filename = f'{library_name}_{model_name}.png'
@@ -938,7 +937,7 @@ def clean_query(db):
 
 def clean_unused_options(db):
     ''' 
-    After each database modification (delete, update) checks for unused 
+    After each database modification (insert, delete, update) checks for unused 
     library plot options (records) and removes them from the database.
     LPO stands for LibraryPlotOption (class name)
     '''
