@@ -53,10 +53,14 @@
                         
                     </th>
                     <th scope="row" text-align="center">
-                        x
+                        {% if model_name == 'FileDataPoint' %}
+                            x
+                        {% endif %}
                     </th>
                     <th scope="row" text-align="center">
-                        y
+                        {% if model_name == 'FileDataPoint' %}
+                            y
+                        {% endif %}
                     </th>
                 </tr>
                 {% if model_name != 'FileDataPoint' %}

@@ -73,6 +73,23 @@
                 <b>{{ form.step.label(for="step", class="col-md-1 col-form-label") }}</b>
                 {{ form.step(id="step", class="form-control form-control-md col-md-3")}}
             </div>
+        {% elif model_name == 'CustomEquation' %}
+            <div class="form-group">
+                <b>{{ form.equation.label(for="equation", class="col-md-1 col-form-label") }}</b>
+                {{ form.equation(id="equation", class="form-control form-control-md col-md-6")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.begin.label(for="begin", class="col-md-1 col-form-label") }}</b>
+                {{ form.begin(id="begin", class="form-control form-control-md col-md-3")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.end.label(for="end", class="col-md-1 col-form-label") }}</b>
+                {{ form.end(id="end", class="form-control form-control-md col-md-3")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.step.label(for="step", class="col-md-1 col-form-label") }}</b>
+                {{ form.step(id="step", class="form-control form-control-md col-md-3")}}
+            </div>
         {% endif %}
         <button type="submit" class="col-md-3 btn btn-dark">Add data</button>
     </form>

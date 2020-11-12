@@ -85,22 +85,26 @@ def home():
 
 @app.route("/data/add/main")
 def route_add_data_main():
-    """ Renders main entry point for inserting the data. """
-    fromfile_form = FromFileForm()
-    return render_template('add_data_main.html', form=fromfile_form)
+    """ Renders page on which all models can be added do the database. """
+    return render_template('add_data_main.html')
 
 
 @app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
 @clean_query(db=db)
 def route_add_data(model_name):
     """ Inserts points to the database to the specific model based on values from forms."""
-    defaults = ['Sinus', 'Cosinus', 'Exponential']
-    if model_name in defaults:
+    common_models = ['Sinus', 'Cosinus', 'Exponential']
+    if model_name in common_models:
         form = DataForm()
     elif model_name == 'SquareRoot':
         form = SqrtForm()
     elif model_name == 'SquareFunc':
         form = SquareFuncForm()
+    elif model_name == 'CustomEquation':
+        form = CustomEquationForm()
+
+
+
 
     if form.validate_on_submit():
         Model = str_to_object(model_name)
@@ -120,9 +124,8 @@ def route_add_data(model_name):
         model_kwargs['id_plotly_options'] = get_default_plotly_options(db, as_dict=False).id
         model_kwargs['id_pygal_options'] = get_default_pygal_options(db, as_dict=False).id
         
-         
 
-        if model_name in defaults or model_name == 'SquareRoot':
+        if model_name in common_models or model_name == 'SquareRoot':
             model_kwargs['a'] = form.coef_a.data
             model_kwargs['b'] = form.coef_b.data
             model_kwargs['c'] = form.coef_c.data
@@ -131,6 +134,8 @@ def route_add_data(model_name):
             model_kwargs['a'] = form.coef_a.data
             model_kwargs['p'] = form.coef_p.data
             model_kwargs['q'] = form.coef_q.data
+        elif model_name == 'CustomEquation':
+            model_kwargs['equation'] = form.equation.data
 
         model_object = Model(**model_kwargs)
         db.session.add(model_object)

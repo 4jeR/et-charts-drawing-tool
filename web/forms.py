@@ -32,12 +32,13 @@ def validate_begin_end(FormName):
 class DataForm(FlaskForm):
     begin = FloatField('begin', validators=[InputRequired()])
     end = FloatField('end', validators=[InputRequired()])
-    
+    step = FloatField('step', validators=[Optional()])
+
     coef_a = FloatField('a', validators=[DataRequired('Non-zero value.')])
     coef_b = FloatField('b', validators=[DataRequired('Non-zero value.')])
     coef_c = FloatField('c', validators=[InputRequired()])
     coef_d = FloatField('d', validators=[InputRequired()])
-    step = FloatField('step', validators=[Optional()])
+    
 
     submit = SubmitField('Add data')
 
@@ -45,15 +46,16 @@ class DataForm(FlaskForm):
 class SqrtForm(FlaskForm):
     """ TODO: on submit check if begin and end are >= -c/b """
 
-    
     begin = FloatField('begin', validators=[InputRequired()])
     end = FloatField('end', validators=[InputRequired()])
+    step = FloatField('step', validators=[Optional()])
+
 
     coef_a = FloatField('a', validators=[DataRequired('Non-zero value.')])
     coef_b = FloatField('b', validators=[DataRequired('Non-zero value.')])
     coef_c = FloatField('c', validators=[InputRequired()])
     coef_d = FloatField('d', validators=[InputRequired()])
-    step = FloatField('step', validators=[Optional()])
+    
 
     submit = SubmitField('Add data')
 
@@ -61,11 +63,12 @@ class SqrtForm(FlaskForm):
 class SquareFuncForm(FlaskForm):
     begin = FloatField('begin', validators=[InputRequired()])
     end = FloatField('end', validators=[InputRequired()])
+    step = FloatField('step', validators=[Optional()])
 
     coef_a = FloatField('a', validators=[InputRequired()])
     coef_p = FloatField('p', validators=[InputRequired()])
     coef_q = FloatField('q', validators=[InputRequired()])
-    step = FloatField('step', validators=[Optional()])
+    
 
     submit = SubmitField('Add data')
 
@@ -75,6 +78,15 @@ class FromFileForm(FlaskForm):
     
     submit = SubmitField('Add data')
 
+
+class CustomEquationForm(FlaskForm):
+    begin = FloatField('begin', validators=[InputRequired()])
+    end = FloatField('end', validators=[InputRequired()])
+    step = FloatField('step', validators=[Optional()])
+
+    equation = StringField('Equation:',  validators=[DataRequired()])
+
+    submit = SubmitField('Add data')
 
 
 
@@ -354,3 +366,7 @@ class PygalOptionsForm (FlaskForm):
     flag_logscale_y = BooleanField("Log scale Y:")
     
     submit = SubmitField('Add data')
+
+
+
+

@@ -13,7 +13,7 @@
         <a id="link-to-sqrt-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_add_data', model_name='SquareRoot') }}">Square root</a>
         <a id="link-to-exp-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_add_data', model_name='Exponential') }}">Exponential</a>
         <a id="link-to-square-model" class="nav-link btn btn-lg btn-dark col-md-2" href="{{ url_for('route_add_data', model_name='SquareFunc') }}">Square</a>
-        <a id="link-to-custom-model" class="nav-link btn btn-lg btn-dark col-md-3" href="#">Custom</a>
+        <a id="link-to-custom-model" class="nav-link btn btn-lg btn-dark col-md-3" href="{{ url_for('route_add_data', model_name='CustomEquation') }}">Custom</a>
     </div>
     <div class="col-md-12" >
         <img id="show-data-main-image" class="w-100 h-100 mr-auto ml-auto col-md-12" src="{{ url_for('static', filename='main_qmark.png') }}" >

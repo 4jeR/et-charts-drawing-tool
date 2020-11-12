@@ -185,6 +185,33 @@ class SquareFunc(db.Model):
 
 
 
+class CustomEquation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    x_begin = db.Column(db.Float, unique=False, nullable=False)
+    x_end = db.Column(db.Float, unique=False, nullable=False)
+    step = db.Column(db.Float, unique=False, nullable=False)
+
+    equation = db.Column(db.String, unique=False, nullable=False)
+
+    id_matplotlib_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_seaborn_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
+    id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
+
+    @staticmethod
+    def get_domain_and_step(chart_id):
+        ''' Returns the range - list consisting two floats. '''
+        coefs_ok = CustomEquation.query.get(chart_id)
+        if coefs_ok:
+            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
+        else:
+            return [0, 1, 0.1]
+    
+   
+
+
+
 class MatplotlibPlotOptions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -382,3 +409,5 @@ class FilePlotOptions(db.Model):
     id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
     id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
     
+
+

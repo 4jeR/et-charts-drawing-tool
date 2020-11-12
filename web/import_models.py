@@ -10,6 +10,8 @@ from web.models import SquareFunc
 
 from web.models import FileDataPoint
 
+from web.models import CustomEquation
+
 from web.models import FilePlotOptions
 from web.models import MatplotlibPlotOptions
 from web.models import SeabornPlotOptions

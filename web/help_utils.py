@@ -983,7 +983,7 @@ def clean_unused_options(db):
         ).all()
         
         for option in options_to_delete:
-            if getattr(option, id.__name__) != used_ids.get(lib, -1):
+            if fpo and getattr(option, id.__name__) != used_ids.get(lib, -1):
                 db.session.delete(option)
     
     db.session.commit()
