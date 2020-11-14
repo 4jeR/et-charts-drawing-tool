@@ -19,6 +19,8 @@
             {% endif %}
         {% elif model_name == 'FileData' %}
             <h3 class="col-md-4 offset-4">Data from file {{ filename }} </h3>
+        {% elif model_name == 'CustomEquation' and custom_equation is defined %}
+            <h3> {{ custom_equation }} </h3>
         {% endif %}
     </div>
     <!-- Data table -->

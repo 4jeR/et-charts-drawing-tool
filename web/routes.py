@@ -37,6 +37,7 @@ from web.help_utils import save_source_code
 from web.help_utils import get_data_from_file
 from web.help_utils import get_recently_added_record
 from web.help_utils import clean_query
+from web.help_utils import string_to_mathjax
 
 from web.help_utils import get_default_matplotlib_options
 from web.help_utils import get_default_seaborn_options
@@ -272,36 +273,40 @@ def route_show_data(model_name, chart_id=-1):
     kw_options = dict()
     if chart_id != -1 and model_name != "FileDataPoint":
         ''' Get options for each library. '''
-        matplotlib_options_id = Model.query.get(chart_id).id_matplotlib_options
+        current_chart = Model.query.get(chart_id)
+
+        matplotlib_options_id = current_chart.id_matplotlib_options
         kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
 
-        seaborn_options_id = Model.query.get(chart_id).id_seaborn_options
+        seaborn_options_id = current_chart.id_seaborn_options
         kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(seaborn_options_id))
 
-        bokeh_options_id = Model.query.get(chart_id).id_bokeh_options
+        bokeh_options_id = current_chart.id_bokeh_options
         kw_options['bokeh_options'] = BokehPlotOptions.get_options(bokeh_options_id) 
 
-        plotly_options_id = Model.query.get(chart_id).id_plotly_options
+        plotly_options_id = current_chart.id_plotly_options
         kw_options['plotly_options'] = PlotlyPlotOptions.get_options(plotly_options_id) 
 
-        pygal_options_id = Model.query.get(chart_id).id_pygal_options
+        pygal_options_id = current_chart.id_pygal_options
         kw_options['pygal_options'] = PygalPlotOptions.get_options(pygal_options_id) 
 
     elif chart_id == -1 and model_name == "FileDataPoint":
         ''' Get options for each library. '''
-        matplotlib_options_id = FilePlotOptions.query.first().id_matplotlib_options
+        current_chart = FilePlotOptions.query.first()
+        
+        matplotlib_options_id = current_chart.id_matplotlib_options
         kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
 
-        seaborn_options_id = FilePlotOptions.query.first().id_seaborn_options
+        seaborn_options_id = current_chart.id_seaborn_options
         kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(seaborn_options_id))
 
-        bokeh_options_id = FilePlotOptions.query.first().id_bokeh_options
+        bokeh_options_id = current_chart.id_bokeh_options
         kw_options['bokeh_options'] = BokehPlotOptions.get_options(bokeh_options_id) 
 
-        plotly_options_id = FilePlotOptions.query.first().id_plotly_options
+        plotly_options_id = current_chart.id_plotly_options
         kw_options['plotly_options'] = PlotlyPlotOptions.get_options(plotly_options_id) 
 
-        pygal_options_id = FilePlotOptions.query.first().id_pygal_options
+        pygal_options_id = current_chart.id_pygal_options
         kw_options['pygal_options'] = PygalPlotOptions.get_options(pygal_options_id) 
 
     getable_models = ['Sinus', 'Cosinus', 'SquareRoot', 'Exponential', 'SquareFunc']
@@ -310,7 +315,9 @@ def route_show_data(model_name, chart_id=-1):
 
     if model_name in getable_models:
         kwargs['coefs'] = Model.get_coefs(chart_id)
-
+    elif chart_id != -1 and model_name == 'CustomEquation':
+        current_chart = Model.query.get(chart_id)
+        kwargs['custom_equation'] = string_to_mathjax(current_chart)
 
 
     bokeh_chart = make_chart_bokeh(model_name, chart_id, kw_options.get('bokeh_options', dict()))

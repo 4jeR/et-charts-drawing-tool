@@ -57,6 +57,18 @@ def formatted_code(code_str):
     return textwrap.dedent(code_str)
 
 
+def string_to_mathjax(chart):
+    try:
+        mathjax_string = ''
+        equation = chart.equation
+        mathjax_string += f'$$y={equation}$$'
+        mathjax_string = mathjax_string.replace('*', '')
+            
+        return mathjax_string
+    except:
+        print(f'[string_to_mathjax] Invalid chart (check query that returned {chart}).')
+        return 'Unknown equation'
+
 def make_points(model_name, chart_id):
     ''' Returns the list of points - tuples (x, y) from the database. '''
     points = []
@@ -99,7 +111,10 @@ def make_points(model_name, chart_id):
             elif model_name == 'SquareRoot':
                 for x in range(x_range):
                     xx = float(round(begin+x*step, 3))
-                    yy = float(round(a*sqrt(b*xx - c) + d, 3))
+                    val = 0
+                    if xx >= c/b:
+                        val = sqrt(b*xx - c)
+                    yy = float(round(a*val + d, 3))
                     points.append((xx, yy))
 
             elif model_name == 'Exponential':
@@ -113,6 +128,16 @@ def make_points(model_name, chart_id):
                     xx = float(round(begin+x*step, 3))
                     yy = float(round(a*(xx - p)**2 + q, 3))
                     points.append((xx, yy))
+
+            elif model_name == 'CustomEquation':
+                correct_equation = chart.equation
+                
+                equation_func = lambda x: eval(correct_equation)
+                for x in range(x_range):
+                    xx = float(round(begin+x*step, 3))
+                    yy = float(round(equation_func(xx), 3))
+                    points.append((xx, yy))
+
 
     elif chart_id == -1 and model_name == "FileDataPoint":
         data_points = FileDataPoint.query.all()
