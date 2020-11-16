@@ -1,5 +1,9 @@
  
 {% extends "layout.html" %}
 {% block content %}
-    <h1>Home page</h1>
+    <div class="row pt-5">
+        <div class="col-md-12" >
+            <img id="show-data-main-image" class="w-100 h-100 mr-auto ml-auto col-md-12" src="{{ url_for('static', filename='home_background.png') }}" >
+        </div>
+    </div>
 {% endblock content %}

@@ -19,24 +19,23 @@ class Sinus(db.Model):
     id_bokeh_options = db.Column(db.Integer, unique=False, nullable=False)
     id_plotly_options = db.Column(db.Integer, unique=False, nullable=False)
     id_pygal_options = db.Column(db.Integer, unique=False, nullable=False)
-
-
+                                                                          
 
     @staticmethod
     def get_domain_and_step(chart_id):
-        ''' Returns the range - list consisting two floats. '''
-        coefs_ok = Sinus.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
+        ''' Returns the list of 3 elements: begin, end and step of the function. '''
+        chart = Sinus.query.get(chart_id)
+        if chart:
+            return [chart.x_begin, chart.x_end, chart.step] 
         else:
             return [0, 1, 0.1]
     
     @staticmethod
     def get_coefs(chart_id):
         ''' Returns the list of all model coefficients. '''
-        coefs_ok = Sinus.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
+        chart = Sinus.query.get(chart_id)
+        if chart:
+            return [chart.a, chart.b, chart.c, chart.d]
         else:
             return ['?', '?', '?', '?']
     
@@ -60,19 +59,19 @@ class Cosinus(db.Model):
    
     @staticmethod
     def get_domain_and_step(chart_id):
-        ''' Returns the range - list consisting two floats. '''
-        coefs_ok = Cosinus.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
+        ''' Returns the list of 3 elements: begin, end and step of the function. '''
+        chart = Cosinus.query.get(chart_id)
+        if chart:
+            return [chart.x_begin, chart.x_end, chart.step] 
         else:
             return [0, 1, 0.1]
     
     @staticmethod
     def get_coefs(chart_id):
         ''' Returns the list of all model coefficients. '''
-        coefs_ok = Cosinus.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
+        chart = Cosinus.query.get(chart_id)
+        if chart:
+            return [chart.a, chart.b, chart.c, chart.d]
         else:
             return ['?', '?', '?', '?']
 
@@ -96,19 +95,19 @@ class SquareRoot(db.Model):
 
     @staticmethod
     def get_domain_and_step(chart_id):
-        ''' Returns the range - list consisting two floats. '''
-        coefs_ok = SquareRoot.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
+        ''' Returns the list of 3 elements: begin, end and step of the function. '''
+        chart = SquareRoot.query.get(chart_id)
+        if chart:
+            return [chart.x_begin, chart.x_end, chart.step] 
         else:
             return [0, 1, 0.1]
     
     @staticmethod
     def get_coefs(chart_id):
         ''' Returns the list of all model coefficients. '''
-        coefs_ok = SquareRoot.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
+        chart = SquareRoot.query.get(chart_id)
+        if chart:
+            return [chart.a, chart.b, chart.c, chart.d]
         else:
             return ['?', '?', '?', '?']
 
@@ -133,19 +132,19 @@ class Exponential(db.Model):
 
     @staticmethod
     def get_domain_and_step(chart_id):
-        ''' Returns the range - list consisting two floats. '''
-        coefs_ok = Exponential.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
+        ''' Returns the list of 3 elements: begin, end and step of the function. '''
+        chart = Exponential.query.get(chart_id)
+        if chart:
+            return [chart.x_begin, chart.x_end, chart.step] 
         else:
             return [0, 1, 0.1]
     
     @staticmethod
     def get_coefs(chart_id):
         ''' Returns the list of all model coefficients. '''
-        coefs_ok = Exponential.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.a, coefs_ok.b, coefs_ok.c, coefs_ok.d]
+        chart = Exponential.query.get(chart_id)
+        if chart:
+            return [chart.a, chart.b, chart.c, chart.d]
         else:
             return ['?', '?', '?', '?']
 
@@ -168,18 +167,18 @@ class SquareFunc(db.Model):
 
     @staticmethod
     def get_domain_and_step(chart_id):
-        ''' Returns the range - list consisting two floats. '''
-        coefs_ok = SquareFunc.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
+        ''' Returns the list of 3 elements: begin, end and step of the function. '''
+        chart = SquareFunc.query.get(chart_id)
+        if chart:
+            return [chart.x_begin, chart.x_end, chart.step] 
         else:
             return [0, 1, 0.1]
     
     def get_coefs(chart_id):
         ''' Returns the list of all model coefficients. '''
-        coefs_ok = SquareFunc.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.a, coefs_ok.p, coefs_ok.q]
+        chart = SquareFunc.query.get(chart_id)
+        if chart:
+            return [chart.a, chart.p, chart.q]
         else:
             return ['a', 'p', 'q']
 
@@ -201,10 +200,10 @@ class CustomEquation(db.Model):
 
     @staticmethod
     def get_domain_and_step(chart_id):
-        ''' Returns the range - list consisting two floats. '''
-        coefs_ok = CustomEquation.query.get(chart_id)
-        if coefs_ok:
-            return [coefs_ok.x_begin, coefs_ok.x_end, coefs_ok.step] 
+        ''' Returns the list of 3 elements: begin, end and step of the function. '''
+        chart = CustomEquation.query.get(chart_id)
+        if chart:
+            return [chart.x_begin, chart.x_end, chart.step] 
         else:
             return [0, 1, 0.1]
     
@@ -229,19 +228,19 @@ class MatplotlibPlotOptions(db.Model):
     @staticmethod
     def get_options(options_id):
         ''' Returns the dictionary of options. '''
-        coefs_ok = MatplotlibPlotOptions.query.get(options_id)
+        chart = MatplotlibPlotOptions.query.get(options_id)
         
-        if coefs_ok:
+        if chart:
             return {
-                'color': coefs_ok.color, 
-                'bg_color': coefs_ok.bg_color,
-                'line_width': coefs_ok.line_width,
-                'line_style': coefs_ok.line_style,
-                'marker': coefs_ok.marker,
-                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
-                'flag_show_grid': coefs_ok.flag_show_grid,
-                'flag_logscale_x': coefs_ok.flag_logscale_x,
-                'flag_logscale_y': coefs_ok.flag_logscale_y
+                'color': chart.color, 
+                'bg_color': chart.bg_color,
+                'line_width': chart.line_width,
+                'line_style': chart.line_style,
+                'marker': chart.marker,
+                'flag_scatter_plot': chart.flag_scatter_plot,
+                'flag_show_grid': chart.flag_show_grid,
+                'flag_logscale_x': chart.flag_logscale_x,
+                'flag_logscale_y': chart.flag_logscale_y
             }
         else:
             return dict()
@@ -264,19 +263,19 @@ class SeabornPlotOptions(db.Model):
     @staticmethod
     def get_options(options_id):
         ''' Returns the dictionary of options. '''
-        coefs_ok = SeabornPlotOptions.query.get(options_id)
+        chart = SeabornPlotOptions.query.get(options_id)
         
-        if coefs_ok:
+        if chart:
             return {
-                'color': coefs_ok.color, 
-                'bg_color': coefs_ok.bg_color, 
-                'line_width': coefs_ok.line_width,
-                'line_style': coefs_ok.line_style,
-                'marker': coefs_ok.marker,
-                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
-                'flag_show_grid': coefs_ok.flag_show_grid,
-                'flag_logscale_x': coefs_ok.flag_logscale_x,
-                'flag_logscale_y': coefs_ok.flag_logscale_y
+                'color': chart.color, 
+                'bg_color': chart.bg_color, 
+                'line_width': chart.line_width,
+                'line_style': chart.line_style,
+                'marker': chart.marker,
+                'flag_scatter_plot': chart.flag_scatter_plot,
+                'flag_show_grid': chart.flag_show_grid,
+                'flag_logscale_x': chart.flag_logscale_x,
+                'flag_logscale_y': chart.flag_logscale_y
             }
         else:
             return dict()
@@ -300,19 +299,19 @@ class BokehPlotOptions(db.Model):
     @staticmethod
     def get_options(options_id):
         ''' Returns the dictionary of options. '''
-        coefs_ok = BokehPlotOptions.query.get(options_id)
+        chart = BokehPlotOptions.query.get(options_id)
         
-        if coefs_ok:
+        if chart:
             return {
-                'color': coefs_ok.color, 
-                'bg_color': coefs_ok.bg_color,
-                'line_width': coefs_ok.line_width,
-                'line_style': coefs_ok.line_style,
-                'marker': coefs_ok.marker,
-                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
-                'flag_show_grid': coefs_ok.flag_show_grid,
-                'flag_logscale_x': coefs_ok.flag_logscale_x,
-                'flag_logscale_y': coefs_ok.flag_logscale_y
+                'color': chart.color, 
+                'bg_color': chart.bg_color,
+                'line_width': chart.line_width,
+                'line_style': chart.line_style,
+                'marker': chart.marker,
+                'flag_scatter_plot': chart.flag_scatter_plot,
+                'flag_show_grid': chart.flag_show_grid,
+                'flag_logscale_x': chart.flag_logscale_x,
+                'flag_logscale_y': chart.flag_logscale_y
             }
         else:
             return dict()
@@ -335,19 +334,19 @@ class PlotlyPlotOptions(db.Model):
     @staticmethod
     def get_options(options_id):
         ''' Returns the dictionary of options. '''
-        coefs_ok = PlotlyPlotOptions.query.get(options_id)
+        chart = PlotlyPlotOptions.query.get(options_id)
         
-        if coefs_ok:
+        if chart:
             return {
-                'color': coefs_ok.color, 
-                'bg_color': coefs_ok.bg_color, 
-                'line_width': coefs_ok.line_width,
-                'line_style': coefs_ok.line_style,
-                'marker': coefs_ok.marker,
-                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
-                'flag_show_grid': coefs_ok.flag_show_grid,
-                'flag_logscale_x': coefs_ok.flag_logscale_x,
-                'flag_logscale_y': coefs_ok.flag_logscale_y
+                'color': chart.color, 
+                'bg_color': chart.bg_color, 
+                'line_width': chart.line_width,
+                'line_style': chart.line_style,
+                'marker': chart.marker,
+                'flag_scatter_plot': chart.flag_scatter_plot,
+                'flag_show_grid': chart.flag_show_grid,
+                'flag_logscale_x': chart.flag_logscale_x,
+                'flag_logscale_y': chart.flag_logscale_y
             }
         else:
             return dict()
@@ -370,18 +369,18 @@ class PygalPlotOptions(db.Model):
     @staticmethod
     def get_options(options_id):
         ''' Returns the dictionary of options. '''
-        coefs_ok = PygalPlotOptions.query.get(options_id)
+        chart = PygalPlotOptions.query.get(options_id)
         
-        if coefs_ok:
+        if chart:
             return {
-                'color': coefs_ok.color, 
-                'bg_color': coefs_ok.bg_color, 
-                'line_width': coefs_ok.line_width,
-                'line_style': coefs_ok.line_style,
-                'marker': coefs_ok.marker,
-                'flag_scatter_plot': coefs_ok.flag_scatter_plot,
-                'flag_show_grid': coefs_ok.flag_show_grid,
-                'flag_logscale_y': coefs_ok.flag_logscale_y
+                'color': chart.color, 
+                'bg_color': chart.bg_color, 
+                'line_width': chart.line_width,
+                'line_style': chart.line_style,
+                'marker': chart.marker,
+                'flag_scatter_plot': chart.flag_scatter_plot,
+                'flag_show_grid': chart.flag_show_grid,
+                'flag_logscale_y': chart.flag_logscale_y
             }
         else:
             return dict()

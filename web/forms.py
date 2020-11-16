@@ -30,8 +30,8 @@ def validate_begin_end(FormName):
 
 
 class DataForm(FlaskForm):
-    begin = FloatField('begin', validators=[InputRequired()])
-    end = FloatField('end', validators=[InputRequired()])
+    begin = FloatField('begin', validators=[Optional()])
+    end = FloatField('end', validators=[Optional()])
     step = FloatField('step', validators=[Optional()])
 
     coef_a = FloatField('a', validators=[DataRequired('Non-zero value.')])

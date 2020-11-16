@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1 class="col-md-12">Change data for {{ model_name }} </h1> 
+<div class="col-md-12">
+    {% if model_name == 'Sinus' %}
+        <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}}$$</h3>
+        <h3>$$y = {a\sin{(bx - c)} + d}$$</h3>
+    {% elif model_name == 'Cosinus' %}
+        <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
+        <h3>$$y = {a\cos{(bx - c)} + d}$$</h3>
+    {% elif model_name == 'SquareRoot' %}
+        <h3>$$y = {a\sqrt{bx - c} + d}$$</h3>
+    {% elif model_name == 'Exponential' %}
+        <h3>$$y = {ae^{b(x - c)} + d}$$</h3>
+    {% elif model_name == 'SquareFunc' %}
+        <h3>$$ y = {a({x - p})^2 + q} $$</h3>
+    {% else %}
+        <h2>Unknown equation </h2>
+    {% endif %}
+    <h3> {{ coefs }}</h3>
+</div>
+<div class="row">
+    <form class="col md-6 offset-5" method="POST" >
+        {{ form.hidden_tag() }}
+        {% if model_name in ['Sinus', 'Cosinus', 'SquareRoot', 'Exponential'] %}
+            <div class="form-group">
+                <b>{{ form.coef_a.label(for="a", class="col-md-1 col-form-label") }}</b>
+                {{ form.coef_a(id="coef_a", class="form-control form-control-md col-md-3")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.coef_b.label(for="b", class="col-md-1 col-form-label") }}</b>
+                {{ form.coef_b(id="coef_b", class="form-control form-control-md col-md-3")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.coef_c.label(for="c", class="col-md-1 col-form-label") }}</b>
+                {{ form.coef_c(id="coef_c", class="form-control form-control-md col-md-3")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.coef_d.label(for="d", class="col-md-1 col-form-label") }}</b>
+                {{ form.coef_d(id="coef_d", class="form-control form-control-md col-md-3")}}
+            </div>
+        {% elif model_name == 'SquareFunc' %}
+            <div class="form-group">
+                <b>{{ form.coef_a.label(for="a", class="col-md-1 col-form-label") }}</b>
+                {{ form.coef_a(id="coef_a", class="form-control form-control-md col-md-3")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.coef_p.label(for="p", class="col-md-1 col-form-label") }}</b>
+                {{ form.coef_p(id="coef_p", class="form-control form-control-md col-md-3")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.coef_q.label(for="q", class="col-md-1 col-form-label") }}</b>
+                {{ form.coef_q(id="coef_q", class="form-control form-control-md col-md-3")}}
+            </div>
+            <div class="form-group">
+                <b>{{ form.step.label(for="step", class="col-md-1 col-form-label") }}</b>
+                {{ form.step(id="step", class="form-control form-control-md col-md-3")}}
+            </div>
+        {% elif model_name == 'CustomEquation' %}
+            <div class="form-group">
+                <b>{{ form.equation.label(for="equation", class="col-md-1 col-form-label") }}</b>
+                {{ form.equation(id="equation", class="form-control form-control-md col-md-6")}}
+            </div>
+        {% endif %}
+        <button type="submit" class="col-md-3 btn btn-dark">Change data</button>
+    </form>
+</div>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+{% endblock content %}

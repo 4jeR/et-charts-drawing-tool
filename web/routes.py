@@ -342,8 +342,55 @@ def route_show_data(model_name, chart_id=-1):
     return render_template('show_data.html', model_name=model_name, chart_id=chart_id, records=records,  **kwargs, **kwforms, **kw_options)
 
 
-@app.route("/data/change_options/<string:library_name>/<string:model_name>", methods=['GET', 'POST'])
-@app.route("/data/change_options/<string:library_name>/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
+@app.route("/data/change/coefs/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
+@clean_query(db=db)
+def route_change_coefs(model_name, chart_id=-1):
+    Model = str_to_object(model_name)
+    model_object = Model.query.get(chart_id)
+
+    common_models = ['Sinus', 'Cosinus', 'Exponential']
+    if model_name in common_models:
+        form = DataForm()
+    elif model_name == 'SquareRoot':
+        form = SqrtForm()
+    elif model_name == 'SquareFunc':
+        form = SquareFuncForm()
+    elif model_name == 'CustomEquation':
+        form = CustomEquationForm()
+
+    coefs = dict()
+
+    coefs = model_object.get_coefs(chart_id)
+
+    if form.validate_on_submit():
+        if model_name in common_models or model_name == 'SquareRoot':
+            model_object.a = form.coef_a.data
+            model_object.b = form.coef_b.data
+            model_object.c = form.coef_c.data
+            model_object.d = form.coef_d.data
+        elif model_name == 'SquareFunc':
+            model_object.a = form.coef_a.data
+            model_object.p = form.coef_p.data
+            model_object.q = form.coef_q.data
+        
+        
+        db.session.commit()
+        
+        flash(f'Changed coefficients for {chart_id} {model_name}!', 'success')
+        return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
+    return render_template("change_data.html", model_name=model_name, chart_id=chart_id, form=form, coefs=coefs)
+    
+
+
+
+
+
+
+
+
+
+@app.route("/data/change/options/<string:library_name>/<string:model_name>", methods=['GET', 'POST'])
+@app.route("/data/change/options/<string:library_name>/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
 @clean_query(db=db)
 def route_change_options(library_name, model_name, chart_id=-1):
     """ Inserts new option OptionsForm."""
