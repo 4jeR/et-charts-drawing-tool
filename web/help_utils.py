@@ -135,7 +135,10 @@ def make_points(model_name, chart_id):
                 equation_func = lambda x: eval(correct_equation)
                 for x in range(x_range):
                     xx = float(round(begin+x*step, 3))
-                    yy = float(round(equation_func(xx), 3))
+                    try:
+                        yy = float(round(equation_func(xx), 3))
+                    except:
+                        yy = 0
                     points.append((xx, yy))
 
 
@@ -973,43 +976,47 @@ def clean_unused_options(db):
         FilePlotOptions.query.filter(FilePlotOptions.id != fpo.id).delete()
         db.session.commit()
     
-        used_ids = {
+        file_data_used_option_ids = {
             'matplotlib': fpo.id_matplotlib_options,
             'seaborn':  fpo.id_seaborn_options,
             'bokeh': fpo.id_bokeh_options,
             'plotly': fpo.id_plotly_options,
-            'pygal': fpo.id_pygal_options
+            'pygal': fpo.id_pygal_options,
         }
+    else:
+        file_data_used_option_ids = dict()
 
     for lib in LIBS:
         LPO = str_to_object(f'{lib.capitalize()}PlotOptions')
         id_library_options = f'id_{lib}_options'
         
-        sin_unused_lib_ids  = (id_ for id_, in Sinus.query.with_entities(getattr(Sinus, id_library_options)))
-        cos_unused_lib_ids  = (id_ for id_, in Cosinus.query.with_entities(getattr(Cosinus, id_library_options)))
-        sqrt_unused_lib_ids = (id_ for id_, in SquareRoot.query.with_entities(getattr(SquareRoot, id_library_options)))
-        exp_unused_lib_ids  = (id_ for id_, in Exponential.query.with_entities(getattr(Exponential, id_library_options)))
-        sqf_unused_lib_ids  = (id_ for id_, in SquareFunc.query.with_entities(getattr(SquareFunc, id_library_options)))
+        sin_used_lib_ids  = (id_ for id_, in Sinus.query.with_entities(getattr(Sinus, id_library_options)))
+        cos_used_lib_ids  = (id_ for id_, in Cosinus.query.with_entities(getattr(Cosinus, id_library_options)))
+        sqrt_used_lib_ids = (id_ for id_, in SquareRoot.query.with_entities(getattr(SquareRoot, id_library_options)))
+        exp_used_lib_ids  = (id_ for id_, in Exponential.query.with_entities(getattr(Exponential, id_library_options)))
+        sqf_used_lib_ids  = (id_ for id_, in SquareFunc.query.with_entities(getattr(SquareFunc, id_library_options)))
+        csm_used_lib_ids  = (id_ for id_, in CustomEquation.query.with_entities(getattr(CustomEquation, id_library_options)))
         
-        unused_ids = (
-            *sin_unused_lib_ids, 
-            *cos_unused_lib_ids, 
-            *sqrt_unused_lib_ids, 
-            *exp_unused_lib_ids, 
-            *sqf_unused_lib_ids
+        used_ids = (
+            *sin_used_lib_ids, 
+            *cos_used_lib_ids, 
+            *sqrt_used_lib_ids, 
+            *exp_used_lib_ids, 
+            *sqf_used_lib_ids,
+            *csm_used_lib_ids,
+            *file_data_used_option_ids.values()
         )
 
         options_to_delete = LPO.query.filter(
             LPO.id.in_(
                 LPO.query.filter(
-                    ~LPO.id.in_(unused_ids)
+                    ~LPO.id.in_(used_ids)
                 ).with_entities(LPO.id)
             )
         ).all()
         
         for option in options_to_delete:
-            if fpo and getattr(option, id.__name__) != used_ids.get(lib, -1):
-                db.session.delete(option)
+            db.session.delete(option)
     
     db.session.commit()
 

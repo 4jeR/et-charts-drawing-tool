@@ -347,6 +347,7 @@ def route_show_data(model_name, chart_id=-1):
 def route_change_coefs(model_name, chart_id=-1):
     Model = str_to_object(model_name)
     model_object = Model.query.get(chart_id)
+    
 
     common_models = ['Sinus', 'Cosinus', 'Exponential']
     if model_name in common_models:
@@ -358,9 +359,7 @@ def route_change_coefs(model_name, chart_id=-1):
     elif model_name == 'CustomEquation':
         form = CustomEquationForm()
 
-    coefs = dict()
-
-    coefs = model_object.get_coefs(chart_id)
+    coefs = model_object.get_coefs(chart_id)    
 
     if form.validate_on_submit():
         if model_name in common_models or model_name == 'SquareRoot':
@@ -372,6 +371,7 @@ def route_change_coefs(model_name, chart_id=-1):
             model_object.a = form.coef_a.data
             model_object.p = form.coef_p.data
             model_object.q = form.coef_q.data
+
         
         
         db.session.commit()
@@ -380,14 +380,6 @@ def route_change_coefs(model_name, chart_id=-1):
         return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
     return render_template("change_data.html", model_name=model_name, chart_id=chart_id, form=form, coefs=coefs)
     
-
-
-
-
-
-
-
-
 
 @app.route("/data/change/options/<string:library_name>/<string:model_name>", methods=['GET', 'POST'])
 @app.route("/data/change/options/<string:library_name>/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
@@ -427,7 +419,6 @@ def route_change_options(library_name, model_name, chart_id=-1):
 
 
         if model_name != "FileDataPoint" and chart_id != -1:
-            ''' get old options to be replaced and after replacing, delete the old'''
             current_chart = Model.query.get(chart_id)
             setattr(current_chart, id_library_options, new_options_id) 
             db.session.commit()

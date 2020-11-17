@@ -2,22 +2,24 @@
 {% block content %}
 <h1 class="col-md-12">Change data for {{ model_name }} </h1> 
 <div class="col-md-12">
-    {% if model_name == 'Sinus' %}
-        <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}}$$</h3>
-        <h3>$$y = {a\sin{(bx - c)} + d}$$</h3>
-    {% elif model_name == 'Cosinus' %}
-        <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
-        <h3>$$y = {a\cos{(bx - c)} + d}$$</h3>
-    {% elif model_name == 'SquareRoot' %}
-        <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% elif coefs[2] > 0 %} - {{ coefs[2] }} {% endif %} } {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
-        <h3>$$y = {a\sqrt{bx - c} + d}$$</h3>
-    {% elif model_name == 'Exponential' %}
-        <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x {% if coefs[2] < 0 %} + {{ -coefs[2]  }}) {% elif coefs[2] > 0 %} - {{ coefs[2] }}) {% else %} ) {% endif %}} } {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %} $$</h3>
-        <h3>$$y = {ae^{b(x - c)} + d}$$</h3>
-    {% elif model_name == 'SquareFunc' %}
-        <h3>$$ y = {a({x - p})^2 + q} $$</h3>
-    {% else %}
-        <h2>Unknown equation </h2>
+    {% if coefs is defined and coefs[0] != '?' %}
+        {% if model_name == 'Sinus' %}
+            <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}}$$</h3>
+            <h3>$$y = {a\sin{(bx - c)} + d}$$</h3>
+        {% elif model_name == 'Cosinus' %}
+            <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
+            <h3>$$y = {a\cos{(bx - c)} + d}$$</h3>
+        {% elif model_name == 'SquareRoot' %}
+            <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% elif coefs[2] > 0 %} - {{ coefs[2] }} {% endif %} } {% if coefs[3] < 0 %} {{ coefs[3] }} {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
+            <h3>$$y = {a\sqrt{bx - c} + d}$$</h3>
+        {% elif model_name == 'Exponential' %}
+            <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x {% if coefs[2] < 0 %} + {{ -coefs[2]  }}) {% elif coefs[2] > 0 %} - {{ coefs[2] }}) {% else %} ) {% endif %}} } {% if coefs[3] < 0 %} {{ coefs[3] }} {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %} $$</h3>
+            <h3>$$y = {ae^{b(x - c)} + d}$$</h3>
+        {% elif model_name == 'SquareFunc' %}
+            <h3>$$ y = {a({x - p})^2 + q} $$</h3>
+        {% else %}
+            <h2>Unknown equation </h2>
+        {% endif %}
     {% endif %}
 </div>
 <div class="row">
