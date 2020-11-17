@@ -2,13 +2,13 @@ import os
 import sys
 import json
 import time
-import inspect
 
 from math import cos
 from math import exp 
 from math import log
 from math import sin
 from math import sqrt
+from math import tan
 import textwrap
 import pandas as pd
 from datetime import datetime

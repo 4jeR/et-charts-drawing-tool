@@ -3,19 +3,19 @@
 <div class="row">
     <!-- MathJax - equation -->
     <!-- <div class="col-md-12" class="btn btn-lg btn-dark">[DEBUG] Chart_id = {{ chart_id }}, model_name = {{ model_name }} </div> -->
-
-    <div class="col-md-12"">
+    
+    <div class="col-md-12 pt-4">
         {% if coefs is defined and coefs[0] != '?' %}
             {% if model_name == 'Sinus' %}
-                <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}}$$</h3>
+                <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% elif coefs[2] > 0 %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
             {% elif model_name == 'Cosinus' %}
-                <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
+                <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% elif coefs[2] > 0 %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
             {% elif model_name == 'SquareRoot' %}
-                <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x - {{ coefs[2] }}} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %} $$</h3>
+                <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% elif coefs[2] > 0 %} - {{ coefs[2] }} {% endif %} } {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
             {% elif model_name == 'Exponential' %}
-                <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %} $$</h3>
+                <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x {% if coefs[2] < 0 %} + {{ -coefs[2]  }}) {% elif coefs[2] > 0 %} - {{ coefs[2] }}) {% else %} ) {% endif %}} } {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %} $$</h3>
             {% elif model_name == 'SquareFunc' %}
-                <h3>$$ y = { {{coefs[0]}}({x - {{coefs[1]}}})^2 + {{coefs[2]}}} $$</h3>
+                <h3>$$ y = { {{ coefs[0] }} ({x {% if coefs[1] < 0 %} + {{ -coefs[1] }} {% else %} - {{ coefs[1] }} {% endif %} })^2 {% if coefs[2] < 0 %} coefs[2] {% elif coefs[2] > 0 %} + {{ coefs[2] }} {% endif %}  } $$</h3>
             {% endif %}
         {% elif model_name == 'FileData' %}
             <h3 class="col-md-4 offset-4">Data from file {{ filename }} </h3>
@@ -82,9 +82,11 @@
                                 <form action="{{ url_for('route_show_data', model_name=model_name, chart_id=chart.id) }}" method="POST">
                                     <input class="btn btn-info" type="submit" value="Select">
                                 </form>
+                                {% if model_name != 'CustomEquation' %}
                                 <form action="{{ url_for('route_change_coefs', model_name=model_name, chart_id=chart.id) }}" method="POST">
                                     <input class="btn btn-warning" type="submit" value="Change">
                                 </form>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

@@ -46,8 +46,8 @@ class DataForm(FlaskForm):
 class SqrtForm(FlaskForm):
     """ TODO: on submit check if begin and end are >= -c/b """
 
-    begin = FloatField('begin', validators=[InputRequired()])
-    end = FloatField('end', validators=[InputRequired()])
+    begin = FloatField('begin', validators=[Optional()])
+    end = FloatField('end', validators=[Optional()])
     step = FloatField('step', validators=[Optional()])
 
 
@@ -61,8 +61,8 @@ class SqrtForm(FlaskForm):
 
 
 class SquareFuncForm(FlaskForm):
-    begin = FloatField('begin', validators=[InputRequired()])
-    end = FloatField('end', validators=[InputRequired()])
+    begin = FloatField('begin', validators=[Optional()])
+    end = FloatField('end', validators=[Optional()])
     step = FloatField('step', validators=[Optional()])
 
     coef_a = FloatField('a', validators=[InputRequired()])
@@ -80,8 +80,8 @@ class FromFileForm(FlaskForm):
 
 
 class CustomEquationForm(FlaskForm):
-    begin = FloatField('begin', validators=[InputRequired()])
-    end = FloatField('end', validators=[InputRequired()])
+    begin = FloatField('begin', validators=[Optional()])
+    end = FloatField('end', validators=[Optional()])
     step = FloatField('step', validators=[Optional()])
 
     equation = StringField('Equation:',  validators=[DataRequired()])

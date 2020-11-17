@@ -180,7 +180,7 @@ class SquareFunc(db.Model):
         if chart:
             return [chart.a, chart.p, chart.q]
         else:
-            return ['a', 'p', 'q']
+            return ['?', '?', '?']
 
 
 

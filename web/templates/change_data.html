@@ -9,15 +9,16 @@
         <h3>$$y = { {{ coefs[0] }}\cos{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% else %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
         <h3>$$y = {a\cos{(bx - c)} + d}$$</h3>
     {% elif model_name == 'SquareRoot' %}
+        <h3>$$y = { {{ coefs[0] }}\sqrt{ {{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% elif coefs[2] > 0 %} - {{ coefs[2] }} {% endif %} } {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
         <h3>$$y = {a\sqrt{bx - c} + d}$$</h3>
     {% elif model_name == 'Exponential' %}
+        <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x {% if coefs[2] < 0 %} + {{ -coefs[2]  }}) {% elif coefs[2] > 0 %} - {{ coefs[2] }}) {% else %} ) {% endif %}} } {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %} $$</h3>
         <h3>$$y = {ae^{b(x - c)} + d}$$</h3>
     {% elif model_name == 'SquareFunc' %}
         <h3>$$ y = {a({x - p})^2 + q} $$</h3>
     {% else %}
         <h2>Unknown equation </h2>
     {% endif %}
-    <h3> {{ coefs }}</h3>
 </div>
 <div class="row">
     <form class="col md-6 offset-5" method="POST" >
