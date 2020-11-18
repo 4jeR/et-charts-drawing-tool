@@ -403,9 +403,14 @@ def route_change_options(library_name, model_name, chart_id=-1):
         kwargs['line_style'] = library_form.line_style.data
         kwargs['marker'] = library_form.marker.data
 
-        kwargs['flag_bar_plot'] = library_form.flag_bar_plot.data
+        if library_name != 'seaborn':
+            kwargs['flag_bar_plot'] = library_form.flag_bar_plot.data
         kwargs['flag_scatter_plot'] = library_form.flag_scatter_plot.data
         kwargs['flag_show_grid'] = library_form.flag_show_grid.data
+
+        kwargs['x_label'] = library_form.x_label.data
+        kwargs['y_label'] = library_form.y_label.data
+        kwargs['title'] = library_form.title.data
 
         if library_name != 'pygal':
             kwargs['flag_logscale_x'] = library_form.flag_logscale_x.data

@@ -78,24 +78,35 @@
             });
         });
 
+        var show_scatter_matplotlib = true;
         $(function() {
             $('#option-matplotlib-scatter').click(function() {
-                if (show_bar_matplotlib){
+                if (show_scatter_matplotlib){
                     $('#option-matplotlib-bar').hide();
                     $('#option-matplotlib-outline-color').hide();
                     $('#option-matplotlib-line-style').hide();
-                    
                 }
                 else {
                     $('#option-matplotlib-bar').show();
                     $('#option-matplotlib-outline-color').show();
                     $('#option-matplotlib-line-style').show();
-
                 }
-                show_bar_matplotlib = !show_bar_matplotlib;
+                show_scatter_matplotlib = !show_scatter_matplotlib;
             });
         });
 
+        var show_scatter_seaborn = true;
+        $(function() {
+            $('#option-seaborn-scatter').click(function() {
+                if (show_scatter_seaborn){
+                    $('#option-seaborn-line-style').hide();
+                }
+                else {
+                    $('#option-seaborn-line-style').show();
+                }
+                show_scatter_seaborn = !show_scatter_seaborn;
+            });
+        });
 
 
     </script>

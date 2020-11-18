@@ -157,6 +157,10 @@ class MatplotlibOptionsForm(FlaskForm):
     flag_logscale_x = BooleanField("Log scale X:")
     flag_logscale_y = BooleanField("Log scale Y:")
     
+    x_label = StringField('X label:',  validators=[Optional()], default='x')
+    y_label = StringField('Y label:',  validators=[Optional()], default='y')
+    title = StringField('Title:',  validators=[Optional()], default='Matplotlib')
+
     submit = SubmitField('Add data')
 
 
@@ -173,6 +177,7 @@ class SeabornOptionsForm(FlaskForm):
             ('#4f84bd', 'blue')
         ]
     )
+    
 
     bg_color = SelectField('Background color: ', choices=[
             ('#292928', 'black'),
@@ -212,6 +217,10 @@ class SeabornOptionsForm(FlaskForm):
     flag_logscale_x = BooleanField("Log scale X:")
     flag_logscale_y = BooleanField("Log scale Y:")
     
+    x_label = StringField('X label:',  validators=[Optional()], default='x')
+    y_label = StringField('Y label:',  validators=[Optional()], default='y')
+    title = StringField('Title:',  validators=[Optional()], default='Seaborn')
+
     submit = SubmitField('Add data')
 
 
