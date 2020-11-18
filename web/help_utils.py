@@ -225,19 +225,23 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
 
     kwargs = dict()
     
-    kwargs['color']     = options.get('color', 'r')              
+    kwargs['color']      = options.get('color', 'r')              
     
-    kwargs['linewidth'] = options.get('line_width', 2)           
-    kwargs['linestyle'] = options.get('line_style', 'solid') 
-    bar_plot            = options.get('flag_bar_plot', False)
+    kwargs['linewidth']  = options.get('line_width', 2)           
+    kwargs['linestyle']  = options.get('line_style', 'solid') 
+    bar_plot             = options.get('flag_bar_plot', False)
     if not bar_plot:   
-        kwargs['marker']    = options.get('marker', '.')              
-    scatter_plot        = options.get('flag_scatter_plot', False)
-    show_grid           = options.get('flag_show_grid', False)    
-    logscale_x          = options.get('flag_logscale_x', False )
-    logscale_y          = options.get('flag_logscale_y', False )
-    background_color    = options.get('bg_color', '#dbdbdb')
+        kwargs['marker'] = options.get('marker', '.')              
+    scatter_plot         = options.get('flag_scatter_plot', False)
+    show_grid            = options.get('flag_show_grid', False)    
+    logscale_x           = options.get('flag_logscale_x', False )
+    logscale_y           = options.get('flag_logscale_y', False )
+    background_color     = options.get('bg_color', '#dbdbdb')
     
+    x_label              = options.get('x_label', 'x')
+    y_label              = options.get('y_label', 'y')
+    title                = options.get('title', 'Matplotlib')
+
     chart.set_facecolor(background_color)
     
     if logscale_x:
@@ -251,9 +255,9 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
     else:
         chart.grid(False)
 
-    chart.set_xlabel('x')
-    chart.set_ylabel('y')
-    chart.set_title('Matplotlib')
+    chart.set_xlabel(x_label)
+    chart.set_ylabel(y_label)
+    chart.set_title(title)
     
     ''' Plot on the figure and return this object to embed in web page '''
     if scatter_plot:
@@ -293,19 +297,19 @@ def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     fig.set_edgecolor('red')
 
     seaborn_style = dict()
-    flag_scatter_plot = options.get('flag_scatter_plot', False)
-    flag_show_grid = options.get('flag_show_grid', True)
-    flag_logscale_x = options.get('flag_logscale_x', False)
-    flag_logscale_y = options.get('flag_logscale_y', False)
+    scatter_plot = options.get('flag_scatter_plot', False)
+    show_grid = options.get('flag_show_grid', True)
+    logscale_x = options.get('flag_logscale_x', False)
+    logscale_y = options.get('flag_logscale_y', False)
 
-    if flag_logscale_x:
+    if logscale_x:
         axis.set_xscale('log')
 
-    if flag_logscale_y:
+    if logscale_y:
         axis.set_yscale('log')
 
 
-    if flag_show_grid:
+    if show_grid:
         axis.grid(True)
         seaborn_style['style'] = 'darkgrid'
     else:
@@ -321,7 +325,7 @@ def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     if options.get('line_style', 'solid') == 'dashed':
         plot_kwargs['dashes'] = [(4,6)]
 
-    if flag_scatter_plot:
+    if scatter_plot:
         sb.scatterplot(data=df, ax=axis, **plot_kwargs)
     else:
         sb.lineplot(data=df, ax=axis, **plot_kwargs)
@@ -472,7 +476,6 @@ def make_chart_pygal(model_name, chart_id, options):
     stroke_options['width'] = options.get('line_width', 2)
     pygal_config.stroke_style = stroke_options
     pygal_config.title = "Pygal"
-    # pygal_config.fill = False    # <----------------------- ?
 
     pygal_config.show_x_guides = show_grid
     pygal_config.show_y_guides = show_grid
@@ -530,16 +533,17 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         {y_str}
         kwargs = dict()
 
-        kwargs['color']     = options.get('color', 'r')
-        kwargs['linewidth'] = options.get('line_width', 2)
-        kwargs['linestyle'] = options.get('line_style', 'solid')
-        kwargs['marker']    = options.get('marker', '.')
-
-        scatter_plot        = options.get('flag_scatter_plot', False)
-        show_grid           = options.get('flag_show_grid', False)
-        logscale_x          = options.get('flag_logscale_x', False )
-        logscale_y          = options.get('flag_logscale_y', False )
-        background_color    = options.get('bg_color', '#dbdbdb')
+        kwargs['color']      = options.get('color', 'r')
+        kwargs['linewidth']  = options.get('line_width', 2)
+        kwargs['linestyle']  = options.get('line_style', 'solid')
+        bar_plot             = options.get('flag_bar_plot', False)
+        if not bar_plot:   
+            kwargs['marker'] = options.get('marker', '.')         
+        scatter_plot         = options.get('flag_scatter_plot', False)
+        show_grid            = options.get('flag_show_grid', False)
+        logscale_x           = options.get('flag_logscale_x', False )
+        logscale_y           = options.get('flag_logscale_y', False )
+        background_color     = options.get('bg_color', '#dbdbdb')
 
         fig = plt.figure()
         fig.set_size_inches(6.2, 5.0)
@@ -565,6 +569,9 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         if scatter_plot:
             kwargs['s'] = 20*kwargs['linewidth']
             chart.scatter(xx, yy, **kwargs)
+        elif bar_plot:
+            kwargs['ec'] = options.get('outline_color', 'r')              
+            chart.bar(xx, yy, **kwargs)
         else:
             kwargs['marker'] = None 
             chart.plot(xx, yy, **kwargs)
@@ -835,6 +842,8 @@ def download_image(library_name, model_name, chart_id, current_time):
     driver.get(image_url)
     button_to_show_chart = driver.find_element_by_id(f'btn-show-chart-{library_name}')
     driver.execute_script("$(arguments[0]).click();", button_to_show_chart)
+    driver.execute_script(f"document.getElementById('{library_name}-right').style.display = 'none';")
+    
 
     wait = WebDriverWait
     wait(driver, 10).until(EC.presence_of_element_located((By.ID, f'card-{library_name}-ss')))
@@ -867,6 +876,9 @@ def get_default_matplotlib_options(db, as_dict=True):
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
+        kwargs['x_label'] = 'x'
+        kwargs['y_label'] = 'y'
+        kwargs['title'] = 'Matplotlib'
         mplib_options = MatplotlibPlotOptions(**kwargs)
         db.session.add(mplib_options)
         db.session.commit()
@@ -880,6 +892,7 @@ def get_default_seaborn_options(db, as_dict=True):
     if not seaborn_options:
         kwargs = dict()
         kwargs['color'] = 'red'
+        kwargs['outline_color'] = '#dbdbdb'
         kwargs['bg_color'] = 'white'
         kwargs['line_width'] = 2
         kwargs['line_style'] = 'dashed'
@@ -888,6 +901,9 @@ def get_default_seaborn_options(db, as_dict=True):
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
+        kwargs['x_label'] = 'x'
+        kwargs['y_label'] = 'y'
+        kwargs['title'] = 'Matplotlib'
         seaborn_options = SeabornPlotOptions(**kwargs)
         db.session.add(seaborn_options)
         db.session.commit()

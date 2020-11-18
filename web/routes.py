@@ -53,9 +53,9 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 import chart_studio.tools as plotly_tools
 
 
-@app.route('/data/plot/matplotlib/<string:model_name>/<string:options>', methods=["GET", "POST"])
-@app.route('/data/plot/matplotlib/<string:model_name>/<string:options>/<int:chart_id>', methods=["GET", "POST"])
-@app.route('/data/plot/matplotlib/<string:model_name>/<string:options>/<string:data_filename>', methods=["GET", "POST"])
+@app.route('/data/plot/matplotlib/<string:model_name>/<string:options>')
+@app.route('/data/plot/matplotlib/<string:model_name>/<string:options>/<int:chart_id>')
+@app.route('/data/plot/matplotlib/<string:model_name>/<string:options>/<string:data_filename>')
 def route_plot_matplotlib(model_name, options, chart_id=-1, data_filename=''):
     """ Returns the Response consisting the matplotlib chart image. """
     options_from_string = json.loads(options)
@@ -65,9 +65,9 @@ def route_plot_matplotlib(model_name, options, chart_id=-1, data_filename=''):
     return Response(output.getvalue(), mimetype='image/png')
 
 
-@app.route('/data/plot/seaborn/<string:model_name>/<string:options>', methods=["GET", "POST"])
-@app.route('/data/plot/seaborn/<string:model_name>/<string:options>/<int:chart_id>', methods=["GET", "POST"])
-@app.route('/data/plot/seaborn/<string:model_name>/<string:options>/<string:data_filename>', methods=["GET", "POST"])
+@app.route('/data/plot/seaborn/<string:model_name>/<string:options>')
+@app.route('/data/plot/seaborn/<string:model_name>/<string:options>/<int:chart_id>')
+@app.route('/data/plot/seaborn/<string:model_name>/<string:options>/<string:data_filename>')
 def route_plot_seaborn(model_name, options, chart_id=-1, data_filename=''):
     """ Returns the Response consisting the Seaborn chart image. """
     options_from_string = json.loads(options)
@@ -90,7 +90,7 @@ def route_add_data_main():
     return render_template('add_data_main.html')
 
 
-@app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
+@app.route("/data/add/<string:model_name>", methods=['POST'])
 @clean_query(db=db)
 def route_add_data(model_name):
     """ Inserts points to the database to the specific model based on values from forms."""
@@ -105,19 +105,15 @@ def route_add_data(model_name):
         form = CustomEquationForm()
 
 
-
-
     if form.validate_on_submit():
         Model = str_to_object(model_name)
         form_step_data = form.step.data if form.step.data is not None else 0.1
 
         ''' if form has exact structure as this: begin,end,a,b,c,d,step'''
         model_kwargs = dict()
-        # default forms and squareroot aswell have this struct
         model_kwargs['x_begin'] = form.begin.data
         model_kwargs['x_end'] = form.end.data
         model_kwargs['step'] = form_step_data
-
 
         model_kwargs['id_matplotlib_options'] = get_default_matplotlib_options(db, as_dict=False).id
         model_kwargs['id_seaborn_options'] = get_default_seaborn_options(db, as_dict=False).id
@@ -143,7 +139,6 @@ def route_add_data(model_name):
         db.session.commit()
         
         chart_id = get_recently_added_record(db, model_name).id
-
 
         flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
@@ -210,7 +205,7 @@ def route_show_data_main():
     return render_template('show_data_main.html')
 
 
-@app.route("/data/show/fromfile", methods=['GET', 'POST'])
+@app.route("/data/show/fromfile", methods=['GET'])
 def route_show_data_from_file():
     Model = str_to_object("FileDataPoint")
     records = Model.query.all()
@@ -258,7 +253,7 @@ def route_show_data_from_file():
     return render_template('show_data.html', model_name="FileDataPoint", chart_id=-1, records=records,  **kwargs, **kwforms, **kw_options)
 
 
-@app.route("/data/show/<string:model_name>", methods=['GET', 'POST'])
+@app.route("/data/show/<string:model_name>", methods=['GET'])
 @app.route("/data/show/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
 def route_show_data(model_name, chart_id=-1):
     """ 
@@ -342,7 +337,7 @@ def route_show_data(model_name, chart_id=-1):
     return render_template('show_data.html', model_name=model_name, chart_id=chart_id, records=records,  **kwargs, **kwforms, **kw_options)
 
 
-@app.route("/data/change/coefs/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
+@app.route("/data/change/coefs/<string:model_name>/<int:chart_id>", methods=['POST'])
 @clean_query(db=db)
 def route_change_coefs(model_name, chart_id=-1):
     Model = str_to_object(model_name)
@@ -403,9 +398,14 @@ def route_change_options(library_name, model_name, chart_id=-1):
         kwargs['line_style'] = library_form.line_style.data
         kwargs['marker'] = library_form.marker.data
 
-        kwargs['flag_bar_plot'] = library_form.flag_bar_plot.data
+        if library_name != 'seaborn':
+            kwargs['flag_bar_plot'] = library_form.flag_bar_plot.data
         kwargs['flag_scatter_plot'] = library_form.flag_scatter_plot.data
         kwargs['flag_show_grid'] = library_form.flag_show_grid.data
+
+        kwargs['x_label'] = library_form.x_label.data
+        kwargs['y_label'] = library_form.y_label.data
+        kwargs['title'] = library_form.title.data
 
         if library_name != 'pygal':
             kwargs['flag_logscale_x'] = library_form.flag_logscale_x.data
@@ -451,15 +451,15 @@ def route_delete_chart(model_name, chart_id):
     return redirect(url_for('route_show_data', model_name=model_name))
 
 
-@app.route("/data/delete/all/<string:model_name>", methods=['POST'])
-@clean_query(db=db)
-def route_delete_all_charts(model_name):
-    ''' Deletes all records from model. '''
-    Model = str_to_object(model_name)
-    all_charts = Model.query.delete()
-    db.session.commit()
-    flash(f'{all_charts} charts have been deleted from {model_name}.', 'success')
-    return redirect(url_for('route_show_data', model_name=model_name))
+# @app.route("/data/delete/all/<string:model_name>", methods=['POST'])
+# @clean_query(db=db)
+# def route_delete_all_charts(model_name):
+#     ''' Deletes all records from model. '''
+#     Model = str_to_object(model_name)
+#     all_charts = Model.query.delete()
+#     db.session.commit()
+#     flash(f'{all_charts} charts have been deleted from {model_name}.', 'success')
+#     return redirect(url_for('route_show_data', model_name=model_name))
 
 
 @app.route("/summary")
@@ -491,7 +491,7 @@ def route_download_src_img(library_name, model_name="FileDataPoint", chart_id=-1
 
 @app.route("/matplotlib")
 def route_matplotlib():
-    path_to_images = os.getcwd() + '/web/static/plots'
+    path_to_images = os.getcwd() + '/web/downloads/images'
     mplib_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'mplib_{i}.png') for i in range(1, files_count('mplib', path_to_images))]
     return render_template('matplotlib.html', chart_images=mplib_charts)
 

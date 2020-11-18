@@ -2,9 +2,11 @@
 {% block content %}
 <div class="row">
     <!-- MathJax - equation -->
-    <!-- <div class="col-md-12" class="btn btn-lg btn-dark">[DEBUG] Chart_id = {{ chart_id }}, model_name = {{ model_name }} </div> -->
+    {% if chart_id != -1 %}
+        <div class="offset-6 pt-4" class="btn btn-lg btn-dark"><h2> # {{ chart_id }} </h2></div>
+    {% endif %}
     
-    <div class="col-md-12 pt-4">
+    <div class="col-md-12 pt-2">
         {% if coefs is defined and coefs[0] != '?' %}
             {% if model_name == 'Sinus' %}
                 <h3>$$y = { {{ coefs[0] }}\sin{ ({{ coefs[1] }} x {% if coefs[2] < 0 %} + {{ -coefs[2] }} {% elif coefs[2] > 0 %} - {{ coefs[2] }} {% endif %} )} {% if coefs[3] < 0 %} coefs[3] {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %}} $$</h3>
@@ -129,7 +131,7 @@
                         <img src="{{ url_for('route_plot_matplotlib', model_name=model_name, options=matplotlib_options, chart_id=chart_id) }}">
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary bg-dark border-danger border-danger">
+                <div class="card col-md-4 text-primary bg-dark border-danger border-danger" id="matplotlib-right">
                     <div class="card-body text-white bg-dark">
                         {% if chart_id == -1 and model_name == "FileDataPoint" %}
                             <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='matplotlib', model_name=model_name) }}">
@@ -139,10 +141,26 @@
                             {% if matplotlib_form is defined %}
                                 {{ matplotlib_form.hidden_tag() }}
                                 <div class="form-group">
+                                    <b>{{ matplotlib_form.title.label(for="Title: ") }}</b>
+                                    {{ matplotlib_form.title(id="title") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.x_label.label(for="X label: ") }}</b>
+                                    {{ matplotlib_form.x_label(id="x_label") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ matplotlib_form.y_label.label(for="Y label: ") }}</b>
+                                    {{ matplotlib_form.y_label(id="y_label") }}
+                                </div>
+                                <div class="form-group" id="option-matplotlib-bar" >
+                                    <b>{{ matplotlib_form.flag_bar_plot.label(for="Bar plot:") }}</b>
+                                    {{ matplotlib_form.flag_bar_plot(id="flag_bar_plot") }}
+                                </div>
+                                <div class="form-group">
                                     <b>{{ matplotlib_form.color.label(for="Line color") }}</b>
                                     {{ matplotlib_form.color(id="color") }}
                                 </div>
-                                <div class="form-group" id="option-matplotlib-outline-color">
+                                <div class="form-group hidden" id="option-matplotlib-outline-color">
                                     <b>{{ matplotlib_form.outline_color.label(for="outline_color") }}</b>
                                     {{ matplotlib_form.outline_color(id="outline_color") }}
                                 </div>
@@ -154,11 +172,6 @@
                                     <b>{{ matplotlib_form.flag_scatter_plot.label(for="Scatter plot:") }}</b>
                                     {{ matplotlib_form.flag_scatter_plot(id="flag_scatter_plot") }}
                                 </div>
-                                <div class="form-group" id="option-matplotlib-bar" >
-                                    <b>{{ matplotlib_form.flag_bar_plot.label(for="Bar plot:") }}</b>
-                                    {{ matplotlib_form.flag_bar_plot(id="flag_bar_plot") }}
-                                </div>
-                                
                                 <div class="form-group">
                                     <b>{{ matplotlib_form.line_width.label(for="Line width:") }}</b>
                                     {{ matplotlib_form.line_width(id="line_width") }}
@@ -225,7 +238,7 @@
                         <img src="{{ url_for('route_plot_seaborn', model_name=model_name, options=seaborn_options, chart_id=chart_id) }}">
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary bg-dark border-danger">
+                <div class="card col-md-4 text-primary bg-dark border-danger" id="seaborn-right">
                     <div class="card-body text-white bg-dark">
                         {% if chart_id == -1 and model_name == "FileDataPoint" %}
                             <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='seaborn', model_name=model_name) }}">
@@ -234,6 +247,18 @@
                         {% endif %}
                             {% if seaborn_form is defined %}
                                 {{ seaborn_form.hidden_tag() }}
+                                <div class="form-group">
+                                    <b>{{ seaborn_form.title.label(for="Title: ") }}</b>
+                                    {{ seaborn_form.title(id="title") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ seaborn_form.x_label.label(for="X label: ") }}</b>
+                                    {{ seaborn_form.x_label(id="x_label") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ seaborn_form.y_label.label(for="Y label: ") }}</b>
+                                    {{ seaborn_form.y_label(id="y_label") }}
+                                </div>
                                 <div class="form-group">
                                     <b>{{ seaborn_form.color.label(for="Line color") }}</b>
                                     {{ seaborn_form.color(id="color") }}
@@ -246,7 +271,7 @@
                                     <b>{{ seaborn_form.line_width.label(for="Line width:") }}</b>
                                     {{ seaborn_form.line_width(id="line_width") }}
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" id="option-seaborn-line-style">
                                     <b>{{ seaborn_form.line_style.label(for="Line style:") }}</b>
                                     {{ seaborn_form.line_style(id="line_style") }}
                                 </div>
@@ -254,7 +279,7 @@
                                     <b>{{ seaborn_form.marker.label(for="Marker") }}</b>
                                     {{ seaborn_form.marker(id="marker") }}
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" id="option-seaborn-scatter">
                                     <b>{{ seaborn_form.flag_scatter_plot.label(for="Scatter:") }}</b>
                                     {{ seaborn_form.flag_scatter_plot(id="flag_scatter_plot") }}
                                 </div>
@@ -311,7 +336,7 @@
                         {{ script_bokeh | safe }}
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary bg-dark border-danger">
+                <div class="card col-md-4 text-primary bg-dark border-danger" id="bokeh-right">
                     <div class="card-body text-white bg-dark">
                         {% if chart_id == -1 and model_name == "FileDataPoint" %}
                             <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='bokeh', model_name=model_name) }}">
@@ -396,7 +421,7 @@
                         {{ div_plotly | safe }}
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary bg-dark border-danger">
+                <div class="card col-md-4 text-primary bg-dark border-danger" id="plotly-right">
                     <div class="card-body text-white bg-dark">
                         {% if chart_id == -1 and model_name == "FileDataPoint" %}
                             <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='plotly', model_name=model_name) }}">
@@ -480,7 +505,7 @@
                         <embed type="image/svg+xml" src= {{ src_pygal | safe }} />
                     </div>
                 </div>
-                <div class="card col-md-4 text-primary bg-dark border-danger">
+                <div class="card col-md-4 text-primary bg-dark border-danger" id="pygal-right">
                     <div class="card-body text-white bg-dark">
                         {% if chart_id == -1 and model_name == "FileDataPoint" %}
                             <form class="form-horizontal col-md-12" method="POST" action="{{ url_for('route_change_options', library_name='pygal', model_name=model_name) }}">
