@@ -111,10 +111,10 @@ def make_points(model_name, chart_id):
             elif model_name == 'SquareRoot':
                 for x in range(x_range):
                     xx = float(round(begin+x*step, 3))
-                    val = 0
-                    if xx >= c/b:
-                        val = sqrt(b*xx - c)
-                    yy = float(round(a*val + d, 3))
+                    try:
+                        yy = float(round(a*sqrt(b*xx - c) + d, 3))
+                    except:
+                        continue
                     points.append((xx, yy))
 
             elif model_name == 'Exponential':
@@ -138,7 +138,7 @@ def make_points(model_name, chart_id):
                     try:
                         yy = float(round(equation_func(xx), 3))
                     except:
-                        yy = 0
+                        continue
                     points.append((xx, yy))
 
 
@@ -226,10 +226,12 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
     kwargs = dict()
     
     kwargs['color']     = options.get('color', 'r')              
+    
     kwargs['linewidth'] = options.get('line_width', 2)           
-    kwargs['linestyle'] = options.get('line_style', 'solid')    
-    kwargs['marker']    = options.get('marker', '.')              
-
+    kwargs['linestyle'] = options.get('line_style', 'solid') 
+    bar_plot            = options.get('flag_bar_plot', False)
+    if not bar_plot:   
+        kwargs['marker']    = options.get('marker', '.')              
     scatter_plot        = options.get('flag_scatter_plot', False)
     show_grid           = options.get('flag_show_grid', False)    
     logscale_x          = options.get('flag_logscale_x', False )
@@ -257,6 +259,9 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
     if scatter_plot:
         kwargs['s'] = 20*kwargs['linewidth'] # marker size
         chart.scatter(xx, yy, **kwargs)
+    elif bar_plot:
+        kwargs['ec'] = options.get('outline_color', 'r')              
+        chart.bar(xx, yy, **kwargs)
     else:
         kwargs['marker'] = None 
         chart.plot(xx, yy, **kwargs)
@@ -811,6 +816,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         f.write(formatted_code(code))
         
 
+
 def download_image(library_name, model_name, chart_id, current_time):
     filename = f'{library_name}_{model_name}.png'
     if model_name == "FileDataPoint" and chart_id == -1:
@@ -851,11 +857,13 @@ def get_default_matplotlib_options(db, as_dict=True):
     if not mplib_options:
         kwargs = dict()
         kwargs['color'] = 'r'
+        kwargs['outline_color'] = '#dbdbdb'
         kwargs['bg_color'] = '#dbdbdb'
         kwargs['line_width'] = 2
         kwargs['line_style'] = '-'
         kwargs['marker'] = '.'
         kwargs['flag_scatter_plot'] = False
+        kwargs['flag_bar_plot'] = False
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
@@ -952,6 +960,7 @@ def get_default_pygal_options(db, as_dict=True):
     return pygal_options
 
 
+
 def clean_query(db):
     def _decorator(func):
         @functools.wraps(func)
@@ -981,7 +990,7 @@ def clean_unused_options(db):
             'seaborn':  fpo.id_seaborn_options,
             'bokeh': fpo.id_bokeh_options,
             'plotly': fpo.id_plotly_options,
-            'pygal': fpo.id_pygal_options,
+            'pygal': fpo.id_pygal_options
         }
     else:
         file_data_used_option_ids = dict()

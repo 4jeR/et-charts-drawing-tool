@@ -142,26 +142,36 @@
                                     <b>{{ matplotlib_form.color.label(for="Line color") }}</b>
                                     {{ matplotlib_form.color(id="color") }}
                                 </div>
+                                <div class="form-group" id="option-matplotlib-outline-color">
+                                    <b>{{ matplotlib_form.outline_color.label(for="outline_color") }}</b>
+                                    {{ matplotlib_form.outline_color(id="outline_color") }}
+                                </div>
                                 <div class="form-group">
                                     <b>{{ matplotlib_form.bg_color.label(for="Background color: ") }}</b>
                                     {{ matplotlib_form.bg_color(id="bg_color") }}
                                 </div>
+                                <div class="form-group" id="option-matplotlib-scatter" >
+                                    <b>{{ matplotlib_form.flag_scatter_plot.label(for="Scatter plot:") }}</b>
+                                    {{ matplotlib_form.flag_scatter_plot(id="flag_scatter_plot") }}
+                                </div>
+                                <div class="form-group" id="option-matplotlib-bar" >
+                                    <b>{{ matplotlib_form.flag_bar_plot.label(for="Bar plot:") }}</b>
+                                    {{ matplotlib_form.flag_bar_plot(id="flag_bar_plot") }}
+                                </div>
+                                
                                 <div class="form-group">
                                     <b>{{ matplotlib_form.line_width.label(for="Line width:") }}</b>
                                     {{ matplotlib_form.line_width(id="line_width") }}
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" id="option-matplotlib-line-style">
                                     <b>{{ matplotlib_form.line_style.label(for="Line style:") }}</b>
                                     {{ matplotlib_form.line_style(id="line_style") }}
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" id="option-matplotlib-marker">
                                     <b>{{ matplotlib_form.marker.label(for="Marker") }}</b>
                                     {{ matplotlib_form.marker(id="marker") }}
                                 </div>
-                                <div class="form-group">
-                                    <b>{{ matplotlib_form.flag_scatter_plot.label(for="Scatter:") }}</b>
-                                    {{ matplotlib_form.flag_scatter_plot(id="flag_scatter_plot") }}
-                                </div>
+                                
                                 <div class="form-group">
                                     <b>{{ matplotlib_form.flag_show_grid.label(for="Grid:") }}</b>
                                     {{ matplotlib_form.flag_show_grid(id="flag_show_grid") }}
@@ -546,7 +556,6 @@
     {% endif %}
 </div>
 
-<script type="text/javascript" src="../js/download.js"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.0.1.min.js" crossorigin="anonymous"></script>

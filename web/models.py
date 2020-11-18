@@ -1,6 +1,6 @@
 from web import db
 
-
+""" TODO: Bar plot / pie plot etc... """
 
 
 class Sinus(db.Model):
@@ -215,11 +215,13 @@ class MatplotlibPlotOptions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     color = db.Column(db.String, unique=False, nullable=False)
+    outline_color = db.Column(db.String, unique=False, nullable=False)
     bg_color = db.Column(db.String, unique=False, nullable=False)
     line_width = db.Column(db.Integer, unique=False, nullable=False)
     line_style = db.Column(db.String, unique=False, nullable=False)
     marker = db.Column(db.String, unique=False, nullable=False)
 
+    flag_bar_plot = db.Column(db.Boolean, unique=False, nullable=False)
     flag_scatter_plot = db.Column(db.Boolean, unique=False, nullable=False)
     flag_show_grid = db.Column(db.Boolean, unique=False, nullable=False)
     flag_logscale_x = db.Column(db.Boolean, unique=False, nullable=False)
@@ -233,10 +235,12 @@ class MatplotlibPlotOptions(db.Model):
         if chart:
             return {
                 'color': chart.color, 
+                'outline_color': chart.outline_color, 
                 'bg_color': chart.bg_color,
                 'line_width': chart.line_width,
                 'line_style': chart.line_style,
                 'marker': chart.marker,
+                'flag_bar_plot': chart.flag_bar_plot,
                 'flag_scatter_plot': chart.flag_scatter_plot,
                 'flag_show_grid': chart.flag_show_grid,
                 'flag_logscale_x': chart.flag_logscale_x,

@@ -16,6 +16,7 @@
             <h3>$$y = { {{ coefs[0] }}e^{ {{ coefs[1] }} (x {% if coefs[2] < 0 %} + {{ -coefs[2]  }}) {% elif coefs[2] > 0 %} - {{ coefs[2] }}) {% else %} ) {% endif %}} } {% if coefs[3] < 0 %} {{ coefs[3] }} {% elif coefs[3] > 0 %} + {{ coefs[3] }} {% endif %} $$</h3>
             <h3>$$y = {ae^{b(x - c)} + d}$$</h3>
         {% elif model_name == 'SquareFunc' %}
+            <h3>$$ y = { {{ coefs[0] }} ({x {% if coefs[1] < 0 %} + {{ -coefs[1] }} {% else %} - {{ coefs[1] }} {% endif %} })^2 {% if coefs[2] < 0 %} {{ coefs[2]}} {% elif coefs[2] > 0 %} + {{ coefs[2] }} {% endif %}  } $$</h3>
             <h3>$$ y = {a({x - p})^2 + q} $$</h3>
         {% else %}
             <h2>Unknown equation </h2>
@@ -54,10 +55,6 @@
             <div class="form-group">
                 <b>{{ form.coef_q.label(for="q", class="col-md-1 col-form-label") }}</b>
                 {{ form.coef_q(id="coef_q", class="form-control form-control-md col-md-3")}}
-            </div>
-            <div class="form-group">
-                <b>{{ form.step.label(for="step", class="col-md-1 col-form-label") }}</b>
-                {{ form.step(id="step", class="form-control form-control-md col-md-3")}}
             </div>
         {% elif model_name == 'CustomEquation' %}
             <div class="form-group">

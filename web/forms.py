@@ -103,6 +103,18 @@ class MatplotlibOptionsForm(FlaskForm):
             ('#4f84bd', 'blue')
         ]
     )
+    outline_color = SelectField('Outline color: ', choices=[
+            ('#292928', 'black'),
+            ('#f5f5f5', 'white'), 
+            ('#92c720', 'green'), 
+            ('#e00f00', 'red'),
+            ('#05dbdb', 'cyan'),
+            ('#d601d2', 'magenta'),
+            ('#f8ff6e', 'yellow'),
+            ('#4f84bd', 'blue')
+        ]
+    )
+
 
     bg_color = SelectField('Background color: ', choices=[
             ('#292928', 'black'),
@@ -118,7 +130,6 @@ class MatplotlibOptionsForm(FlaskForm):
 
 
     line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
-
     line_style = SelectField('Style: ', choices=[
             ('solid',  'solid'), 
             ('dashed', 'dashed'), 
@@ -140,6 +151,7 @@ class MatplotlibOptionsForm(FlaskForm):
         ]
     )
 
+    flag_bar_plot = BooleanField("Bar:")
     flag_scatter_plot = BooleanField("Scatter:")
     flag_show_grid = BooleanField("Grid:")
     flag_logscale_x = BooleanField("Log scale X:")

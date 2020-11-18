@@ -15,11 +15,7 @@
         $(function() {
             $('#link-to-sinus-model').hover(function() {
                 $('#show-data-main-image').attr('src', img_sine);
-            }/*
-        , function() {
-                $('#show-data-main-image').attr('src', img_qmark);
-            }
-        */);
+            });
         });
 
         const img_cosine = "{{ url_for('static', filename='main_cosine.png') }}"
@@ -63,6 +59,45 @@
                 $('#show-data-main-image').attr('src', img_custom);
             });
         });
+
+        
+        var show_bar_matplotlib = true;
+        $(function() {
+            $('#option-matplotlib-bar').click(function() {
+                if (show_bar_matplotlib){
+                    $('#option-matplotlib-scatter').hide();
+                    $('#option-matplotlib-marker').hide();
+                    $('#option-matplotlib-outline-color').show();
+                }
+                else {
+                    $('#option-matplotlib-scatter').show();
+                    $('#option-matplotlib-marker').show();
+                    $('#option-matplotlib-outline-color').hide();
+                }
+                show_bar_matplotlib = !show_bar_matplotlib;
+            });
+        });
+
+        $(function() {
+            $('#option-matplotlib-scatter').click(function() {
+                if (show_bar_matplotlib){
+                    $('#option-matplotlib-bar').hide();
+                    $('#option-matplotlib-outline-color').hide();
+                    $('#option-matplotlib-line-style').hide();
+                    
+                }
+                else {
+                    $('#option-matplotlib-bar').show();
+                    $('#option-matplotlib-outline-color').show();
+                    $('#option-matplotlib-line-style').show();
+
+                }
+                show_bar_matplotlib = !show_bar_matplotlib;
+            });
+        });
+
+
+
     </script>
 </head>
 <body>

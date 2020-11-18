@@ -359,7 +359,7 @@ def route_change_coefs(model_name, chart_id=-1):
     elif model_name == 'CustomEquation':
         form = CustomEquationForm()
 
-    coefs = model_object.get_coefs(chart_id)    
+    coefs = Model.get_coefs(chart_id)    
 
     if form.validate_on_submit():
         if model_name in common_models or model_name == 'SquareRoot':
@@ -399,9 +399,11 @@ def route_change_options(library_name, model_name, chart_id=-1):
         kwargs['color'] = library_form.color.data
         kwargs['bg_color'] = library_form.bg_color.data
         kwargs['line_width'] = library_form.line_width.data
+        kwargs['outline_color'] = library_form.outline_color.data
         kwargs['line_style'] = library_form.line_style.data
         kwargs['marker'] = library_form.marker.data
 
+        kwargs['flag_bar_plot'] = library_form.flag_bar_plot.data
         kwargs['flag_scatter_plot'] = library_form.flag_scatter_plot.data
         kwargs['flag_show_grid'] = library_form.flag_show_grid.data
 
