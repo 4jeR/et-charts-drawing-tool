@@ -261,7 +261,6 @@ class SeabornPlotOptions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     color = db.Column(db.String, unique=False, nullable=False)
-    outline_color = db.Column(db.String, unique=False, nullable=False)
     bg_color = db.Column(db.String, unique=False, nullable=False)
     line_width = db.Column(db.Integer, unique=False, nullable=False)
     line_style = db.Column(db.String, unique=False, nullable=False)
@@ -284,7 +283,6 @@ class SeabornPlotOptions(db.Model):
         if chart:
             return {
                 'color': chart.color, 
-                'outline_color': chart.outline_color, 
                 'bg_color': chart.bg_color, 
                 'line_width': chart.line_width,
                 'line_style': chart.line_style,

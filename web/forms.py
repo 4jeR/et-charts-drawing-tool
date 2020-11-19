@@ -20,15 +20,6 @@ from wtforms.validators import Optional
 from wtforms.validators import ValidationError
 
 
-def validate_begin_end(FormName):
-    def _validate_begin_end(form, field):
-        min_value = -FormName.coef_c.data / FormName.coef_b.data 
-        if field.data >= min_value and field.data >= min_value:
-            raise ValidationError(f'Min value must be atleast {min_value}')
-
-    return _validate_begin_end
-
-
 class DataForm(FlaskForm):
     begin = FloatField('begin', validators=[Optional()])
     end = FloatField('end', validators=[Optional()])
@@ -43,21 +34,19 @@ class DataForm(FlaskForm):
     submit = SubmitField('Add data')
 
 
-class SqrtForm(FlaskForm):
-    """ TODO: on submit check if begin and end are >= -c/b """
-
-    begin = FloatField('begin', validators=[Optional()])
-    end = FloatField('end', validators=[Optional()])
-    step = FloatField('step', validators=[Optional()])
+# class SqrtForm(FlaskForm):
+#     begin = FloatField('begin', validators=[Optional()])
+#     end = FloatField('end', validators=[Optional()])
+#     step = FloatField('step', validators=[Optional()])
 
 
-    coef_a = FloatField('a', validators=[DataRequired('Non-zero value.')])
-    coef_b = FloatField('b', validators=[DataRequired('Non-zero value.')])
-    coef_c = FloatField('c', validators=[InputRequired()])
-    coef_d = FloatField('d', validators=[InputRequired()])
+#     coef_a = FloatField('a', validators=[DataRequired('Non-zero value.')])
+#     coef_b = FloatField('b', validators=[DataRequired('Non-zero value.')])
+#     coef_c = FloatField('c', validators=[InputRequired()])
+#     coef_d = FloatField('d', validators=[InputRequired()])
     
 
-    submit = SubmitField('Add data')
+#     submit = SubmitField('Add data')
 
 
 class SquareFuncForm(FlaskForm):
@@ -91,7 +80,6 @@ class CustomEquationForm(FlaskForm):
 
 
 class MatplotlibOptionsForm(FlaskForm):
-    
     color = SelectField('Line color: ', choices=[
             ('#292928', 'black'),
             ('#f5f5f5', 'white'), 
@@ -115,7 +103,6 @@ class MatplotlibOptionsForm(FlaskForm):
         ]
     )
 
-
     bg_color = SelectField('Background color: ', choices=[
             ('#292928', 'black'),
             ('#f5f5f5', 'white'), 
@@ -127,9 +114,9 @@ class MatplotlibOptionsForm(FlaskForm):
             ('#4f84bd', 'blue')
         ]
     )
-
-
+    
     line_width = SelectField('Line width: ', choices=[(val, val) for val in range(1, 11)])
+    
     line_style = SelectField('Style: ', choices=[
             ('solid',  'solid'), 
             ('dashed', 'dashed'), 

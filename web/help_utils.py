@@ -255,9 +255,9 @@ def make_chart_matplotlib(model_name, chart_id, options, data_filename=''):
     else:
         chart.grid(False)
 
-    chart.set_xlabel(x_label)
-    chart.set_ylabel(y_label)
-    chart.set_title(title)
+    chart.set_xlabel(x_label, labelpad=5, fontsize=15)
+    chart.set_ylabel(y_label, labelpad=-5, fontsize=15)
+    chart.set_title(title, fontsize=17)
     
     ''' Plot on the figure and return this object to embed in web page '''
     if scatter_plot:
@@ -576,9 +576,9 @@ def save_source_code(library_name, model_name, chart_id, current_time):
             kwargs['marker'] = None 
             chart.plot(xx, yy, **kwargs)
 
-        chart.set_xlabel('x')
-        chart.set_ylabel('y')
-        chart.set_title('Matplotlib')
+        chart.set_xlabel('x', labelpad=5, fontsize=15)
+        chart.set_ylabel('y', labelpad=5, fontsize=15)
+        chart.set_title('Matplotlib', fontsize=17)
 
         plt.show()
         '''
@@ -892,7 +892,6 @@ def get_default_seaborn_options(db, as_dict=True):
     if not seaborn_options:
         kwargs = dict()
         kwargs['color'] = 'red'
-        kwargs['outline_color'] = '#dbdbdb'
         kwargs['bg_color'] = 'white'
         kwargs['line_width'] = 2
         kwargs['line_style'] = 'dashed'

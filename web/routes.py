@@ -90,39 +90,34 @@ def route_add_data_main():
     return render_template('add_data_main.html')
 
 
-@app.route("/data/add/<string:model_name>", methods=['POST'])
+@app.route("/data/add/<string:model_name>", methods=['GET', 'POST'])
 @clean_query(db=db)
 def route_add_data(model_name):
     """ Inserts points to the database to the specific model based on values from forms."""
-    common_models = ['Sinus', 'Cosinus', 'Exponential']
+    common_models = ['Sinus', 'Cosinus', 'Exponential', 'SquareRoot']
     if model_name in common_models:
         form = DataForm()
-    elif model_name == 'SquareRoot':
-        form = SqrtForm()
     elif model_name == 'SquareFunc':
         form = SquareFuncForm()
     elif model_name == 'CustomEquation':
         form = CustomEquationForm()
 
-
     if form.validate_on_submit():
         Model = str_to_object(model_name)
         form_step_data = form.step.data if form.step.data is not None else 0.1
 
-        ''' if form has exact structure as this: begin,end,a,b,c,d,step'''
         model_kwargs = dict()
         model_kwargs['x_begin'] = form.begin.data
-        model_kwargs['x_end'] = form.end.data
-        model_kwargs['step'] = form_step_data
+        model_kwargs['x_end']   = form.end.data
+        model_kwargs['step']    = form_step_data
 
         model_kwargs['id_matplotlib_options'] = get_default_matplotlib_options(db, as_dict=False).id
-        model_kwargs['id_seaborn_options'] = get_default_seaborn_options(db, as_dict=False).id
-        model_kwargs['id_bokeh_options'] = get_default_bokeh_options(db, as_dict=False).id
-        model_kwargs['id_plotly_options'] = get_default_plotly_options(db, as_dict=False).id
-        model_kwargs['id_pygal_options'] = get_default_pygal_options(db, as_dict=False).id
+        model_kwargs['id_seaborn_options']    = get_default_seaborn_options(db, as_dict=False).id
+        model_kwargs['id_bokeh_options']      = get_default_bokeh_options(db, as_dict=False).id
+        model_kwargs['id_plotly_options']     = get_default_plotly_options(db, as_dict=False).id
+        model_kwargs['id_pygal_options']      = get_default_pygal_options(db, as_dict=False).id
         
-
-        if model_name in common_models or model_name == 'SquareRoot':
+        if model_name in common_models:
             model_kwargs['a'] = form.coef_a.data
             model_kwargs['b'] = form.coef_b.data
             model_kwargs['c'] = form.coef_c.data
@@ -153,26 +148,18 @@ def route_add_data_from_file():
     filename = form.filename.data
 
     if form.validate_on_submit():
-
-        get_default_matplotlib_options(db)
-        mplib_id = MatplotlibPlotOptions.query.first().id
+        matplotlib_id = get_default_matplotlib_options(db, as_dict=False).id
         
-        get_default_seaborn_options(db)
-        seaborn_id = SeabornPlotOptions.query.first().id
+        seaborn_id = get_default_seaborn_options(db, as_dict=False).id
 
-        get_default_bokeh_options(db)
-        bokeh_id = BokehPlotOptions.query.first().id
+        bokeh_id = get_default_bokeh_options(db, as_dict=False).id
 
-
-        get_default_plotly_options(db)
-        plotly_id = PlotlyPlotOptions.query.first().id
+        plotly_id = get_default_plotly_options(db, as_dict=False).id
         
-        get_default_pygal_options(db)
-        pygal_id = PlotlyPlotOptions.query.first().id
-
+        pygal_id = get_default_pygal_options(db,as_dict=False).id
 
         fpo = FilePlotOptions(
-            id_matplotlib_options=mplib_id, 
+            id_matplotlib_options=matplotlib_id, 
             id_seaborn_options=seaborn_id, 
             id_bokeh_options=bokeh_id, 
             id_plotly_options=plotly_id, 
@@ -180,14 +167,11 @@ def route_add_data_from_file():
         )
         db.session.add(fpo)
 
-        ''' delete old points '''
         previous_data_points = FileDataPoint.query.all()
         if previous_data_points:
             for point_record in previous_data_points:
                 db.session.delete(point_record)
             db.session.commit()
-        ''' delete old options '''
-
 
         x, y = get_data_from_file(filename)
         for xx, yy in zip(x, y):
@@ -205,14 +189,12 @@ def route_show_data_main():
     return render_template('show_data_main.html')
 
 
-@app.route("/data/show/fromfile", methods=['GET'])
+@app.route("/data/show/file", methods=['GET'])
 def route_show_data_from_file():
     Model = str_to_object("FileDataPoint")
     records = Model.query.all()
 
     kw_options = dict()
-
-    ''' Get options for each library. '''
     matplotlib_options_id = FilePlotOptions.query.first().id_matplotlib_options
     kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
 
@@ -228,9 +210,7 @@ def route_show_data_from_file():
     pygal_options_id = FilePlotOptions.query.first().id_pygal_options
     kw_options['pygal_options'] = PygalPlotOptions.get_options(pygal_options_id) 
 
-
     kwargs = dict()
-
     bokeh_chart = make_chart_bokeh("FileDataPoint", -1, kw_options.get('bokeh_options', dict()))
     script_bokeh, div_bokeh = bokeh_components(bokeh_chart)
     kwargs["script_bokeh"] = script_bokeh
@@ -242,7 +222,6 @@ def route_show_data_from_file():
     pygal_chart = make_chart_pygal("FileDataPoint", -1, kw_options.get('pygal_options', dict()))
     kwargs["src_pygal"] = pygal_chart.render_data_uri()
 
-    ''' Pass all forms to be shown (view)'''
     kwforms = dict()
     kwforms['matplotlib_form'] = MatplotlibOptionsForm()
     kwforms['seaborn_form'] = SeabornOptionsForm()
@@ -257,38 +236,16 @@ def route_show_data_from_file():
 @app.route("/data/show/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
 def route_show_data(model_name, chart_id=-1):
     """ 
-    Renders end point on which are shown:
-    data table with all points for specific model,
+    Renders end point on which data table with all points is shown for specific model,
     five charts for each library: Matplotlib, Seaborn, Bokeh, Plotly and Pygal.
     """
-    
     Model = str_to_object(model_name)
     records = Model.query.all()
 
     kw_options = dict()
     if chart_id != -1 and model_name != "FileDataPoint":
-        ''' Get options for each library. '''
         current_chart = Model.query.get(chart_id)
 
-        matplotlib_options_id = current_chart.id_matplotlib_options
-        kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
-
-        seaborn_options_id = current_chart.id_seaborn_options
-        kw_options['seaborn_options'] = json.dumps(SeabornPlotOptions.get_options(seaborn_options_id))
-
-        bokeh_options_id = current_chart.id_bokeh_options
-        kw_options['bokeh_options'] = BokehPlotOptions.get_options(bokeh_options_id) 
-
-        plotly_options_id = current_chart.id_plotly_options
-        kw_options['plotly_options'] = PlotlyPlotOptions.get_options(plotly_options_id) 
-
-        pygal_options_id = current_chart.id_pygal_options
-        kw_options['pygal_options'] = PygalPlotOptions.get_options(pygal_options_id) 
-
-    elif chart_id == -1 and model_name == "FileDataPoint":
-        ''' Get options for each library. '''
-        current_chart = FilePlotOptions.query.first()
-        
         matplotlib_options_id = current_chart.id_matplotlib_options
         kw_options['matplotlib_options'] = json.dumps(MatplotlibPlotOptions.get_options(matplotlib_options_id))
 
@@ -314,7 +271,6 @@ def route_show_data(model_name, chart_id=-1):
         current_chart = Model.query.get(chart_id)
         kwargs['custom_equation'] = string_to_mathjax(current_chart)
 
-
     bokeh_chart = make_chart_bokeh(model_name, chart_id, kw_options.get('bokeh_options', dict()))
     script_bokeh, div_bokeh = bokeh_components(bokeh_chart)
     kwargs["script_bokeh"] = script_bokeh
@@ -326,7 +282,6 @@ def route_show_data(model_name, chart_id=-1):
     pygal_chart = make_chart_pygal(model_name, chart_id, kw_options.get('pygal_options', dict()))
     kwargs["src_pygal"] = pygal_chart.render_data_uri()
 
-    ''' Pass all forms to be shown (view)'''
     kwforms = dict()
     kwforms['matplotlib_form'] = MatplotlibOptionsForm()
     kwforms['seaborn_form'] = SeabornOptionsForm()
@@ -343,12 +298,9 @@ def route_change_coefs(model_name, chart_id=-1):
     Model = str_to_object(model_name)
     model_object = Model.query.get(chart_id)
     
-
-    common_models = ['Sinus', 'Cosinus', 'Exponential']
+    common_models = ['Sinus', 'Cosinus', 'Exponential', 'SquareRoot']
     if model_name in common_models:
         form = DataForm()
-    elif model_name == 'SquareRoot':
-        form = SqrtForm()
     elif model_name == 'SquareFunc':
         form = SquareFuncForm()
     elif model_name == 'CustomEquation':
@@ -357,7 +309,7 @@ def route_change_coefs(model_name, chart_id=-1):
     coefs = Model.get_coefs(chart_id)    
 
     if form.validate_on_submit():
-        if model_name in common_models or model_name == 'SquareRoot':
+        if model_name in common_models:
             model_object.a = form.coef_a.data
             model_object.b = form.coef_b.data
             model_object.c = form.coef_c.data
@@ -366,8 +318,6 @@ def route_change_coefs(model_name, chart_id=-1):
             model_object.a = form.coef_a.data
             model_object.p = form.coef_p.data
             model_object.q = form.coef_q.data
-
-        
         
         db.session.commit()
         
@@ -380,7 +330,6 @@ def route_change_coefs(model_name, chart_id=-1):
 @app.route("/data/change/options/<string:library_name>/<string:model_name>/<int:chart_id>", methods=['GET', 'POST'])
 @clean_query(db=db)
 def route_change_options(library_name, model_name, chart_id=-1):
-    """ Inserts new option OptionsForm."""
     Model = str_to_object(model_name)
     LPO = str_to_object(f'{library_name.capitalize()}PlotOptions')
     LOF = str_to_object(f'{library_name.capitalize()}OptionsForm')
@@ -394,11 +343,12 @@ def route_change_options(library_name, model_name, chart_id=-1):
         kwargs['color'] = library_form.color.data
         kwargs['bg_color'] = library_form.bg_color.data
         kwargs['line_width'] = library_form.line_width.data
-        kwargs['outline_color'] = library_form.outline_color.data
+        if library_name == 'matplotlib':
+            kwargs['outline_color'] = library_form.outline_color.data
         kwargs['line_style'] = library_form.line_style.data
         kwargs['marker'] = library_form.marker.data
 
-        if library_name != 'seaborn':
+        if library_name == 'matplotlib':
             kwargs['flag_bar_plot'] = library_form.flag_bar_plot.data
         kwargs['flag_scatter_plot'] = library_form.flag_scatter_plot.data
         kwargs['flag_show_grid'] = library_form.flag_show_grid.data
@@ -419,7 +369,6 @@ def route_change_options(library_name, model_name, chart_id=-1):
         recently_added = get_recently_added_record(db, LPO.__name__)
         new_options_id = recently_added.id
 
-
         if model_name != "FileDataPoint" and chart_id != -1:
             current_chart = Model.query.get(chart_id)
             setattr(current_chart, id_library_options, new_options_id) 
@@ -439,7 +388,7 @@ def route_change_options(library_name, model_name, chart_id=-1):
 @app.route("/data/delete/<string:model_name>/<int:chart_id>", methods=['POST'])
 @clean_query(db=db)
 def route_delete_chart(model_name, chart_id):
-    """ Deletes chosen point from the database and redirects again on `route_show_data` route. """
+    """ Deletes chosen chart from the database. """
     Model = str_to_object(model_name)
     chart = Model.query.get_or_404(chart_id)
     db.session.delete(chart)
@@ -449,17 +398,6 @@ def route_delete_chart(model_name, chart_id):
     if chart:
         return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart.id))
     return redirect(url_for('route_show_data', model_name=model_name))
-
-
-# @app.route("/data/delete/all/<string:model_name>", methods=['POST'])
-# @clean_query(db=db)
-# def route_delete_all_charts(model_name):
-#     ''' Deletes all records from model. '''
-#     Model = str_to_object(model_name)
-#     all_charts = Model.query.delete()
-#     db.session.commit()
-#     flash(f'{all_charts} charts have been deleted from {model_name}.', 'success')
-#     return redirect(url_for('route_show_data', model_name=model_name))
 
 
 @app.route("/summary")
