@@ -263,7 +263,11 @@ class BokehOptionsForm(FlaskForm):
     flag_show_grid = BooleanField("Grid:")
     flag_logscale_x = BooleanField("Log scale X:")
     flag_logscale_y = BooleanField("Log scale Y:")
-    
+
+    x_label = StringField('X label:',  validators=[Optional()], default='x')
+    y_label = StringField('Y label:',  validators=[Optional()], default='y')
+    title = StringField('Title:',  validators=[Optional()], default='Bokeh')
+
     submit = SubmitField('Add data')
 
 
@@ -318,7 +322,11 @@ class PlotlyOptionsForm (FlaskForm):
     flag_show_grid = BooleanField("Grid:")
     flag_logscale_x = BooleanField("Log scale X:")
     flag_logscale_y = BooleanField("Log scale Y:")
-    
+
+    x_label = StringField('X label:',  validators=[Optional()], default='x')
+    y_label = StringField('Y label:',  validators=[Optional()], default='y')
+    title = StringField('Title:',  validators=[Optional()], default='Plotly')
+
     submit = SubmitField('Add data')
 
 
@@ -373,6 +381,9 @@ class PygalOptionsForm (FlaskForm):
     flag_show_grid = BooleanField("Grid:")
     flag_logscale_y = BooleanField("Log scale Y:")
     
+    y_label = StringField('Y label:',  validators=[Optional()], default='y')
+    title = StringField('Title:',  validators=[Optional()], default='Pygal')
+
     submit = SubmitField('Add data')
 
 

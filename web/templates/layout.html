@@ -116,6 +116,7 @@
     <header>
         <nav class="navbar navbar-dark bg-dark navbar-expand-md">
             <div class="navbar-main-menu col-md-6">
+                <a class="btn btn-lg btn-secondary col-md-2" href="{{ url_for('route_summary') }}" >Summary</a>
                 <div class="btn-group col-md-2">
                     <button class="btn btn-secondary btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Data
@@ -125,7 +126,6 @@
                         <a class="nav-link" href="{{ url_for('route_add_data_main') }}">Add</a>
                     </div>
                 </div>
-                <a class="btn btn-lg btn-secondary col-md-2" href="{{ url_for('route_summary') }}" >Summary</a>
             </div>
             <div id="banner" class="carousel slide col-md-2 " data-ride="carousel" data-interval="2100" >
                 <div class="carousel-inner">

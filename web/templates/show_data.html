@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
-    <!-- MathJax - equation -->
+    <!-- MathJax equation -->
     {% if chart_id != -1 %}
         <div class="offset-6 pt-4" class="btn btn-lg btn-dark"><h2> # {{ chart_id }} </h2></div>
     {% endif %}
@@ -115,7 +115,6 @@
     {% elif records|length > 0 %}
     <!-- records menu -->
     <div class="col-md-9">
-        
         <div class="btn-group" role="group" aria-label="Basic example">
             <button id="btn-show-chart-matplotlib" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-matplotlib" aria-expanded="false" aria-controls="card-matplotlib">Matplotlib</button>
             <button id="btn-show-chart-seaborn" type="button" class="btn btn-dark" class="btn btn-secondary" data-toggle="collapse" data-target="#card-seaborn" aria-expanded="false" aria-controls="card-seaborn">Seaborn</button>
@@ -184,7 +183,6 @@
                                     <b>{{ matplotlib_form.marker.label(for="Marker") }}</b>
                                     {{ matplotlib_form.marker(id="marker") }}
                                 </div>
-                                
                                 <div class="form-group">
                                     <b>{{ matplotlib_form.flag_show_grid.label(for="Grid:") }}</b>
                                     {{ matplotlib_form.flag_show_grid(id="flag_show_grid") }}
@@ -206,7 +204,7 @@
                 </div>
             </div>
             <div class="row text-white bg-dark mb-2">
-                {% if chart_id == -1 and model_name == "FileDataPoint" %}
+                {% if model_name == "FileDataPoint" %}
                     <form class="col-md-3 offset-1 mt-2 mb-2" method="GET" action="{{ url_for('route_download_src_img', library_name='matplotlib', save_img='0', save_src='1') }}">
                         <button type="submit" class="col-md-12 btn btn-danger text-light">code</button>
                     </form>
@@ -346,6 +344,18 @@
                             {% if bokeh_form is defined %}
                                 {{ bokeh_form.hidden_tag() }}
                                 <div class="form-group">
+                                    <b>{{ bokeh_form.title.label(for="Title: ") }}</b>
+                                    {{ bokeh_form.title(id="title") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ bokeh_form.x_label.label(for="X label: ") }}</b>
+                                    {{ bokeh_form.x_label(id="x_label") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ bokeh_form.y_label.label(for="Y label: ") }}</b>
+                                    {{ bokeh_form.y_label(id="y_label") }}
+                                </div>
+                                <div class="form-group">
                                     <b>{{ bokeh_form.color.label(for="Line color") }}</b>
                                     {{ bokeh_form.color(id="color") }}
                                 </div>
@@ -430,6 +440,18 @@
                         {% endif %}
                             {% if plotly_form is defined %}
                                 {{ plotly_form.hidden_tag() }}
+                                <div class="form-group">
+                                    <b>{{ plotly_form.title.label(for="Title: ") }}</b>
+                                    {{ plotly_form.title(id="title") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.x_label.label(for="X label: ") }}</b>
+                                    {{ plotly_form.x_label(id="x_label") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ plotly_form.y_label.label(for="Y label: ") }}</b>
+                                    {{ plotly_form.y_label(id="y_label") }}
+                                </div>
                                 <div class="form-group">
                                     <b>{{ plotly_form.color.label(for="Line color") }}</b>
                                     {{ plotly_form.color(id="color") }}
@@ -516,6 +538,14 @@
                             {% if pygal_form is defined %}
                                 {{ pygal_form.hidden_tag() }}
                                 <div class="form-group">
+                                    <b>{{ pygal_form.title.label(for="Title: ") }}</b>
+                                    {{ pygal_form.title(id="title") }}
+                                </div>
+                                <div class="form-group">
+                                    <b>{{ pygal_form.y_label.label(for="Y label: ") }}</b>
+                                    {{ pygal_form.y_label(id="y_label") }}
+                                </div>
+                                <div class="form-group">
                                     <b>{{ pygal_form.color.label(for="Line color") }}</b>
                                     {{ pygal_form.color(id="color") }}
                                 </div>
@@ -585,6 +615,5 @@
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.0.1.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.0.1.min.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.0.1.min.js" crossorigin="anonymous"></script>
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 {% endblock content %}

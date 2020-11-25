@@ -1,7 +1,5 @@
 from web import db
 
-""" TODO: Bar plot / pie plot etc... """
-
 
 class Sinus(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -314,6 +312,11 @@ class BokehPlotOptions(db.Model):
     flag_logscale_x = db.Column(db.Boolean, unique=False, nullable=False)
     flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
     
+    x_label = db.Column(db.String, unique=False, nullable=False)
+    y_label = db.Column(db.String, unique=False, nullable=False)
+    title = db.Column(db.String, unique=False, nullable=False)
+
+
     @staticmethod
     def get_options(options_id):
         ''' Returns the dictionary of options. '''
@@ -329,7 +332,10 @@ class BokehPlotOptions(db.Model):
                 'flag_scatter_plot': chart.flag_scatter_plot,
                 'flag_show_grid': chart.flag_show_grid,
                 'flag_logscale_x': chart.flag_logscale_x,
-                'flag_logscale_y': chart.flag_logscale_y
+                'flag_logscale_y': chart.flag_logscale_y,
+                'x_label': chart.x_label,
+                'y_label': chart.y_label,
+                'title': chart.title
             }
         else:
             return dict()
@@ -349,6 +355,10 @@ class PlotlyPlotOptions(db.Model):
     flag_logscale_x = db.Column(db.Boolean, unique=False, nullable=False)
     flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
     
+    x_label = db.Column(db.String, unique=False, nullable=False)
+    y_label = db.Column(db.String, unique=False, nullable=False)
+    title = db.Column(db.String, unique=False, nullable=False)
+
     @staticmethod
     def get_options(options_id):
         ''' Returns the dictionary of options. '''
@@ -364,7 +374,10 @@ class PlotlyPlotOptions(db.Model):
                 'flag_scatter_plot': chart.flag_scatter_plot,
                 'flag_show_grid': chart.flag_show_grid,
                 'flag_logscale_x': chart.flag_logscale_x,
-                'flag_logscale_y': chart.flag_logscale_y
+                'flag_logscale_y': chart.flag_logscale_y,
+                'x_label': chart.x_label,
+                'y_label': chart.y_label,
+                'title': chart.title
             }
         else:
             return dict()
@@ -384,6 +397,10 @@ class PygalPlotOptions(db.Model):
     flag_show_grid = db.Column(db.Boolean, unique=False, nullable=False)
     flag_logscale_y = db.Column(db.Boolean, unique=False, nullable=False)
     
+    y_label = db.Column(db.String, unique=False, nullable=False)
+    title = db.Column(db.String, unique=False, nullable=False)
+
+
     @staticmethod
     def get_options(options_id):
         ''' Returns the dictionary of options. '''
@@ -398,7 +415,9 @@ class PygalPlotOptions(db.Model):
                 'marker': chart.marker,
                 'flag_scatter_plot': chart.flag_scatter_plot,
                 'flag_show_grid': chart.flag_show_grid,
-                'flag_logscale_y': chart.flag_logscale_y
+                'flag_logscale_y': chart.flag_logscale_y,
+                'y_label': chart.y_label,
+                'title': chart.title
             }
         else:
             return dict()

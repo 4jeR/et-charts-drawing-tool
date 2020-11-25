@@ -15,7 +15,7 @@ from datetime import datetime
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.options import Options as SeleniumChromeOptions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -278,29 +278,36 @@ def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     points = []
     if model_name == "FileData" and data_filename and chart_id == -1:
         xx, yy = get_data_from_file(data_filename)
-        points = [(x, y) for x, y in zip(xx, yy)]
     else:
         points = make_points(model_name, chart_id)
-    data = [
-        {model_name: point[0], model_name: point[1]} for point in points
-    ]
-    df = pd.DataFrame(data=data)
+        xx = [x[0] for x in points]
+        yy = [y[1] for y in points]
+    
     
     if options.get('color') == options.get('bg_color'):
         color_to_contrast = options.get('color', '#292928')
         options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)
 
+    seaborn_style = dict()
+
+    scatter_plot         = options.get('flag_scatter_plot', False)
+    show_grid            = options.get('flag_show_grid', True)
+    logscale_x           = options.get('flag_logscale_x', False)
+    logscale_y           = options.get('flag_logscale_y', False)
+
+    x_label              = options.get('x_label', 'x')
+    y_label              = options.get('y_label', 'y')
+    title                = options.get('title', 'Seaborn')
+
     fig = Figure(figsize=(5.0, 5.0), facecolor='#ebebeb')
     axis = fig.add_subplot(1, 1, 1)
-    axis.set_title('Seaborn')
     axis.set_facecolor(options.get('bg_color', 'white'))
-    fig.set_edgecolor('red')
 
-    seaborn_style = dict()
-    scatter_plot = options.get('flag_scatter_plot', False)
-    show_grid = options.get('flag_show_grid', True)
-    logscale_x = options.get('flag_logscale_x', False)
-    logscale_y = options.get('flag_logscale_y', False)
+    axis.set_xlabel(x_label, labelpad=5, fontsize=15)
+    axis.set_ylabel(y_label, labelpad=-5, fontsize=15)
+    axis.set_title(title, fontsize=17)
+
+    fig.set_edgecolor('red')
 
     if logscale_x:
         axis.set_xscale('log')
@@ -315,20 +322,20 @@ def make_chart_seaborn(model_name, chart_id, options, data_filename=''):
     else:
         axis.grid(False)
 
-    sb.set_theme(**seaborn_style)
-    
     plot_kwargs = dict()
     plot_kwargs['legend'] = False
-    plot_kwargs['palette'] = [options.get('color', 'black'),]
+    plot_kwargs['color'] = options.get('color', 'black')
     plot_kwargs['linewidth'] = options.get('line_width', 3)
-
-    if options.get('line_style', 'solid') == 'dashed':
-        plot_kwargs['dashes'] = [(4,6)]
-
+    plot_kwargs['markers'] = [options.get('marker', 'dot'), '']
+    
     if scatter_plot:
-        sb.scatterplot(data=df, ax=axis, **plot_kwargs)
+        Ax = sb.scatterplot(xx, yy, ax=axis, **plot_kwargs)
     else:
-        sb.lineplot(data=df, ax=axis, **plot_kwargs)
+        Ax = sb.lineplot(xx, yy, ax=axis, **plot_kwargs)
+
+    for line in Ax.lines:
+       line.set_linestyle(options.get('line_style', 'solid'))
+    
     return fig
 
 
@@ -342,11 +349,11 @@ def make_chart_bokeh(model_name, chart_id, options):
         options['bg_color'], options['color'] = get_contrasted_colors(color_to_contrast)
 
     fig_kwargs = dict()
-    fig_kwargs['title'] = model_name
+    fig_kwargs['title'] = options.get('title', 'Bokeh')
     fig_kwargs['width'] = 500
     fig_kwargs['height'] = 500
-    fig_kwargs['x_axis_label'] = 'x'
-    fig_kwargs['y_axis_label'] = 'y'
+    fig_kwargs['x_axis_label'] = options.get('x_label', 'x')
+    fig_kwargs['y_axis_label'] = options.get('y_label', 'y')
     fig_kwargs['toolbar_location'] = None
     fig_kwargs['min_border_left'] = 0
     fig_kwargs['min_border_right'] = 45
@@ -358,7 +365,6 @@ def make_chart_bokeh(model_name, chart_id, options):
     flag_logscale_x = options.get('flag_logscale_x', False)
     flag_logscale_y = options.get('flag_logscale_y', False)
 
-   
     if flag_logscale_x:
         fig_kwargs['x_axis_type'] = "log"   # linear, datetime ,mercator <------------------
     else:
@@ -413,10 +419,10 @@ def make_chart_plotly(model_name, chart_id, options):
     ]
 
     layout = plotly_go.Layout(
-        title=model_name, 
+        title=options.get('title', 'Plotly'), 
         title_x=0.5, 
-        xaxis_title="x", 
-        yaxis_title="y", 
+        xaxis_title=options.get('x_label', 'x'), 
+        yaxis_title=options.get('y_label', 'y'), 
         width=500, 
         height=500, 
         margin={'l': 30, 'r': 30, 't': 40, 'b': 5},
@@ -475,13 +481,13 @@ def make_chart_pygal(model_name, chart_id, options):
 
     stroke_options['width'] = options.get('line_width', 2)
     pygal_config.stroke_style = stroke_options
-    pygal_config.title = "Pygal"
+    pygal_config.title = options.get('title', 'Pygal')
 
     pygal_config.show_x_guides = show_grid
     pygal_config.show_y_guides = show_grid
 
     chart = pygal.XY(pygal_config, width=600, height=600)
-    chart.add('y', points)
+    chart.add(options.get('y_label', 'y'), points)
 
     return chart
 
@@ -526,7 +532,9 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         code = f''' 
         """ AUTO-GENERATED FILE """
         import matplotlib.pyplot as plt
-
+        import warnings
+        import matplotlib.cbook
+        warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
         plt.rcParams['toolbar'] = 'None'
         options = {options}
         {x_str}
@@ -583,17 +591,18 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         plt.show()
         '''
     elif library_name == 'seaborn':
-        code = '''
+        code = f'''
         """ AUTO-GENERATED FILE """
-        import pandas as pd
         import seaborn as sb
         import matplotlib.pyplot as plt
-
+        import warnings
+        import matplotlib.cbook
+        warnings.filterwarnings("ignore",category=matplotlib.cbook.mplDeprecation)
         plt.rcParams['toolbar'] = 'None'
+        import numpy as np
 
-        data = [
-            {\' ''' + model_name + ''' \': x, \' ''' + model_name + ''' \': y} for x, y in ''' + f'zip({xx}, {yy})]' + f'''
-        df = pd.DataFrame(data=data)
+        xx = np.array({xx})
+        yy = np.array({yy})
 
         options = {options}
         fig = plt.figure()
@@ -601,7 +610,6 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         axis.set_title('Seaborn')
         ax = plt.axes()
         ax.set_facecolor(options.get('bg_color', 'white'))
-
 
         seaborn_style = dict()
 
@@ -617,14 +625,11 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         if flag_logscale_y:
             axis.set_yscale('log')
 
-
         if flag_show_grid:
             axis.grid(True)
             seaborn_style['style'] = 'darkgrid'
         else:
             axis.grid(False)
-
-
 
         sb.set_theme(**seaborn_style)
 
@@ -635,12 +640,11 @@ def save_source_code(library_name, model_name, chart_id, current_time):
 
         if options.get('line_style', 'solid') == 'dashed':
             plot_kwargs['dashes'] = [(4,6)]
-
+        
         if flag_scatter_plot:
-            sb.scatterplot(data=df, ax=axis, **plot_kwargs)
+            sb.scatterplot(xx, yy, ax=axis, **plot_kwargs)
         else:
-            sb.lineplot(data=df, ax=axis, **plot_kwargs)
-
+            sb.lineplot(xx, yy, ax=axis, **plot_kwargs)
         plt.show()
         '''
     elif library_name == 'bokeh':
@@ -650,7 +654,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         from bokeh.plotting import figure as bokeh_figure, show
         from bokeh.io.export import get_screenshot_as_png
         from selenium import webdriver
-        from selenium.webdriver.chrome.options import Options
+        from selenium.webdriver.chrome.options import Options as SeleniumChromeOptions
         from PIL import Image
 
         {x_str}
@@ -662,14 +666,14 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         flag_show_grid = options.get('flag_show_grid', True)
         flag_logscale_x = options.get('flag_logscale_x', False)
         flag_logscale_y = options.get('flag_logscale_y', False)
-
+        
         fig_kwargs = dict()
-        fig_kwargs['title'] = 'Bokeh plot'
-        fig_kwargs['x_axis_label'] = 'x'
-        fig_kwargs['y_axis_label'] = 'y'
+        fig_kwargs['title'] = options.get('title', 'Bokeh')
+        fig_kwargs['x_axis_label'] = options.get('x_label', 'x')
+        fig_kwargs['y_axis_label'] = options.get('y_label', 'y')
         fig_kwargs['toolbar_location'] = None
         fig_kwargs['min_border_right'] = 45
-
+        fig_kwargs
         if flag_logscale_x:
             fig_kwargs['x_axis_type'] = "log"
         else:
@@ -681,7 +685,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
             fig_kwargs['y_axis_type'] = "linear"   
 
         bokeh_chart = bokeh_figure(**fig_kwargs) 
-
+        bokeh_chart.background_fill_color = options.get('bg_color', '#cccccc')
         chart_kwargs = dict()
         chart_kwargs['x'] = xx  
         chart_kwargs['y'] = yy  
@@ -699,7 +703,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         else:
             bokeh_chart.line(**chart_kwargs)
 
-        chrome_options = Options()
+        chrome_options = SeleniumChromeOptions()
         chrome_options.add_argument(f"--window-size={500},{500}")
         chrome_options.add_argument("--kiosk")
         chrome_options.add_argument("--headless")
@@ -710,9 +714,9 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         image.show()'''
     elif library_name == 'plotly':
         code = f'''
+        """ AUTO-GENERATED FILE """
         import plotly
         import plotly.graph_objs as plotly_go
-        import numpy as np
 
         {x_str}
         {y_str}
@@ -737,10 +741,10 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         ]
 
         layout = plotly_go.Layout(
-            title='Plotly', 
+            title=options.get('title', 'Plotly'), 
             title_x=0.5, 
-            xaxis_title="x", 
-            yaxis_title="y", 
+            xaxis_title=options.get('x_label', 'x'), 
+            yaxis_title=options.get('y_label', 'y'), 
             width=500, 
             height=500, 
             margin={'l': 30, 'r': 30, 't': 40, 'b': 5},
@@ -805,14 +809,14 @@ def save_source_code(library_name, model_name, chart_id, current_time):
 
         stroke_options['width'] = options.get('line_width', 2)
         pygal_config.stroke_style = stroke_options
-        pygal_config.title = "Pygal"
+        pygal_config.title = options.get('title', 'Pygal')
 
         pygal_config.show_x_guides = show_grid
         pygal_config.show_y_guides = show_grid
 
         chart = pygal.XY(pygal_config)
 
-        chart.add('y', points)
+        chart.add(options.get('y_label', 'y'), points)
         chart.render_to_png('pygal.png')
         im = Image.open('pygal.png')
         os.remove("pygal.png")
@@ -833,7 +837,7 @@ def download_image(library_name, model_name, chart_id, current_time):
     save_path = f'web/downloads/images/{current_time}_{filename}'
     window_size = (1920, 1080)
     
-    chrome_options = Options()
+    chrome_options = SeleniumChromeOptions()
     chrome_options.add_argument(f"--window-size={window_size[0]},{window_size[1]}")
     chrome_options.add_argument("--kiosk") # for full screen -> images are caught entirely, not in half
     chrome_options.add_argument("--headless") # in background
@@ -925,6 +929,9 @@ def get_default_bokeh_options(db, as_dict=True):
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
+        kwargs['x_label'] = 'x'
+        kwargs['y_label'] = 'y'
+        kwargs['title'] = 'Bokeh'
         bokeh_options = BokehPlotOptions(**kwargs)
         db.session.add(bokeh_options)
         db.session.commit()
@@ -946,6 +953,9 @@ def get_default_plotly_options(db, as_dict=True):
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_x'] = False
         kwargs['flag_logscale_y'] = False
+        kwargs['x_label'] = 'x'
+        kwargs['y_label'] = 'y'
+        kwargs['title'] = 'Plotly'
         plotly_options = PlotlyPlotOptions(**kwargs)
         db.session.add(plotly_options)
         db.session.commit()
@@ -967,6 +977,8 @@ def get_default_pygal_options(db, as_dict=True):
         kwargs['flag_scatter_plot'] = False
         kwargs['flag_show_grid'] = True
         kwargs['flag_logscale_y'] = False
+        kwargs['y_label'] = 'y'
+        kwargs['title'] = 'Pygal'
         pygal_options = PygalPlotOptions(**kwargs)
         db.session.add(pygal_options)
         db.session.commit()
@@ -1047,10 +1059,15 @@ def clean_unused_options(db):
 
 
 def get_lib_options_from_model_and_chart_id(library_name, model_name, chart_id):
-    Model = str_to_object(model_name)
     LPO = str_to_object(f'{library_name.capitalize()}PlotOptions')
     id_library_options = f'id_{library_name}_options'
-    options_id = getattr(Model.query.get(chart_id), id_library_options)
+    if model_name != 'FileDataPoint':
+        Model = str_to_object(model_name)
+        options_id = getattr(Model.query.get(chart_id), id_library_options)
+    else:
+        options_id = getattr(FilePlotOptions.query.first(), id_library_options)
+        
     options = LPO.get_options(options_id)
+
 
     return options

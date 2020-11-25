@@ -353,7 +353,8 @@ def route_change_options(library_name, model_name, chart_id=-1):
         kwargs['flag_scatter_plot'] = library_form.flag_scatter_plot.data
         kwargs['flag_show_grid'] = library_form.flag_show_grid.data
 
-        kwargs['x_label'] = library_form.x_label.data
+        if library_name != 'pygal':
+            kwargs['x_label'] = library_form.x_label.data
         kwargs['y_label'] = library_form.y_label.data
         kwargs['title'] = library_form.title.data
 
@@ -427,30 +428,30 @@ def route_download_src_img(library_name, model_name="FileDataPoint", chart_id=-1
         return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
 
 
-@app.route("/matplotlib")
-def route_matplotlib():
-    path_to_images = os.getcwd() + '/web/downloads/images'
-    mplib_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'mplib_{i}.png') for i in range(1, files_count('mplib', path_to_images))]
-    return render_template('matplotlib.html', chart_images=mplib_charts)
+# @app.route("/matplotlib")
+# def route_matplotlib():
+#     path_to_images = os.getcwd() + '/web/downloads/images'
+#     mplib_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'mplib_{i}.png') for i in range(1, files_count('mplib', path_to_images))]
+#     return render_template('matplotlib.html', chart_images=mplib_charts)
 
 
-@app.route("/seaborn")
-def route_seaborn():
-    path_to_images = os.getcwd() + '/web/static/plots'
-    sb_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'sborn_{i}.png') for i in range(1, files_count('sborn', path_to_images))]
-    return render_template('seaborn.html', chart_images=sb_charts)
+# @app.route("/seaborn")
+# def route_seaborn():
+#     path_to_images = os.getcwd() + '/web/static/plots'
+#     sb_charts = [os.path.join(app.config['UPLOAD_FOLDER'], f'sborn_{i}.png') for i in range(1, files_count('sborn', path_to_images))]
+#     return render_template('seaborn.html', chart_images=sb_charts)
 
 
-@app.route("/bokeh")
-def route_bokeh():
-    return render_template('bokeh.html')
+# @app.route("/bokeh")
+# def route_bokeh():
+#     return render_template('bokeh.html')
 
 
-@app.route("/plotly")
-def route_plotly():
-    return render_template('plotly.html')
+# @app.route("/plotly")
+# def route_plotly():
+#     return render_template('plotly.html')
 
 
-@app.route("/pygal")
-def route_pygal():
-    return render_template('pygal.html')
+# @app.route("/pygal")
+# def route_pygal():
+#     return render_template('pygal.html')
