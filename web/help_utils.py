@@ -673,7 +673,7 @@ def save_source_code(library_name, model_name, chart_id, current_time):
         fig_kwargs['y_axis_label'] = options.get('y_label', 'y')
         fig_kwargs['toolbar_location'] = None
         fig_kwargs['min_border_right'] = 45
-        fig_kwargs
+        
         if flag_logscale_x:
             fig_kwargs['x_axis_type'] = "log"
         else:

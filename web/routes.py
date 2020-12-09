@@ -134,7 +134,7 @@ def route_add_data(model_name):
         db.session.commit()
         
         chart_id = get_recently_added_record(db, model_name).id
-
+        
         flash(f'Range <{form.begin.data}, {form.end.data}> has been successfully added to the database!', 'success')
         return redirect(url_for('route_show_data', model_name=model_name, chart_id=chart_id))
     return render_template('add_data.html', form=form, model_name=model_name)
@@ -178,7 +178,7 @@ def route_add_data_from_file():
             pt = FileDataPoint.make_point(xx, yy)
             db.session.add(pt)
         db.session.commit()
-        flash(f'Data from {filename} has been successfully added to the database!', 'success')
+        flash(f'Showing data from {filename}.', 'success')
         return redirect(url_for('route_show_data_from_file'))
     return render_template('add_data_file.html', form=form)
 

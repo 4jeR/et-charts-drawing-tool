@@ -111,7 +111,9 @@
     </div>
     {% endif %}
     {% if chart_id == -1 and records|length > 0 and model_name != 'FileDataPoint' %}
+    <div class="col-md-5 offset-1">
         <h1>Select chart to show</h1>
+    </div>
     {% elif records|length > 0 %}
     <!-- records menu -->
     <div class="col-md-9">
