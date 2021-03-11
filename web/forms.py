@@ -34,20 +34,6 @@ class DataForm(FlaskForm):
     submit = SubmitField('Add data')
 
 
-# class SqrtForm(FlaskForm):
-#     begin = FloatField('begin', validators=[Optional()])
-#     end = FloatField('end', validators=[Optional()])
-#     step = FloatField('step', validators=[Optional()])
-
-
-#     coef_a = FloatField('a', validators=[DataRequired('Non-zero value.')])
-#     coef_b = FloatField('b', validators=[DataRequired('Non-zero value.')])
-#     coef_c = FloatField('c', validators=[InputRequired()])
-#     coef_d = FloatField('d', validators=[InputRequired()])
-    
-
-#     submit = SubmitField('Add data')
-
 
 class SquareFuncForm(FlaskForm):
     begin = FloatField('begin', validators=[Optional()])
